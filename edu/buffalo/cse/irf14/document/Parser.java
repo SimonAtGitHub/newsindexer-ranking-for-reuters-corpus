@@ -22,7 +22,7 @@ public class Parser {
 	public static Document parse(String filename) throws ParserException {
 		// TODO YOU MUST IMPLEMENT THIS
 		try {
-			//Read the file contents into a buffer
+			//Read the file contents into a buffer qwdw
 			BufferedReader reader = new BufferedReader(new FileReader(filename));
 			//line buffer to read a line once at a time
 			String newLine;
