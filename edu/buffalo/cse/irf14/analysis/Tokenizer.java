@@ -3,16 +3,24 @@
  */
 package edu.buffalo.cse.irf14.analysis;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.buffalo.cse.irf14.common.CommonConstants;
+
 /**
  * @author nikhillo
  * Class that converts a given string into a {@link TokenStream} instance
  */
 public class Tokenizer {
+	
+	private String delim;
 	/**
 	 * Default constructor. Assumes tokens are whitespace delimited
 	 */
 	public Tokenizer() {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+	    this.delim = CommonConstants.WHITESPACE;
 	}
 	
 	/**
@@ -21,6 +29,7 @@ public class Tokenizer {
 	 */
 	public Tokenizer(String delim) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		this.delim = delim;
 	}
 	
 	/**
@@ -38,7 +47,18 @@ public class Tokenizer {
 	 * tokenization
 	 */
 	public TokenStream consume(String str) throws TokenizerException {
-		//TODO : YOU MUST IMPLEMENT THIS METHOD
-		return null;
+		//splits the string into a string array on the basis of delimitor
+		String arr [] = str.split(delim);
+		//Temp list to hold the tokens
+		List<Token> tempList = new ArrayList<Token>();
+		//iterate over the items in the array
+        for(int index=0;index<arr.length;index++){
+              Token token = new Token();
+              token.setTermText(arr[index]);
+              token.setTermBuffer(token.getTermText().toCharArray());
+              tempList.add(token);
+        }
+        TokenStream tokenStream = new TokenStream(tempList);
+		return tokenStream;
 	}
 }

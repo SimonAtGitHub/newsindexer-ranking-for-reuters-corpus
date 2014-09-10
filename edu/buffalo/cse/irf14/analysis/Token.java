@@ -59,7 +59,7 @@ public class Token {
 	
 	/**
 	 * Method to merge this token with the given array of Tokens
-	 * You are free to update termText and termBuffer as you please
+	 * You are free     to update termText and termBuffer as you please
 	 * based upon your Token implementation. But the toString() method
 	 * below must return whitespace separated value for all tokens combined
 	 * Also the token order must be maintained.

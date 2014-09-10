@@ -11,16 +11,16 @@ import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
 
 public class TFRuleBaseTest {
-	public final String[] runTest(String str) throws TokenizerException {
+	public static final String[] runTest(String str) throws TokenizerException {
 		Tokenizer tkizer = new Tokenizer();
 		TokenStream tstream = tkizer.consume(str);
 		TokenFilterFactory factory = TokenFilterFactory.getInstance();
 		TokenFilter filter = factory.getFilterByType(TokenFilterType.SPECIALCHARS, tstream);
-		tstream.reset();
+		/*tstream.reset();
 		
 		while (tstream.hasNext()) {
 			filter.increment();
-		}
+		}*/
 		
 		tstream = filter.getStream();
 		tstream.reset();

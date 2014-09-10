@@ -37,4 +37,18 @@ public class Document {
 	public String[] getField(FieldNames fn) {
 		return map.get(fn);
 	}
+	
+	public String toString(){
+		return new StringBuilder().append("FILEID ::").append(map.get(FieldNames.FILEID))
+				.append("CATEGORY ::").append(map.get(FieldNames.CATEGORY))
+				.append("TITLE ::").append(map.get(FieldNames.TITLE))
+				.append("AUTHOR ::").append(map.get(FieldNames.AUTHOR))
+				.append("AUTHORORG ::").append(map.get(FieldNames.AUTHORORG))
+				.append("PLACE ::").append(map.get(FieldNames.PLACE))
+				.append("NEWSDATE ::").append(map.get(FieldNames.NEWSDATE))
+				.append("CONTENT ::").append(map.get(FieldNames.CONTENT))
+				.toString();
+		
+	}
+	
 }

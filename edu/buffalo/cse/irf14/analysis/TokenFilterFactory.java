@@ -11,6 +11,10 @@ package edu.buffalo.cse.irf14.analysis;
  */
 public class TokenFilterFactory {
 	/**
+	 * singleton instance of the class
+	 */
+	private static TokenFilterFactory instance = null;
+	/**
 	 * Static method to return an instance of the factory class.
 	 * Usually factory classes are defined as singletons, i.e. 
 	 * only one instance of the class exists at any instance.
@@ -23,7 +27,10 @@ public class TokenFilterFactory {
 	 */
 	public static TokenFilterFactory getInstance() {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
-		return null;
+		if(instance == null){
+			instance = new TokenFilterFactory();
+		}
+		return instance;
 	}
 	
 	/**
@@ -36,6 +43,14 @@ public class TokenFilterFactory {
 	 */
 	public TokenFilter getFilterByType(TokenFilterType type, TokenStream stream) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
-		return null;
+		TokenFilter tokenFilter=null;
+		switch(type){
+		    case SPECIALCHARS:
+		    	tokenFilter = new TokenFilterSymbol(stream);
+		    	break;
+		    default:
+		    	break;
+		}
+		return tokenFilter;
 	}
 }

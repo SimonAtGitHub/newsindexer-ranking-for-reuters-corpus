@@ -12,6 +12,7 @@ package edu.buffalo.cse.irf14.analysis;
  *
  */
 public abstract class TokenFilter implements Analyzer {
+	
 	/**
 	 * Default constructor, creates an instance over the given
 	 * TokenStream
