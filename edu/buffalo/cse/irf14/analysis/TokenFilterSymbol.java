@@ -51,13 +51,13 @@ public class TokenFilterSymbol extends TokenFilter {
 	 */
 	private String filterSymbols(String termText) {
 		// 1. Filter Punctuation Marks
-		String regexForPunctuation = "[.!?]";
+		String regexForPunctuation = ".+[.!?]";
 		// Run it till all the punctuation marks are gone. It might happen that
 		// someone has put "Bermuda triangle exists?." by mistake.
 
-		// while (termText.matches(regexForPunctuation)) {
-		termText = termText.replaceAll(regexForPunctuation, "");
-		// }
+		if (termText.matches(regexForPunctuation)) {
+			termText = termText.replaceAll("[.!?]", "");
+		}
 		// Return as it is if the punctuation does't come in the end.
 
 		// 2. Filter apostrophes
