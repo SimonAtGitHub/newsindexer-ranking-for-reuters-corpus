@@ -10,8 +10,9 @@ public class TokenFilterSymbol extends TokenFilter {
 	}
 
 	@Override
-	public void increment() throws TokenizerException {
+	public boolean increment() throws TokenizerException {
 		stream.next();
+		return false;
 	}
 
 	// To be changed

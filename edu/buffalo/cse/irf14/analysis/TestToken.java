@@ -1,6 +1,5 @@
 package edu.buffalo.cse.irf14.analysis;
 
-import edu.buffalo.cse.irf14.analysis.test.TFRuleBaseTest;
 
 
 public class TestToken {
@@ -20,10 +19,10 @@ public class TestToken {
     	  Token token = tokenStream.next();
     	  System.out.println(token.getTermText());
       }*/
-		TFRuleBaseTest.runTest("I am a good boy.");
-		TFRuleBaseTest.runTest("I am a good boy?");
-		TFRuleBaseTest.runTest("I am a good boy?.");
-		TFRuleBaseTest.runTest("I am a good-boy.");
-       TFRuleBaseTest.runTest("I am a good-3224 boy.");
+		// TFRuleBaseTest.runTest("I am a good boy.");
+		// TFRuleBaseTest.runTest("I am a good boy?");
+		// TFRuleBaseTest.runTest("I am a good boy?.");
+		// TFRuleBaseTest.runTest("I am a good-boy.");
+		// TFRuleBaseTest.runTest("I am a good-3224 boy.");
     }
 }
