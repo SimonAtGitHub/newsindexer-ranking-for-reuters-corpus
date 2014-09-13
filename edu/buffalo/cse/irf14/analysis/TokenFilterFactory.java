@@ -46,7 +46,7 @@ public class TokenFilterFactory {
 		TokenFilter tokenFilter=null;
 		switch(type){
 		    case SPECIALCHARS:
-		    	tokenFilter = new TokenFilterSymbol(stream);
+		    	tokenFilter = new SymbolRule(stream);
 		    	break;
 		    default:
 		    	break;

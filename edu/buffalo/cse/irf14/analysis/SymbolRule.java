@@ -1,10 +1,10 @@
 package edu.buffalo.cse.irf14.analysis;
 
-public class TokenFilterSymbol extends TokenFilter {
+public class SymbolRule extends TokenFilter {
 
 	TokenStream stream;
 
-	public TokenFilterSymbol(TokenStream stream) {
+	public SymbolRule(TokenStream stream) {
 		super(stream);
 		this.stream = stream;
 	}
