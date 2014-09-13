@@ -29,6 +29,8 @@ public class Parser {
 	public static Document parse(String filename) throws ParserException {
 		// TODO YOU MUST IMPLEMENT THIS
 		System.out.println("\nFileName:: " + filename);
+		
+		BufferedReader reader;
 		// create the Document object
 		Document document = new Document();
 		try {
@@ -39,8 +41,16 @@ public class Parser {
 			boolean hasAuthor = false;
 			boolean hasTitle = false;
 			boolean hasPlaceDate = false;
-			// Read the file contents into a buffer
-			BufferedReader reader = new BufferedReader(new FileReader(filename));
+			//handle NULL file
+			if(filename==null){
+			  throw new ParserException();	
+			}
+			else{
+				// Read the file contents into a buffer
+				reader = new BufferedReader(new FileReader(filename));
+			}
+			
+			
 			// line buffer to read a line once at a time
 			String line;
 
@@ -78,10 +88,12 @@ public class Parser {
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found ::" + filename);
 			e.printStackTrace();
+			throw new ParserException();
 		} catch (IOException e) {
 			System.out.println("I/O Error occured while reding the file ::"
 					+ filename);
 			e.printStackTrace();
+			throw new ParserException();
 		}
 
 		return document;
@@ -110,10 +122,10 @@ public class Parser {
 			newsDate = placeDateArr[placeDateArrLength - 1];
 
 			for (int i = 0; i <= placeDateArrLength - 2; i++) {
-				place = placeDateArr[i] + ",";
+				place = place +"," +placeDateArr[i];
 			}
 			System.out.println("\nPlace " + place);
-			place = place.substring(0, place.length() - 1);
+			place = place.substring(1, place.length());
 			place = place.trim();
 			document.setField(FieldNames.PLACE, place);
 			newsDate = newsDate.trim();
