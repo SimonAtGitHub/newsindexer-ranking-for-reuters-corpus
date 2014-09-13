@@ -48,6 +48,9 @@ public class TokenFilterFactory {
 		    case SPECIALCHARS:
 		    	tokenFilter = new SymbolRule(stream);
 		    	break;
+		    case STOPWORD:
+		    	tokenFilter = new StopWordsRule(stream);
+		    	break;
 		    default:
 		    	break;
 		}
