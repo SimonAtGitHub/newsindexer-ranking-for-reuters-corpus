@@ -14,6 +14,9 @@ import java.util.regex.Pattern;
  * @author nikhillo Class that parses a given file into a Document
  */
 public class Parser {
+	
+	//declared content as a global var as it would be used by different functions
+	private static String content="";
 	/**
 	 * Static method to parse the given file into the Document object
 	 * 
@@ -30,7 +33,7 @@ public class Parser {
 		Document document = new Document();
 		try {
 			// variables to hold the "Document" attributes
-			String title, place = "", newsDate, content = "";
+			String title, place = "", newsDate;
 
 			// flags to hold if the fields have been populated or not
 			boolean hasAuthor = false;
@@ -51,49 +54,21 @@ public class Parser {
 						title = line.trim();
 						document.setField(FieldNames.TITLE, title);
 						hasTitle = true;
+					
+					}else if (line.contains("<AUTHOR>")) {
+						fetchAndSetAuthorDetails(document, line.trim());
+						hasAuthor = true;
 					} else if (!hasPlaceDate) {
-						// try{
 						String placeDateContent[] = line.split("-");
 						if (placeDateContent != null
 								&& placeDateContent.length > 1) {
-							String placeDate = placeDateContent[0];
-							int placeDateContLength = placeDateContent.length;
-							// Populate content-If there are multiple '-' within
-							// the same line where there are place and date
-							for (int i = 1; i <= placeDateContLength - 1; i++) {
-								content = content + placeDateContent[i];
-							}
-							// Populate place and date
-							String[] placeDateArr = placeDate.split(",");
-							if (placeDateArr != null && placeDateArr.length > 1) {
-								int placeDateArrLength = placeDateArr.length;
-								newsDate = placeDateArr[placeDateArrLength - 1];
-
-								for (int i = 0; i <= placeDateArrLength - 2; i++) {
-									place = placeDateArr[i] + ",";
-								}
-								System.out.println("\nPlace " + place);
-								place = place.substring(0, place.length() - 1);
-								place = place.trim();
-								document.setField(FieldNames.PLACE, place);
-								newsDate = newsDate.trim();
-								document.setField(FieldNames.NEWSDATE, newsDate);
-							} else {
-								System.out.println("No place and date");
-							}
-							hasPlaceDate = true;
-						} else if (!hasAuthor) {
-							fetchAndSetAuthorDetails(document, line.trim());
-							hasAuthor = true;
-						}
-						/*
-						 * }catch(Exception e){
-						 * System.out.println("Exception occured");
-						 * System.out.println("Handle it"); }
-						 */
+							fetchAndSetPlaceAndDate(document,placeDateContent);		
+						} 
+						hasPlaceDate = true;
 					} else {
 						content = content + line;
 					}
+					
 
 				}
 				content = content.trim();
@@ -110,6 +85,43 @@ public class Parser {
 		}
 
 		return document;
+	}
+	
+	/**
+	 * This method fetches place and date from the content and sets it in the document
+	 * object
+	 * @param docObj
+	 * @param content
+	 */
+	private static void fetchAndSetPlaceAndDate(Document document,String [] placeDateContent){
+
+		String place="",newsDate="";
+		String placeDate = placeDateContent[0];
+		int placeDateContLength = placeDateContent.length;
+		// Populate content-If there are multiple '-' within
+		// the same line where there are place and date
+		for (int i = 1; i <= placeDateContLength - 1; i++) {
+			content = content + placeDateContent[i];
+		}
+		// Populate place and date
+		String[] placeDateArr = placeDate.split(",");
+		if (placeDateArr != null && placeDateArr.length > 1) {
+			int placeDateArrLength = placeDateArr.length;
+			newsDate = placeDateArr[placeDateArrLength - 1];
+
+			for (int i = 0; i <= placeDateArrLength - 2; i++) {
+				place = placeDateArr[i] + ",";
+			}
+			System.out.println("\nPlace " + place);
+			place = place.substring(0, place.length() - 1);
+			place = place.trim();
+			document.setField(FieldNames.PLACE, place);
+			newsDate = newsDate.trim();
+			document.setField(FieldNames.NEWSDATE, newsDate);
+		} else {
+			System.out.println("No place and date");
+		}
+	
 	}
 
 	private static void fetchAndSetAuthorDetails(Document docObj, String content) {
