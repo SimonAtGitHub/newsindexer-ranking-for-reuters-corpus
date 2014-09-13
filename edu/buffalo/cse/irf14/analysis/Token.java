@@ -3,6 +3,8 @@
  */
 package edu.buffalo.cse.irf14.analysis;
 
+import edu.buffalo.cse.irf14.common.CommonConstants;
+
 /**
  * @author nikhillo
  * This class represents the smallest indexable unit of text.
@@ -67,6 +69,16 @@ public class Token {
 	 */
 	protected void merge(Token...tokens) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		//temp variable to hold the term text
+		String tempText = termText;
+		if(null!=tempText){
+			int toBeMergedLength=tokens.length;
+			for(int i=0;i<toBeMergedLength;i++){
+				tempText = tempText + CommonConstants.WHITESPACE + tokens[i];
+			}
+			tempText = tempText.trim();
+			setTermText(tempText);
+		}
 	}
 	
 	/**

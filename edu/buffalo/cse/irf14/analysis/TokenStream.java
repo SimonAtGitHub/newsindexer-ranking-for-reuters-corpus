@@ -27,6 +27,12 @@ public class TokenStream implements Iterator<Token>{
 	public int index=0;
 	
 	/**
+	 * variable which will contain a copy of the main index . It can be used
+	 * to get the next token without modifying the main index.
+	 */
+	public int cloneIndex=0;
+	
+	/**
 	 * Constructor that initializes the token stream with the list
 	 */
 	public TokenStream(List<Token> token){
@@ -62,6 +68,7 @@ public class TokenStream implements Iterator<Token>{
 	public Token next() {
 		// TODO YOU MUST IMPLEMENT THIS
 		if(hasNext()){
+			cloneIndex = index;
 			return tokenList.get(index++);
 	    }
 		else{
@@ -115,5 +122,35 @@ public class TokenStream implements Iterator<Token>{
 	public Token getCurrent() {
 		//TODO: YOU MUST IMPLEMENT THIS
 		return null;
+	}
+	
+	/**
+	 * Method to get the next Token from the stream without iteration.
+	 * This method {@link TokenStream#getNext()}  does not move the stream forward.
+	 */
+	public Token getNext() {
+		cloneIndex = index;
+		if(hasNext()){
+			return tokenList.get(cloneIndex);
+	    }
+		else{
+			return null;
+		}
+	}
+	
+	/**
+	 * getter for index
+	 * @return
+	 */
+	public int getIndex(){
+		return index;
+	}
+	
+	/**
+	 * setter for index
+	 * @param index
+	 */
+	public void setIndex(int index) {
+		this.index = index;
 	}
 }

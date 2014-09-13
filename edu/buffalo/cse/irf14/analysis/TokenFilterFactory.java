@@ -51,6 +51,9 @@ public class TokenFilterFactory {
 		    case STOPWORD:
 		    	tokenFilter = new StopWordsRule(stream);
 		    	break;
+		    case CAPITALIZATION:
+		    	tokenFilter = new CapitalizationRule(stream);
+		    	break;
 		    default:
 		    	break;
 		}
