@@ -57,6 +57,9 @@ public class TokenFilterFactory {
 		    case ACCENT:
 		    	tokenFilter = new AccentRule(stream);
 		    	break;
+		    case NUMERIC:
+		    	tokenFilter = new NumberRule(stream);
+		    	break;
 		    default:
 		    	break;
 		}
