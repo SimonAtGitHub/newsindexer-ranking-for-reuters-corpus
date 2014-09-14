@@ -60,6 +60,9 @@ public class TokenFilterFactory {
 		    case NUMERIC:
 		    	tokenFilter = new NumberRule(stream);
 		    	break;
+		    case STEMMER:
+		    	tokenFilter = new StemmerRule(stream);
+		    	break;
 		    default:
 		    	break;
 		}
