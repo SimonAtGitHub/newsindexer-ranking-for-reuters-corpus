@@ -23,6 +23,10 @@ public class SymbolRule extends TokenFilter {
 			String termText = token.getTermText();
 			if (termText != null) {
 				termText = filterSymbols(termText);
+				if (termText == null || termText.isEmpty()) {
+					stream.remove();
+					continue;
+				}
 				token.setTermText(termText);
 				System.out.println(token.getTermText());
 			}
@@ -83,9 +87,15 @@ public class SymbolRule extends TokenFilter {
 		// Any other hyphens padded by spaces on either or both sides
 		// should be removed.
 
+		// If it's just hyphen return null
+		String regexForJustHyphen = "^(\\s)*[-]+(\\s)*$";
+		if (termText.matches(regexForJustHyphen)) {
+			return null;
+		}
 		// This regex should match for various combinations like 6-6, BB3-A,
 		// BB3B-A, BB3-A9 etc.
-		String regex = "([0-9]+[-][0-9]+)|(([a-zA-Z]*)(\\d)+([a-zA-Z]*)[-][0-9]*[aA-zZ]+[0-9]*)|([0-9]*([a-zA-Z]+)[0-9]*[-][aA-zZ]*[0-9]+[aA-zZ]*)";
+		// "([0-9]+[-][0-9]+)|(([a-zA-Z]*)(\\d)+([a-zA-Z]*)[-][0-9]*[aA-zZ]+[0-9]*)|([0-9]*([a-zA-Z]+)[0-9]*[-][aA-zZ]*[0-9]+[aA-zZ]*)";
+		String regex = "((\\d)+[-](\\d)+)|(([a-zA-Z]*)(\\d)+([a-zA-Z]*)[-](\\d)*[aA-zZ]+(\\d)*)|((\\d)*([a-zA-Z]+)(\\d)*[-][aA-zZ]*(\\d)+[aA-zZ]*)";
 		String regexWithHyphenAtEndOrStart = "([aA-zZ]+[-]+$)|(^[-]+[aA-zZ]+$)";
 		if (!termText.matches(regex)
 				&& !termText.matches(regexWithHyphenAtEndOrStart)) {

@@ -1,7 +1,5 @@
 package edu.buffalo.cse.irf14.analysis;
 
-import java.text.Normalizer;
-
 import edu.buffalo.cse.irf14.common.RegExp;
 import edu.buffalo.cse.irf14.common.StringUtil;
 

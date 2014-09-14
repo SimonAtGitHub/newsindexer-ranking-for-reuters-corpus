@@ -147,10 +147,10 @@ public class SymbolRuleTest extends TFRuleBaseTest {
 			// should be removed.
 
 			// whitespace padded hyphens
-			// assertArrayEquals(new String[] { "hyphen", "test" },
-			// runTest(TokenFilterType.SYMBOL, "hyphen - test"));
-			// assertArrayEquals(new String[] { "hyphen", "test" },
-			// runTest(TokenFilterType.SYMBOL, "hyphen -- test"));
+			assertArrayEquals(new String[] { "hyphen", "test" },
+					runTest(TokenFilterType.SYMBOL, "hyphen - test"));
+			assertArrayEquals(new String[] { "hyphen", "test" },
+					runTest(TokenFilterType.SYMBOL, "hyphen -- test"));
 
 			// alphanumeric
 			assertArrayEquals(new String[] { "B-52" },
