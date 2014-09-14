@@ -54,6 +54,9 @@ public class TokenFilterFactory {
 		    case CAPITALIZATION:
 		    	tokenFilter = new CapitalizationRule(stream);
 		    	break;
+		    case ACCENT:
+		    	tokenFilter = new AccentRule(stream);
+		    	break;
 		    default:
 		    	break;
 		}
