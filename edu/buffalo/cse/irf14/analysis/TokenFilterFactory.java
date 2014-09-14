@@ -45,7 +45,7 @@ public class TokenFilterFactory {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
 		TokenFilter tokenFilter=null;
 		switch(type){
-		    case SPECIALCHARS:
+		    case SYMBOL:
 		    	tokenFilter = new SymbolRule(stream);
 		    	break;
 		    case STOPWORD:

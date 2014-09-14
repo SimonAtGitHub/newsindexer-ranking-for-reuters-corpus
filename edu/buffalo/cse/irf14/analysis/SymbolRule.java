@@ -11,7 +11,7 @@ public class SymbolRule extends TokenFilter {
 
 	@Override
 	public boolean increment() throws TokenizerException {
-		stream.next();
+		// stream.next();
 		return false;
 	}
 
@@ -54,25 +54,63 @@ public class SymbolRule extends TokenFilter {
 		// 1. Filter Punctuation Marks
 		String regexForPunctuation = ".+[.!?]";
 		// Run it till all the punctuation marks are gone. It might happen that
-		// someone has put "Bermuda triangle exists?." by mistake.
-
+		// someone has put "Bermuda triangle exists?." by mistake or has put
+		// multiple exclamation marks like Amazing!!!!!!.
+		// Don't Remove dots if they occur between two numbers
 		if (termText.matches(regexForPunctuation)) {
 			termText = termText.replaceAll("[.!?]", "");
 		}
 		// Return as it is if the punctuation does't come in the end.
 
-		// 2. Filter apostrophes
-		// String regexForApostrophes = "[*'s]|[*s']|*'*]";
+		// Filter out apostrophes if there exists any
+		if (termText.contains("'")) {
+			termText = filterOutApostrophes(termText);
+		}
+
 		// 3. Filter hyphens
 		if (termText.contains("-")) {
-			String regexHyphenBetweenAlphanumeric = "[aA-zZ]+[-][0-9]+|[0-9]+[-][aA-zZ]+";
-			String regexHyphenBetweenTwoWords = "[aA-zZ]+[-][aA-zZ]+";
-			if (!termText.matches(regexHyphenBetweenAlphanumeric)) {
-				termText = termText.replace("-", "");
-			} else if (termText.matches(regexHyphenBetweenTwoWords)) {
-				termText = termText.replace("-", " ");
-			}
+			termText = filterOutHyphens(termText);
 		}
+		return termText;
+	}
+
+	private String filterOutHyphens(String termText) {
+		// If a hyphen occurs within a alphanumeric
+		// token it should be retained (B-52, at least one
+		// of the two constituents must have a number). If both are
+		// alphabetic, it should be replaced with a whitespace and
+		// retained as a single token (week-day => week day).
+		// Any other hyphens padded by spaces on either or both sides
+		// should be removed.
+
+		// This regex should match for various combinations like 6-6, BB3-A,
+		// BB3B-A, BB3-A9 etc.
+		String regex = "([0-9]+[-][0-9]+)|(([a-zA-Z]*)(\\d)+([a-zA-Z]*)[-][0-9]*[aA-zZ]+[0-9]*)|([0-9]*([a-zA-Z]+)[0-9]*[-][aA-zZ]*[0-9]+[aA-zZ]*)";
+		String regexWithHyphenAtEndOrStart = "([aA-zZ]+[-]+$)|(^[-]+[aA-zZ]+$)";
+		if (!termText.matches(regex)
+				&& !termText.matches(regexWithHyphenAtEndOrStart)) {
+			termText = termText.replaceAll("-", " ");
+		} else if (termText.matches(regexWithHyphenAtEndOrStart)) {
+			termText = termText.replaceAll("-", "");
+		}
+		return termText;
+	}
+
+	/**
+	 * Returns a filtered termText after applying all rules applicable to
+	 * apostrophes.
+	 * 
+	 * @param termText
+	 *            Unfiltered termText on which apostrophe filtering is to be
+	 *            applied.
+	 * @return filtered termText
+	 */
+	private String filterOutApostrophes(String termText) {
+		// Since 's has different implementations
+		// 2. Filter apostrophes |*'*]
+		termText = termText.replaceAll("('s)", "");
+		termText = termText.replaceAll("s'", "s");
+		// 2b - Filter out all common contractions.
 		return termText;
 	}
 }
