@@ -1,5 +1,7 @@
 package edu.buffalo.cse.irf14.analysis;
 
+import edu.buffalo.cse.irf14.common.RegExp;
+
 public class SymbolRule extends TokenFilter {
 
 	TokenStream stream;
@@ -56,13 +58,12 @@ public class SymbolRule extends TokenFilter {
 	 */
 	private String filterSymbols(String termText) {
 		// 1. Filter Punctuation Marks
-		String regexForPunctuation = ".+[.!?]+$";
 		// Run it till all the punctuation marks are gone. It might happen that
 		// someone has put "Bermuda triangle exists?." by mistake or has put
 		// multiple exclamation marks like Amazing!!!!!!.
 		// Don't Remove punctuation marks if they occur between two words. Only
 		// take out the ones in the end.
-		if (termText.matches(regexForPunctuation)) {
+		if (termText.matches(RegExp.REGEX_SENT_ENDS)) {
 			termText = termText.replaceAll("[.!?]+$", "");
 		}
 		// Return as it is if the punctuation does't come in the end.
