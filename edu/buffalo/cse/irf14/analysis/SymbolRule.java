@@ -2,6 +2,10 @@ package edu.buffalo.cse.irf14.analysis;
 
 import edu.buffalo.cse.irf14.common.RegExp;
 
+/**
+ * @author animeshk
+ *
+ */
 public class SymbolRule extends TokenFilter {
 
 	TokenStream stream;
