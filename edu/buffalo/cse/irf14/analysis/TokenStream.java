@@ -21,20 +21,20 @@ public class TokenStream implements Iterator<Token> {
 	/**
 	 * variable that maintains the index to individual tokens in the tokenList
 	 */
-	public int index = 0;
+	public int index = -1;
 
 	/**
 	 * variable which will contain a copy of the main index . It can be used to
 	 * get the next token without modifying the main index.
 	 */
-	public int cloneIndex = 0;
+	public int cloneIndex = -1;
 
 	/**
 	 * Constructor that initializes the token stream with the list
 	 */
 	public TokenStream(List<Token> token) {
 		tokenList = token;
-		index = 0;
+		index = -1;
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class TokenStream implements Iterator<Token> {
 		 * As soon as size becomes equal to index that means the last item in
 		 * the list has already been iterated
 		 */
-		if (tokenList.size() != index)
+		if (index < tokenList.size() && !tokenList.isEmpty())
 			return true;
 		else
 			return false;
@@ -65,6 +65,10 @@ public class TokenStream implements Iterator<Token> {
 	@Override
 	public Token next() {
 		// TODO YOU MUST IMPLEMENT THIS
+		// Initialize the index if it is not initialized
+		if (index < 0) {
+			index = 0;
+		}
 		if (hasNext()) {
 			cloneIndex = index;
 			return tokenList.get(index++);
@@ -81,8 +85,6 @@ public class TokenStream implements Iterator<Token> {
 	@Override
 	public void remove() {
 		// TODO YOU MUST IMPLEMENT THIS
-		// TODO Fix it. This implementation is totally wrong and should
-		// use getCurrent instead of index
 		if (index <= tokenList.size() && index > 0) {
 			tokenList.remove(--index);
 		}
@@ -95,8 +97,8 @@ public class TokenStream implements Iterator<Token> {
 	 */
 	public void reset() {
 		// TODO : YOU MUST IMPLEMENT THIS
-		// Set to -1
-		index = 0;
+		// Set to -1 to indicate the beginning of the list
+		index = -1;
 	}
 
 	/**
@@ -112,6 +114,10 @@ public class TokenStream implements Iterator<Token> {
 	 */
 	public void append(TokenStream stream) {
 		// TODO : YOU MUST IMPLEMENT THIS
+		if (stream != null && stream.tokenList != null
+				&& stream.tokenList.size() > 0) {
+			tokenList.addAll(stream.tokenList);
+		}
 	}
 
 	/**
@@ -126,6 +132,11 @@ public class TokenStream implements Iterator<Token> {
 	 */
 	public Token getCurrent() {
 		// TODO: YOU MUST IMPLEMENT THIS
+		// Return null if index has not been initialized i.e., next() has not
+		// been called even once
+		if (index < 0) {
+			return null;
+		}
 		return tokenList.get(index);
 	}
 

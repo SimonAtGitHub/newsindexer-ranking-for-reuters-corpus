@@ -35,10 +35,10 @@ import edu.buffalo.cse.irf14.index.IndexerException;
  *
  */
 public class IndexerTest {
-	private IndexReader reader;
+	private static IndexReader reader;
 	
 	@BeforeClass
-	public final void setupIndex() throws IndexerException {
+	public static final void setupIndex() throws IndexerException {
 		String[] strs = {"new home sales top sales forecasts", "home sales rise in july", 
 				"increase in home sales in july", "july new home sales rise"};
 		int len = strs.length;
