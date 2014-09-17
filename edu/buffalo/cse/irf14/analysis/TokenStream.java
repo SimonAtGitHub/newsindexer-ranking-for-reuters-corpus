@@ -19,11 +19,6 @@ public class TokenStream implements Iterator<Token> {
 	 */
 	private LinkedList<Token> tokenList;
 
-	/**
-	 * variable that maintains the index to individual tokens in the tokenList
-	 */
-	public int index = 0;
-
 	private ListIterator<Token> tokenListIterator;
 
 	private Token currentToken = null;
@@ -35,7 +30,6 @@ public class TokenStream implements Iterator<Token> {
 	 */
 	public TokenStream(LinkedList<Token> token) {
 		tokenList = token;
-		index = 0;
 		tokenListIterator = tokenList.listIterator();
 	}
 
@@ -146,21 +140,4 @@ public class TokenStream implements Iterator<Token> {
 		}
 	}
 
-	/**
-	 * getter for index
-	 * 
-	 * @return
-	 */
-	public int getIndex() {
-		return index;
-	}
-
-	/**
-	 * setter for index
-	 * 
-	 * @param index
-	 */
-	public void setIndex(int index) {
-		this.index = index;
-	}
 }
