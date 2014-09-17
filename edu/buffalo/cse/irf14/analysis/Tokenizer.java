@@ -3,8 +3,7 @@
  */
 package edu.buffalo.cse.irf14.analysis;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
 import edu.buffalo.cse.irf14.common.CommonConstants;
 
@@ -59,7 +58,8 @@ public class Tokenizer {
 			// splits the string into a string array on the basis of delimitor
 			String arr[] = str.split(delim);
 			// Temp list to hold the tokens
-			List<Token> tempList = new ArrayList<Token>();
+			LinkedList<Token> tempList = new LinkedList<Token>();
+
 			// iterate over the items in the array
 			for (int index = 0; index < arr.length; index++) {
 				Token token = new Token();

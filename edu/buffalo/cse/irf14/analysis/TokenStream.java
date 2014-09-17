@@ -4,7 +4,8 @@
 package edu.buffalo.cse.irf14.analysis;
 
 import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
 /**
  * @author nikhillo Class that represents a stream of Tokens. All
@@ -16,25 +17,26 @@ public class TokenStream implements Iterator<Token> {
 	/**
 	 * variable to hold the list of tokens
 	 */
-	private List<Token> tokenList;
+	private LinkedList<Token> tokenList;
 
 	/**
 	 * variable that maintains the index to individual tokens in the tokenList
 	 */
-	public int index = -1;
+	public int index = 0;
 
-	/**
-	 * variable which will contain a copy of the main index . It can be used to
-	 * get the next token without modifying the main index.
-	 */
-	public int cloneIndex = -1;
+	private ListIterator<Token> tokenListIterator;
+
+	private Token currentToken = null;
+
+	private Token nextToken = null;
 
 	/**
 	 * Constructor that initializes the token stream with the list
 	 */
-	public TokenStream(List<Token> token) {
+	public TokenStream(LinkedList<Token> token) {
 		tokenList = token;
-		index = -1;
+		index = 0;
+		tokenListIterator = tokenList.listIterator();
 	}
 
 	/**
@@ -45,12 +47,7 @@ public class TokenStream implements Iterator<Token> {
 	 */
 	@Override
 	public boolean hasNext() {
-		// TODO YOU MUST IMPLEMENT THIS
-		/**
-		 * As soon as size becomes equal to index that means the last item in
-		 * the list has already been iterated
-		 */
-		if (index < tokenList.size() && !tokenList.isEmpty())
+		if (tokenListIterator.hasNext())
 			return true;
 		else
 			return false;
@@ -65,16 +62,15 @@ public class TokenStream implements Iterator<Token> {
 	@Override
 	public Token next() {
 		// TODO YOU MUST IMPLEMENT THIS
-		// Initialize the index if it is not initialized
-		if (index < 0) {
-			index = 0;
-		}
+		// Put the nextToken of last computation to the currentToken
+		// Update the nextToken
 		if (hasNext()) {
-			cloneIndex = index;
-			return tokenList.get(index++);
+			nextToken = tokenListIterator.next();
 		} else {
-			return null;
+			nextToken = null;
 		}
+		currentToken = nextToken;
+		return nextToken;
 	}
 
 	/**
@@ -85,8 +81,12 @@ public class TokenStream implements Iterator<Token> {
 	@Override
 	public void remove() {
 		// TODO YOU MUST IMPLEMENT THIS
-		if (index <= tokenList.size() && index > 0) {
-			tokenList.remove(--index);
+		// NOOP at the beginning and end of the stream.
+		if (currentToken != null && nextToken != null) {
+			tokenListIterator.remove();
+			// Update current to null since the current token got deleted and
+			// the next is not called yet
+			currentToken = null;
 		}
 	}
 
@@ -97,8 +97,7 @@ public class TokenStream implements Iterator<Token> {
 	 */
 	public void reset() {
 		// TODO : YOU MUST IMPLEMENT THIS
-		// Set to -1 to indicate the beginning of the list
-		index = -1;
+		tokenListIterator = tokenList.listIterator();
 	}
 
 	/**
@@ -132,12 +131,7 @@ public class TokenStream implements Iterator<Token> {
 	 */
 	public Token getCurrent() {
 		// TODO: YOU MUST IMPLEMENT THIS
-		// Return null if index has not been initialized i.e., next() has not
-		// been called even once
-		if (index < 0) {
-			return null;
-		}
-		return tokenList.get(index);
+		return currentToken;
 	}
 
 	/**
@@ -145,9 +139,8 @@ public class TokenStream implements Iterator<Token> {
 	 * method {@link TokenStream#getNext()} does not move the stream forward.
 	 */
 	public Token getNext() {
-		cloneIndex = index;
 		if (hasNext()) {
-			return tokenList.get(cloneIndex);
+			return tokenList.get(tokenListIterator.nextIndex());
 		} else {
 			return null;
 		}
