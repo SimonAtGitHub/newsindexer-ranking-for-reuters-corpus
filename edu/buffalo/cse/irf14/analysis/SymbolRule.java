@@ -3,7 +3,7 @@ package edu.buffalo.cse.irf14.analysis;
 import edu.buffalo.cse.irf14.common.RegExp;
 
 /**
- * @author animeshk
+ * @author animeshk--test
  *
  */
 public class SymbolRule extends TokenFilter {
