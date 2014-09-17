@@ -95,6 +95,7 @@ public class TokenStream implements Iterator<Token> {
 	 */
 	public void reset() {
 		// TODO : YOU MUST IMPLEMENT THIS
+		// Set to -1
 		index = 0;
 	}
 
