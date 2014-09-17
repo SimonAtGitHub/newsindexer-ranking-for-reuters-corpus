@@ -81,7 +81,9 @@ public class TokenStream implements Iterator<Token> {
 	@Override
 	public void remove() {
 		// TODO YOU MUST IMPLEMENT THIS
-		if (index < tokenList.size() && index > 0) {
+		// TODO Fix it. This implementation is totally wrong and should
+		// use getCurrent instead of index
+		if (index <= tokenList.size() && index > 0) {
 			tokenList.remove(--index);
 		}
 	}
@@ -123,7 +125,7 @@ public class TokenStream implements Iterator<Token> {
 	 */
 	public Token getCurrent() {
 		// TODO: YOU MUST IMPLEMENT THIS
-		return null;
+		return tokenList.get(index);
 	}
 
 	/**
