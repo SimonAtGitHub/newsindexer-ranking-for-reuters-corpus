@@ -22,10 +22,6 @@ public class AccentRule extends TokenFilter {
 
 	@Override
 	public boolean increment() throws TokenizerException {
-		while (stream.hasNext()) {
-			Token token = stream.next();
-
-		}
 		return false;
 	}
 
@@ -40,8 +36,8 @@ public class AccentRule extends TokenFilter {
 			Token token = stream.next();
 			String termText = token.getTermText();
 			termText = Normalizer.normalize(termText, Normalizer.Form.NFD);
-			termText = termText.replaceAll(
-					"\\p{InCombiningDiacriticalMarks}+", "");
+			termText = termText.replaceAll("\\p{InCombiningDiacriticalMarks}+",
+					"");
 			token.setTermText(termText);
 		}
 	}
