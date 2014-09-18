@@ -56,13 +56,14 @@ public class TokenStream implements Iterator<Token> {
 	@Override
 	public Token next() {
 		// TODO YOU MUST IMPLEMENT THIS
-		// Put the nextToken of last computation to the currentToken
-		// Update the nextToken
 		if (hasNext()) {
 			nextToken = tokenListIterator.next();
 		} else {
 			nextToken = null;
 		}
+		// Put the nextToken in current token. Both will be usually same unless
+		// remove() is called before next in which case current becomes null and
+		// nextToken remains unchanged.
 		currentToken = nextToken;
 		return nextToken;
 	}
@@ -91,6 +92,7 @@ public class TokenStream implements Iterator<Token> {
 	 */
 	public void reset() {
 		// TODO : YOU MUST IMPLEMENT THIS
+		// Reset the iterator to point to the beginning of the tokenlist
 		tokenListIterator = tokenList.listIterator();
 	}
 
@@ -107,13 +109,17 @@ public class TokenStream implements Iterator<Token> {
 	 */
 	public void append(TokenStream stream) {
 		// TODO : YOU MUST IMPLEMENT THIS
+		// Check that stream is present and not empty
 		if (stream != null && stream.tokenList != null
 				&& stream.tokenList.size() > 0) {
+			// Save the current iterator position so that it can be used to
+			// reset the iterator to original position after append completes
 			int nextIndex = tokenListIterator.nextIndex();
-			// Move to end of the list. Create a new iterator with the last
-			// index and it will automatically move to the end
+			// Move to end of the list.
+			// Create a new iterator with the last index (size) and it will
+			// automatically move to the end
 			tokenListIterator = tokenList.listIterator(tokenList.size());
-			// Add all the elements one by one
+			// Add all the elements one by one to the end of the list
 			for (Token token : stream.tokenList) {
 				tokenListIterator.add(token);
 			}
