@@ -109,7 +109,16 @@ public class TokenStream implements Iterator<Token> {
 		// TODO : YOU MUST IMPLEMENT THIS
 		if (stream != null && stream.tokenList != null
 				&& stream.tokenList.size() > 0) {
-			tokenList.addAll(stream.tokenList);
+			int nextIndex = tokenListIterator.nextIndex();
+			// Move to end of the list. Create a new iterator with the last
+			// index and it will automatically move to the end
+			tokenListIterator = tokenList.listIterator(tokenList.size());
+			// Add all the elements one by one
+			for (Token token : stream.tokenList) {
+				tokenListIterator.add(token);
+			}
+			// Now reset the iterator back to the original position
+			tokenListIterator = tokenList.listIterator(nextIndex);
 		}
 	}
 
