@@ -121,11 +121,11 @@ public class SymbolRuleTest extends TFRuleBaseTest {
 							"192.168.10.124" },
 					runTest(TokenFilterType.SYMBOL,
 							"Is your ip address 192.168.10.124?"));
-			// assertArrayEquals(
-			// new String[] { "Your", "query", "em?ty", "returned", "0",
-			// "results" },
-			// runTest(TokenFilterType.SYMBOL,
-			// "Your query 'em?ty' returned 0 results!"));
+			assertArrayEquals(
+					new String[] { "Your", "query", "em?ty", "returned", "0",
+							"results" },
+					runTest(TokenFilterType.SYMBOL,
+							"Your query 'em?ty' returned 0 results!"));
 			assertArrayEquals(new String[] { "Say", "what" },
 					runTest(TokenFilterType.SYMBOL, "Say what??!!!!??"));
 		} catch (TokenizerException e) {

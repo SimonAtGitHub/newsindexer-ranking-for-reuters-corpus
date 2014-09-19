@@ -97,10 +97,12 @@ public class SymbolRule extends TokenFilter {
 		if (termText.matches(RegExp.REGEX_FOR_JUST_HYPHEN)) {
 			return null;
 		}
-		// This regex should match for various combinations like 6-6, BB3-A,
+		// This regex should handle preserving of hyphens in case of alphnumeric
+		// or completely numeric combinations with hyphens like 6-6, BB3-A,
 		// BB3B-A, BB3-A9 etc.
-
-		if (!termText.matches(RegExp.REGEX_FOR_HYPHEN_ALPHANUMERIC)
+		// So, just check if it's completely alphabetic with hyphen. If not.
+		// Chuck out the hyphens.
+		if (termText.matches(RegExp.REGEX_FOR_ALPHABETS_HYPHEN)
 				&& !termText.matches(RegExp.REGEX_FOR_HYPHEN_AT_END_OR_START)) {
 			termText = termText.replaceAll("-", " ");
 		} else if (termText.matches(RegExp.REGEX_FOR_HYPHEN_AT_END_OR_START)) {
@@ -173,7 +175,9 @@ public class SymbolRule extends TokenFilter {
 		if (termText.contains("'re")) {
 			termText = termText.replaceAll("'re", " are");
 		}
-		if (termText.contains("'em")) {
+		// Special handling since it breaks the 'empty' test. Check if it's also
+		// end of the string
+		if (termText.contains("'em") && termText.endsWith("'em")) {
 			termText = termText.replaceAll("'em", "them");
 		}
 		return termText;

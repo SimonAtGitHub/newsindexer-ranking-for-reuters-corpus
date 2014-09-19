@@ -24,9 +24,11 @@ public class RegExp {
 	// -, --- or --
 	public static final String REGEX_FOR_JUST_HYPHEN = "^(\\s)*[-]+(\\s)*$";
 
+	public static final String REGEX_FOR_ALPHABETS_HYPHEN = "([aA-zZ]+[-][aA-zZ]+$)";
+	
 	// This regex should match for various alphanumeric combinations with
 	// hyphens like 6-6, BB3-A,
-	// BB3B-A, BB3-A9 etc.
+	// BB3B-A, BB3-A9 etc. //NOTE Currently not being used
 	public static final String REGEX_FOR_HYPHEN_ALPHANUMERIC = "((\\d)+[-](\\d)+)|(([a-zA-Z]*)(\\d)+([a-zA-Z]*)[-](\\d)*[aA-zZ]+(\\d)*)|((\\d)*([a-zA-Z]+)(\\d)*[-][aA-zZ]*(\\d)+[aA-zZ]*)";
 
 	// Eg. a-- , ++b
