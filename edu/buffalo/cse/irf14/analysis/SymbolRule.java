@@ -143,6 +143,9 @@ public class SymbolRule extends TokenFilter {
 		if (termText.contains("won't")) {
 			termText = termText.replaceAll("on't", "ill not");
 		}
+		if (termText.contains("ma'am")) {
+			termText = termText.replaceAll("'am", "dam");
+		}
 		if (termText.contains("ain't")) {
 			termText = termText.replaceAll("n't", "re not");
 		}
