@@ -19,4 +19,17 @@ public class RegExp {
 	// regular expression that denotes a number sequence followed by an optional
 	// period
 	public static final String REGEX_NUM_PERIOD = "[\\d]+[\\.]?";
+
+	// Will match tokens containing any number of instances of just hyphen. Eg
+	// -, --- or --
+	public static final String REGEX_FOR_JUST_HYPHEN = "^(\\s)*[-]+(\\s)*$";
+
+	// This regex should match for various alphanumeric combinations with
+	// hyphens like 6-6, BB3-A,
+	// BB3B-A, BB3-A9 etc.
+	public static final String REGEX_FOR_HYPHEN_ALPHANUMERIC = "((\\d)+[-](\\d)+)|(([a-zA-Z]*)(\\d)+([a-zA-Z]*)[-](\\d)*[aA-zZ]+(\\d)*)|((\\d)*([a-zA-Z]+)(\\d)*[-][aA-zZ]*(\\d)+[aA-zZ]*)";
+
+	// Eg. a-- , ++b
+	public static final String REGEX_FOR_HYPHEN_AT_END_OR_START = "([aA-zZ]+[-]+$)|(^[-]+[aA-zZ]+$)";
+
 }

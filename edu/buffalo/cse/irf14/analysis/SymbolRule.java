@@ -3,7 +3,7 @@ package edu.buffalo.cse.irf14.analysis;
 import edu.buffalo.cse.irf14.common.RegExp;
 
 /**
- * @author animeshk--test
+ * @author animeshk
  *
  */
 public class SymbolRule extends TokenFilter {
@@ -94,19 +94,16 @@ public class SymbolRule extends TokenFilter {
 		// should be removed.
 
 		// If it's just hyphen return null
-		String regexForJustHyphen = "^(\\s)*[-]+(\\s)*$";
-		if (termText.matches(regexForJustHyphen)) {
+		if (termText.matches(RegExp.REGEX_FOR_JUST_HYPHEN)) {
 			return null;
 		}
 		// This regex should match for various combinations like 6-6, BB3-A,
 		// BB3B-A, BB3-A9 etc.
-		// "([0-9]+[-][0-9]+)|(([a-zA-Z]*)(\\d)+([a-zA-Z]*)[-][0-9]*[aA-zZ]+[0-9]*)|([0-9]*([a-zA-Z]+)[0-9]*[-][aA-zZ]*[0-9]+[aA-zZ]*)";
-		String regex = "((\\d)+[-](\\d)+)|(([a-zA-Z]*)(\\d)+([a-zA-Z]*)[-](\\d)*[aA-zZ]+(\\d)*)|((\\d)*([a-zA-Z]+)(\\d)*[-][aA-zZ]*(\\d)+[aA-zZ]*)";
-		String regexWithHyphenAtEndOrStart = "([aA-zZ]+[-]+$)|(^[-]+[aA-zZ]+$)";
-		if (!termText.matches(regex)
-				&& !termText.matches(regexWithHyphenAtEndOrStart)) {
+
+		if (!termText.matches(RegExp.REGEX_FOR_HYPHEN_ALPHANUMERIC)
+				&& !termText.matches(RegExp.REGEX_FOR_HYPHEN_AT_END_OR_START)) {
 			termText = termText.replaceAll("-", " ");
-		} else if (termText.matches(regexWithHyphenAtEndOrStart)) {
+		} else if (termText.matches(RegExp.REGEX_FOR_HYPHEN_AT_END_OR_START)) {
 			termText = termText.replaceAll("-", "");
 		}
 		return termText;
@@ -122,11 +119,61 @@ public class SymbolRule extends TokenFilter {
 	 * @return filtered termText
 	 */
 	private String filterOutApostrophes(String termText) {
-		// Since 's has different implementations
-		// 2. Filter apostrophes |*'*]
+		// First remove all 's and s'
 		termText = termText.replaceAll("('s)", "");
 		termText = termText.replaceAll("s'", "s");
 		// 2b - Filter out all common contractions.
+		termText = expandCommonContractions(termText);
+		// If quote still exists, remove all instances of it
+		termText = termText.replaceAll("'", "");
 		return termText;
+	}
+
+	private String expandCommonContractions(String termText) {
+		// Run it in separation till all occurences of common contractions are
+		// gone i.e., Don't use if-elseif-else because once a condition is
+		// satisfied, loop exits and we have to handle multiple cases of
+		// contractions too.
+
+		// Run the non obvious contractions first like shan't, won't, y'all,
+		// ai'nt
+		if (termText.contains("shan't")) {
+			termText = termText.replaceAll("n't", "ll not");
+		}
+		if (termText.contains("won't")) {
+			termText = termText.replaceAll("on't", "ill not");
+		}
+		if (termText.contains("ain't")) {
+			termText = termText.replaceAll("n't", "re not");
+		}
+		if (termText.contains("y'all")) {
+			termText = termText.replaceAll("'all", "ou all");
+		}
+		if (termText.contains("n't")) {
+			termText = termText.replaceAll("n't", " not");
+		}
+		if (termText.contains("'ve")) {
+			termText = termText.replaceAll("'ve", " have");
+		}
+		if (termText.contains("'d")) {
+			termText = termText.replaceAll("'d", " would");
+		}
+		if (termText.contains("'ll")) {
+			termText = termText.replaceAll("'ll", " will");
+		}
+		if (termText.contains("'m")) {
+			termText = termText.replaceAll("'m", " am");
+		}
+		if (termText.contains("o'clock")) {
+			termText = termText.replaceAll("o'clock", " of the clock");
+		}
+		if (termText.contains("'re")) {
+			termText = termText.replaceAll("'re", " are");
+		}
+		if (termText.contains("'em")) {
+			termText = termText.replaceAll("'em", "them");
+		}
+		return termText;
+
 	}
 }

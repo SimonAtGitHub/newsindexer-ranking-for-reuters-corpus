@@ -1,6 +1,9 @@
 package edu.buffalo.cse.irf14.analysis;
 
 /*
+ Porter Algorithm implemented by Tartarus. <br>
+ It's copied from the internet <br>
+ http://tartarus.org/martin/PorterStemmer/java.txt
 
  Porter stemmer in Java. The original paper is in
 
