@@ -90,7 +90,7 @@ public class IndexerTest {
 	 */
 	@Test
 	public final void testGetPostings() {
-		String query = getAnalyzedTerm("home");
+		String query = getAnalyzedTerm("apple has 777,000 employees");
 		Map<String, Integer> map = reader.getPostings(query);
 		assertNotNull(map);
 		assertEquals(4, map.size(), 0);
@@ -119,7 +119,8 @@ public class IndexerTest {
 		AnalyzerFactory fact = AnalyzerFactory.getInstance();
 		try {
 			TokenStream stream = tknizer.consume(string);
-			Analyzer analyzer = fact.getAnalyzerForField(FieldNames.CONTENT,
+			Analyzer analyzer ;
+			analyzer = fact.getAnalyzerForField(FieldNames.CONTENT,
 					stream);
 
 			while (analyzer.increment()) {
@@ -127,6 +128,7 @@ public class IndexerTest {
 			}
 
 			stream.reset();
+			
 			return stream.next().toString();
 		} catch (TokenizerException e) {
 			// TODO Auto-generated catch block
