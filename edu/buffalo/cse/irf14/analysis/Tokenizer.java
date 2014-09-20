@@ -6,6 +6,7 @@ package edu.buffalo.cse.irf14.analysis;
 import java.util.LinkedList;
 
 import edu.buffalo.cse.irf14.common.CommonConstants;
+import edu.buffalo.cse.irf14.common.RegExp;
 
 /**
  * @author nikhillo Class that converts a given string into a
@@ -65,6 +66,11 @@ public class Tokenizer {
 				Token token = new Token();
 				token.setTermText(arr[index]);
 				token.setTermBuffer(token.getTermText().toCharArray());
+				// For Sentence ending with punctuation, mark the end of
+				// sentence
+				if (token.getTermText().matches(RegExp.REGEX_SENT_ENDS)) {
+					token.setEndOfSentence(true);
+				}
 				tempList.add(token);
 			}
 			TokenStream tokenStream = new TokenStream(tempList);

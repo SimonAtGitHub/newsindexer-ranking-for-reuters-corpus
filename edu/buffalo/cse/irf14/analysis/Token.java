@@ -19,6 +19,9 @@ public class Token {
 	// The char array backing termText
 	private char[] termBuffer;
 
+	// Whenever an end of sentence punctuation is removed, set it to true.
+	private boolean endOfSentence = false;
+
 	/**
 	 * Method to set the termText to given text. This is a sample implementation
 	 * and you CAN change this to suit your class definition and data structure
@@ -85,6 +88,14 @@ public class Token {
 			tempText = tempText.trim();
 			setTermText(tempText);
 		}
+	}
+
+	public boolean isEndOfSentence() {
+		return endOfSentence;
+	}
+
+	public void setEndOfSentence(boolean endOfSentence) {
+		this.endOfSentence = endOfSentence;
 	}
 
 	/**
