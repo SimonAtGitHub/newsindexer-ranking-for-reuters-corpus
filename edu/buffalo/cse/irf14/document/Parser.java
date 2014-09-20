@@ -14,9 +14,11 @@ import java.util.regex.Pattern;
  * @author nikhillo Class that parses a given file into a Document
  */
 public class Parser {
-	
-	//declared content as a global var as it would be used by different functions
-	private static String content="";
+
+	// declared content as a global var as it would be used by different
+	// functions
+	private static String content = "";
+
 	/**
 	 * Static method to parse the given file into the Document object
 	 * 
@@ -29,7 +31,11 @@ public class Parser {
 	public static Document parse(String filename) throws ParserException {
 		// TODO YOU MUST IMPLEMENT THIS
 		System.out.println("\nFileName:: " + filename);
-		
+		if (filename == null) {
+			throw new ParserException();
+		} else if (filename.isEmpty()) {
+			throw new ParserException();
+		}
 		BufferedReader reader;
 		// create the Document object
 		Document document = new Document();
@@ -41,16 +47,11 @@ public class Parser {
 			boolean hasAuthor = false;
 			boolean hasTitle = false;
 			boolean hasPlaceDate = false;
-			//handle NULL file
-			if(filename==null){
-			  throw new ParserException();	
-			}
-			else{
-				// Read the file contents into a buffer
-				reader = new BufferedReader(new FileReader(filename));
-			}
-			
-			
+			// handle NULL file
+
+			// Read the file contents into a buffer
+			reader = new BufferedReader(new FileReader(filename));
+
 			// line buffer to read a line once at a time
 			String line;
 
@@ -64,21 +65,20 @@ public class Parser {
 						title = line.trim();
 						document.setField(FieldNames.TITLE, title);
 						hasTitle = true;
-					
-					}else if (line.contains("<AUTHOR>")) {
+
+					} else if (line.contains("<AUTHOR>")) {
 						fetchAndSetAuthorDetails(document, line.trim());
 						hasAuthor = true;
 					} else if (!hasPlaceDate) {
 						String placeDateContent[] = line.split("-");
 						if (placeDateContent != null
 								&& placeDateContent.length > 1) {
-							fetchAndSetPlaceAndDate(document,placeDateContent);		
-						} 
+							fetchAndSetPlaceAndDate(document, placeDateContent);
+						}
 						hasPlaceDate = true;
 					} else {
 						content = content + line;
 					}
-					
 
 				}
 				content = content.trim();
@@ -98,16 +98,18 @@ public class Parser {
 
 		return document;
 	}
-	
+
 	/**
-	 * This method fetches place and date from the content and sets it in the document
-	 * object
+	 * This method fetches place and date from the content and sets it in the
+	 * document object
+	 * 
 	 * @param docObj
 	 * @param content
 	 */
-	private static void fetchAndSetPlaceAndDate(Document document,String [] placeDateContent){
+	private static void fetchAndSetPlaceAndDate(Document document,
+			String[] placeDateContent) {
 
-		String place="",newsDate="";
+		String place = "", newsDate = "";
 		String placeDate = placeDateContent[0];
 		int placeDateContLength = placeDateContent.length;
 		// Populate content-If there are multiple '-' within
@@ -122,7 +124,7 @@ public class Parser {
 			newsDate = placeDateArr[placeDateArrLength - 1];
 
 			for (int i = 0; i <= placeDateArrLength - 2; i++) {
-				place = place +"," +placeDateArr[i];
+				place = place + "," + placeDateArr[i];
 			}
 			System.out.println("\nPlace " + place);
 			place = place.substring(1, place.length());
@@ -133,7 +135,7 @@ public class Parser {
 		} else {
 			System.out.println("No place and date");
 		}
-	
+
 	}
 
 	private static void fetchAndSetAuthorDetails(Document docObj, String content) {
