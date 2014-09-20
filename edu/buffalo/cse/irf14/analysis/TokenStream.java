@@ -25,6 +25,8 @@ public class TokenStream implements Iterator<Token> {
 
 	private Token nextToken = null;
 
+	private Token previousToken;
+
 	/**
 	 * Constructor that initializes the token stream with the list
 	 */
@@ -66,6 +68,16 @@ public class TokenStream implements Iterator<Token> {
 		// nextToken remains unchanged.
 		currentToken = nextToken;
 		return nextToken;
+	}
+
+	/**
+	 * Method to return the previous Token in the stream. If for any reason, it
+	 * is called at the beginning of the stream, when all tokens have already
+	 * been iterated, return null
+	 */
+	public Token getPrevious() {
+		previousToken = tokenListIterator.previous();
+		return previousToken;
 	}
 
 	/**
