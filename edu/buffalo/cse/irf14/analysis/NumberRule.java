@@ -11,27 +11,38 @@ public class NumberRule extends TokenFilter{
 		this.stream = stream;
 	}
 
+	/**
+	 * 1. Processes the current token if it is not null
+	 * 2. Moves the pointer to the next token and returns true if there is any more tokens to 
+	 *    be processed
+	 */
 	@Override
 	public boolean increment() throws TokenizerException {
-		
+		if(stream.getCurrent()!=null){
+			   applyFilter();
+		}
+		if(stream.hasNext()){
+			stream.next();
+			return true;
+		}
 		return false;
 	}
 
 	@Override
 	public TokenStream getStream() {
-		filterNumbers();
 		return stream;
 	}
 	
-	//TODO- Discard dates
-	private void filterNumbers(){
-		while (stream.hasNext()) {
-			Token token = stream.next();
+	/**
+	 * Function that applies rule to the current token
+	 */
+	public void applyFilter(){
+		    Token token = stream.getCurrent();
 			String termText = token.getTermText();
 			//if the token is a real number delete the token
 			if(StringUtil.matchRegex(termText,RegExp.REGEX_REAL_NUM)){
 				stream.remove();
-				continue;
+				stream.next();
 			}
 			//if the token is a composite number (i.e. fractions or percentages ,replace
 			//only the digits
@@ -39,7 +50,6 @@ public class NumberRule extends TokenFilter{
 				termText=termText.replaceAll(RegExp.REGEX_NUM_PERIOD, "");
 			}
 			token.setTermText(termText);
-		}
 	}
 
 }

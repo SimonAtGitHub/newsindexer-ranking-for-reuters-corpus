@@ -3,6 +3,7 @@
  */
 package edu.buffalo.cse.irf14.analysis;
 
+import edu.buffalo.cse.irf14.common.FilterChains;
 import edu.buffalo.cse.irf14.document.FieldNames;
 
 /**
@@ -44,6 +45,14 @@ public class AnalyzerFactory {
 	 */
 	public Analyzer getAnalyzerForField(FieldNames name, TokenStream stream) {
 		//TODO : YOU NEED TO IMPLEMENT THIS METHOD
-		return null;
+		Analyzer analyzer=null;
+		switch(name){
+		    case CONTENT:
+		    	analyzer = new AnalyzerContent(stream,FilterChains.FILTERS_FOR_CONTENT);
+		    	break;
+		    default:
+		    	break;
+		}
+		return analyzer;
 	}
 }

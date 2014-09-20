@@ -21,4 +21,11 @@ public abstract class TokenFilter implements Analyzer {
 	public TokenFilter(TokenStream stream) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
 	}
+	
+	/**
+	 * Applies filter rule to the current token in the stream
+	 */
+    public void applyFilter(){
+    	
+    }
 }
