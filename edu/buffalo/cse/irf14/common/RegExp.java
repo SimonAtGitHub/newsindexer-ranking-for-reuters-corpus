@@ -8,6 +8,9 @@ public class RegExp {
 	public static final String REGEX_ALL_CAPS = "[A-Z]$";
 	// regular expression that denotes that a word ends with ! or . or ?
 	public static final String REGEX_SENT_ENDS = "(.*)[.!?]+$";
+	// regular expression that denotes that a word contains punctuation ! or .
+	// or ?
+	public static final String REGEX_CONTAINS_PUNCTUATION = "(.*)[.!?]+(.*)";
 	// regular expression that denotes that a string is in caps
 	public static final String REGEX_ANY_CAPS = "(.*)[A-Z+](.*)";
 	// regular expression that denotes a number e.g. 12 , 98.22
@@ -25,7 +28,7 @@ public class RegExp {
 	public static final String REGEX_FOR_JUST_HYPHEN = "^(\\s)*[-]+(\\s)*$";
 
 	public static final String REGEX_FOR_ALPHABETS_HYPHEN = "([aA-zZ]+[-][aA-zZ]+$)";
-	
+
 	// This regex should match for various alphanumeric combinations with
 	// hyphens like 6-6, BB3-A,
 	// BB3B-A, BB3-A9 etc. //NOTE Currently not being used
@@ -33,5 +36,9 @@ public class RegExp {
 
 	// Eg. a-- , ++b
 	public static final String REGEX_FOR_HYPHEN_AT_END_OR_START = "([aA-zZ]+[-]+$)|(^[-]+[aA-zZ]+$)";
+
+	public static final String REGEX_FOR_SPECIAL_CHARS_EXCLUDE_HYPHENS_PUNCTUATION = "[^a-zA-Z0-9!?.-]";
+
+	public static final String REGEX_FOR_SPECIAL_CHARS = "[^a-zA-Z0-9]";
 
 }
