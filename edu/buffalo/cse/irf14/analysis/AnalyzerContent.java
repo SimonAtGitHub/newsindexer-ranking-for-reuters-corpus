@@ -27,10 +27,12 @@ public class AnalyzerContent implements Analyzer {
 
 		TokenFilter tokenFilter = null;
 		if (stream.getCurrent() != null) {
-			for (TokenFilterType tokenFilterType : filterTypes){
-				tokenFilter = TokenFilterFactory.getInstance()
-						.getFilterByType(tokenFilterType, stream);
-			    tokenFilter.applyFilter();
+			for (TokenFilterType tokenFilterType : filterTypes) {
+				// Reset the stream before applying filter
+				stream.reset();
+				tokenFilter = TokenFilterFactory.getInstance().getFilterByType(
+						tokenFilterType, stream);
+				tokenFilter.applyFilter();
 			}
 		}
 		if (stream.hasNext()) {
