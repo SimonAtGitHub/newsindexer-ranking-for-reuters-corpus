@@ -7,7 +7,6 @@ package edu.buffalo.cse.irf14.analysis;
  *
  */
 public class StemmerRule extends TokenFilter {
-	TokenStream stream;
 	Stemmer stemmer;
 
 	public StemmerRule(TokenStream stream) {
@@ -17,28 +16,19 @@ public class StemmerRule extends TokenFilter {
 	}
 
 	@Override
-	public boolean increment() throws TokenizerException {
-		// stream.next();
-		return false;
-	}
-
-	// To be changed
-	@Override
-	public TokenStream getStream() {
-		while (stream.hasNext()) {
-			Token token = stream.next();
-			String termText = token.getTermText();
-			// Apply the stemming only if the termText is not null and
-			// begins with alphabet.
-			if (termText != null) {
-				if (termText.matches("^[a-zA-Z]+")) {
-					stemmer.add(termText.toCharArray(), termText.length());
-					stemmer.stem();
-					termText = stemmer.toString();
-				}
-				token.setTermText(termText);
+	public void applyFilter() {
+		Token token = stream.getCurrent();
+		String termText = token.getTermText();
+		// Apply the stemming only if the termText is not null and
+		// begins with alphabet.
+		if (termText != null) {
+			if (termText.matches("^[a-zA-Z]+")) {
+				stemmer.add(termText.toCharArray(), termText.length());
+				stemmer.stem();
+				termText = stemmer.toString();
 			}
+			token.setTermText(termText);
 		}
-		return stream;
+
 	}
 }

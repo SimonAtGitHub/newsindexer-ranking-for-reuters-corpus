@@ -13,32 +13,21 @@ import java.text.Normalizer;
 
 public class AccentRule extends TokenFilter {
 
-	TokenStream stream;
-
 	public AccentRule(TokenStream stream) {
 		super(stream);
 		this.stream = stream;
 	}
 
 	@Override
-	public boolean increment() throws TokenizerException {
-		return false;
-	}
-
-	@Override
-	public TokenStream getStream() {
+	public void applyFilter() {
 		filterAccents();
-		return stream;
 	}
 
 	private void filterAccents() {
-		while (stream.hasNext()) {
-			Token token = stream.next();
-			String termText = token.getTermText();
-			termText = Normalizer.normalize(termText, Normalizer.Form.NFD);
-			termText = termText.replaceAll("\\p{InCombiningDiacriticalMarks}+",
-					"");
-			token.setTermText(termText);
-		}
+		Token token = stream.getCurrent();
+		String termText = token.getTermText();
+		termText = Normalizer.normalize(termText, Normalizer.Form.NFD);
+		termText = termText.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+		token.setTermText(termText);
 	}
 }
