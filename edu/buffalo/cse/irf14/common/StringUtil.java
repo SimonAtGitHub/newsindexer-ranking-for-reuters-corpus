@@ -1,7 +1,13 @@
 package edu.buffalo.cse.irf14.common;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import edu.buffalo.cse.irf14.analysis.Token;
+import edu.buffalo.cse.irf14.analysis.TokenStream;
+import edu.buffalo.cse.irf14.document.FieldNames;
 
 public class StringUtil {
 
@@ -21,5 +27,38 @@ public class StringUtil {
        
         return flag;
 	}
+	
+	public static String convertStrArrToString(String [] strArr){
+		if(null!=strArr && strArr.length>0 ){
+			return Arrays.deepToString(strArr);
+		}
+		return null;
+	}
+	
+	private String convertTokenStreamToString(TokenStream tstream){
+
+		ArrayList<String> list = new ArrayList<String>();
+		String s;
+		Token t;
+
+		while (tstream.hasNext()) {
+			t = tstream.next();
+
+			if (t != null) {
+				s = t.toString();
+				
+				if (s!= null && !s.isEmpty())
+					list.add(s);	
+			}
+		}
+		
+		String[] rv = new String[list.size()];
+		rv = list.toArray(rv);
+		tstream = null;
+		list = null;
+		System.out.println(rv);
+		return rv.toString();
+	}
+	
 	 
 }

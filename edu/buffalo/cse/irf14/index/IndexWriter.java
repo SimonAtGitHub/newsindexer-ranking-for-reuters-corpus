@@ -3,8 +3,11 @@
  */
 package edu.buffalo.cse.irf14.index;
 
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.List;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
 import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
@@ -12,6 +15,8 @@ import edu.buffalo.cse.irf14.analysis.Token;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
+import edu.buffalo.cse.irf14.common.CommonUtil;
+import edu.buffalo.cse.irf14.common.StringUtil;
 import edu.buffalo.cse.irf14.document.Document;
 import edu.buffalo.cse.irf14.document.FieldNames;
 
@@ -38,59 +43,107 @@ public class IndexWriter {
 	 */
 	public void addDocument(Document d) throws IndexerException {
 		//TODO : YOU MUST IMPLEMENT THIS
-		Tokenizer tknizer = new Tokenizer();
-		AnalyzerFactory fact = AnalyzerFactory.getInstance();
-
-		
+        TokenStream stream = null;
 		try {
-			String[] contentArr = d.getField(FieldNames.CONTENT);
-			String content=Arrays.deepToString(contentArr);
-			TokenStream stream = tknizer.consume(content);
-			Analyzer analyzer ;
-			analyzer = fact.getAnalyzerForField(FieldNames.CONTENT,
-					stream);
-
-			while (analyzer.increment()) {
-
+			
+			/**
+			 * create document dictionary
+			 */
+			String fileId = StringUtil.convertStrArrToString(d.getField(FieldNames.FILEID));
+			//document id to be put in the postings list
+			Integer docId = DocumentDictionary.getInstance().nextVal();
+			//create document dictionary
+			DocumentDictionary docDictionary = DocumentDictionary.getInstance();
+			docDictionary.getMap().put(fileId, docId);
+			
+			/*FileOutputStream fileOut  = new FileOutputStream("E://ser//test2.ser");
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(docDictionary);
+			out.close();
+			fileOut.close();*/
+			
+			for(FieldNames fieldName:FieldNames.values()){
+				//analyze the tokenstream and apply filter chaining except for FileId
+				if(fieldName.equals(FieldNames.CONTENT)){
+					stream=analyzeStream(fieldName,d);
+					createDictionaryAndIndex(fieldName,stream,fileId,docId);
+				}
 			}
 			
-			stream.reset();
 			
-			String streamTest = convertTokenStreamToString(stream);
-			System.out.println("Content ::: "+streamTest);
+			
+			//String streamTest = convertTokenStreamToString(stream);
+			//System.out.println("Content ::: "+streamTest);
 
-		} catch (TokenizerException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	
-	private String convertTokenStreamToString(TokenStream tstream){
-
-		ArrayList<String> list = new ArrayList<String>();
-		String s;
-		Token t;
-
-		while (tstream.hasNext()) {
-			t = tstream.next();
-
-			if (t != null) {
-				s = t.toString();
-				
-				if (s!= null && !s.isEmpty())
-					list.add(s);	
+	/**
+	 * Analyze the tokenstream of each document attributes adn apply chained filters to it
+	 * @param fieldName
+	 * @param d
+	 * @return
+	 * @throws TokenizerException
+	 */
+	private TokenStream analyzeStream(FieldNames fieldName,Document d) throws TokenizerException{
+		Tokenizer tknizer = new Tokenizer();
+		AnalyzerFactory fact = AnalyzerFactory.getInstance();
+		TokenStream stream = null;
+		String[] termArr=null;
+		try{
+			switch(fieldName){
+			    case FILEID:
+			    	termArr = d.getField(FieldNames.FILEID);
+			    	break;
+			    case CATEGORY:
+			    	termArr = d.getField(FieldNames.CATEGORY);
+			    	break;
+			    case TITLE:
+			    	termArr = d.getField(FieldNames.TITLE);
+			    	break;
+			    case AUTHOR:
+			    	termArr = d.getField(FieldNames.AUTHOR);
+			    	break;
+			    case AUTHORORG:
+			    	termArr = d.getField(FieldNames.AUTHORORG);
+			    	break;
+			    case PLACE:
+			    	termArr = d.getField(FieldNames.PLACE);
+			    	break;
+			    case CONTENT:
+			    	termArr = d.getField(FieldNames.CONTENT);
+			    	break;
+			    case NEWSDATE:
+			    	termArr = d.getField(FieldNames.NEWSDATE);
+			    	break;
+			    default:
+			    	break;
 			}
-		}
+			String str=StringUtil.convertStrArrToString(termArr);
+			if(str!=null){
+				stream = tknizer.consume(str);
+				Analyzer analyzer ;
+				analyzer = fact.getAnalyzerForField(fieldName,
+						stream);
 		
-		String[] rv = new String[list.size()];
-		rv = list.toArray(rv);
-		tstream = null;
-		list = null;
-		System.out.println(rv);
-		return rv.toString();
+				while (analyzer.increment()) {
+		
+				}
+				
+				stream.reset();
+			}
+			return stream;
+		}catch(TokenizerException e){
+			throw new TokenizerException("Error while analyzing");
+		}
 	}
 	
+	
+	
+
 	/**
 	 * Method that indicates that all open resources must be closed
 	 * and cleaned and that the entire indexing operation has been completed.
@@ -98,5 +151,83 @@ public class IndexWriter {
 	 */
 	public void close() throws IndexerException {
 		//TODO
+	}
+	
+	/**
+	 * Method that creates the term dictionary and term index
+	 * @param d
+	 * @param docId
+	 */
+	private void createDictionaryAndIndex(FieldNames fieldName,TokenStream stream,String fileId,Integer docId){
+		
+		try{				
+				  while(stream.hasNext()){
+						Token token=stream.next();
+						String term=token.toString();
+						//get the dictionary
+						NewsDictionary dictionary = CommonUtil.getDictionaryByType(fieldName);
+						//get the index
+						NewsIndex index = CommonUtil.getIndexByType(fieldName);
+						//enter the term in the dictionary and index if term is not in the dictionary
+						// if it is not in the dictionary , it is also not in the postings list
+						if(dictionary.getMap().get(term)==null){
+							//enter the term in the dictionary
+							Integer id = dictionary.nextVal();
+							dictionary.getMap().put(term, id);
+							
+							//enter the term in the postings list
+							Posting posting= new Posting();
+							posting.setDocId(docId);
+							posting.setFileId(fileId);
+							posting.setFrequency(1);
+							List<Posting> postings = new ArrayList<Posting>();
+							postings.add(posting);
+							index.getMap().put(id, postings);
+							
+						}
+						//if the term is already present in the dictionary
+						else{
+	                        boolean hasPosting=false;
+	                        //get the id from the dictionary
+	                        Integer termId = dictionary.getMap().get(term);
+	                        //get the postings list from the index
+							List<Posting> postings=index.getMap().get(termId);
+							
+							//prepare the new posting object
+							Posting posting= new Posting();
+							posting.setDocId(docId);
+							posting.setFileId(fileId);
+							if(postings!=null){
+								for(Posting postingItem:postings){
+									//if the term is already mapped to a doc in the postings list just increase its frequency
+									if(postingItem.equals(posting)){
+										 Integer frequency = postingItem.getFrequency();
+										 postingItem.setFrequency(++frequency);
+										 hasPosting = true;
+										 break;
+									}
+								}
+								//if the term is not mapped to the doc in the postings list , create a new posting for the term
+								if(!hasPosting){
+									//enter the term in the postings list
+									Posting posting1= new Posting();
+									posting1.setDocId(docId);
+									posting1.setFileId(fileId);
+									posting1.setFrequency(1);
+									List<Posting> postings1 = new ArrayList<Posting>();
+									postings1.add(posting1);
+									Integer id = dictionary.nextVal();
+									index.getMap().put(id, postings1);
+								}
+							}
+						}
+						
+						
+			}
+			stream.reset();	  
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 }
