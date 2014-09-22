@@ -29,9 +29,6 @@ public class RegExp {
 
 	public static final String REGEX_FOR_ALPHABETS_HYPHEN = "([aA-zZ]+[-][aA-zZ]+$)";
 
-	// Extended Punctuations for Date Handling - May or may not be there
-	public static final String REGEX_EXT_PUNCTUATION = "([,?.!;]{0,})";
-
 	// This regex should match for various alphanumeric combinations with
 	// hyphens like 6-6, BB3-A,
 	// BB3B-A, BB3-A9 etc. //NOTE Currently not being used
@@ -44,21 +41,26 @@ public class RegExp {
 
 	public static final String REGEX_FOR_SPECIAL_CHARS = "[^a-zA-Z0-9]";
 
+	// Extended Punctuations for Date Handling - May or may not be there
+	public static final String REGEX_EXT_PUNCTUATION = "([,?.!;]{0,})";
+
 	// Match a valid date from 1-31 or 01-31. It might be followed by a
 	// punctuation.
 	public static final String REGEX_DATE = "([0]{0,1}[1-9]{1}|[12][0-9]|[3][0-1])";
 
-	public static final String REGEX_YEAR = "\\d{1,4}([bB][cC]|[aA][dD]){0,1}";
+	public static final String REGEX_YEAR_BC_AD = "(\\d{1,4})(bc|BC|ad|AD)";
 
-	public static final String REGEX_YEAR_PUNCTUATION_BC_AD = "(\\d{1,4})(bc|BC|ad|AD)([,?.!;]{0,})";
+	public static final String REGEX_YEAR = "(\\d{1,4})";
 
-	public static final String REGEX_YEAR_PUNCTUATION = "(\\d{1,4})([,?.!;]{0,})";
+	public static final String REGEX_ALPHABETS = "([a-zA-Z]+)";
 
-	public static final String REGEX_ALPHA_PUNCTUATION = "([a-zA-Z]+)([,?.!;]{0,})";
+	// Regular Expression for time
+	public static final String REGEX_HOURS = "([01]?[0-9]|2[0-3])";
 
-	// Regular Expression for time in AM/PM Format
-	public static final String REGEX_TIME_AMPM = "([0]{0,1}[0-9]{1}|[1]{1}[0-2]{1})[:]{0,1}[:]{0,1}(([aA]|[pP])[mM]){0,1}";
-	// public static final String REGEX_TIME =
-	// "([0]{0,1}[0-9]{1}|[1]{1}[0-9]{1}|[2]{1}[0-4]{1})[:]{0,1}[:]"
+	public static final String REGEX_MINUTES_SECONDS = "(([0-5][0-9]){0,1})";
+
+	public static final String REGEX_TIME_SEPARATOR = "([:]{0,1})";
+
+	public static final String REGEX_TIME_AM_PM = "((am|pm|AM|PM){0,1})";
 
 }
