@@ -77,6 +77,7 @@ public class TokenStream implements Iterator<Token> {
 	 */
 	public Token getPrevious() {
 		previousToken = tokenListIterator.previous();
+		currentToken = previousToken;
 		return previousToken;
 	}
 
