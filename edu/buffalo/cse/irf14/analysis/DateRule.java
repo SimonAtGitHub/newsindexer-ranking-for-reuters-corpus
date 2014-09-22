@@ -37,7 +37,8 @@ public class DateRule extends TokenFilter {
 		Token secondToken = null, thirdToken = null;
 		String firstTermText = null, secondTermText = null, thirdTermText = null, monthValue = "01", dateValue = "01", yearValue = "1900";
 		String month = "", punctuations = "", date = "", year = "", yearPrefix = "";
-		String formattedDateValue = yearValue + monthValue + dateValue;
+		String formattedDateValue = yearValue + monthValue + dateValue
+				+ punctuations;
 		// Handle Case 1 : Eg 01 January 1990 or 31 Jan 2000 or 28 Feb or 02
 		// August 90
 		if (firstToken != null) {
@@ -288,7 +289,7 @@ public class DateRule extends TokenFilter {
 											Integer.parseInt(firstTermText));
 							stream.remove();
 							formattedDateValue = yearValue + monthValue
-									+ dateValue;
+									+ dateValue + punctuations;
 							// Set the date to first token
 							firstToken.setTermText(formattedDateValue);
 						} else if (secondTermText.equalsIgnoreCase("AD")) {
@@ -296,7 +297,7 @@ public class DateRule extends TokenFilter {
 									Integer.parseInt(firstTermText));
 							stream.remove();
 							formattedDateValue = yearValue + monthValue
-									+ dateValue;
+									+ dateValue + punctuations;
 							// Set the date to first token
 							firstToken.setTermText(formattedDateValue);
 						} else if (months.contains(secondTermText)) {
@@ -304,7 +305,7 @@ public class DateRule extends TokenFilter {
 							monthValue = convertMonthToEquivalentNumber(secondTermText);
 							stream.remove();
 							formattedDateValue = yearValue + monthValue
-									+ dateValue;
+									+ dateValue + punctuations;
 							// Set the date to first token
 							firstToken.setTermText(formattedDateValue);
 							// Date can be after month
@@ -338,7 +339,7 @@ public class DateRule extends TokenFilter {
 							yearValue = String.format("%04d",
 									Integer.parseInt(firstTermText));
 							formattedDateValue = yearValue + monthValue
-									+ dateValue;
+									+ dateValue + punctuations;
 							// Set the date to first token
 							firstToken.setTermText(formattedDateValue);
 							// Date formatted. No need of further
@@ -364,7 +365,6 @@ public class DateRule extends TokenFilter {
 					// Check if BC or AD exists
 					if (yearPrefix.toUpperCase().endsWith("BC")) {
 						yearValue = "-" + year;
-
 					} else if (yearPrefix.toUpperCase().endsWith("AD")) {
 						yearValue = year;
 					} else {
@@ -378,7 +378,7 @@ public class DateRule extends TokenFilter {
 								monthValue = convertMonthToEquivalentNumber(secondTermText);
 								stream.remove();
 								formattedDateValue = yearValue + monthValue
-										+ dateValue;
+										+ dateValue + punctuations;
 								// Set the date to first token
 								firstToken.setTermText(formattedDateValue);
 								// Date can be after month
@@ -396,7 +396,7 @@ public class DateRule extends TokenFilter {
 												Integer.parseInt(dateString));
 										stream.remove();
 										dateString = yearValue + monthValue
-												+ dateValue;
+												+ dateValue + punctuations;
 										// Set the date to first token
 										firstToken.setTermText(dateString
 												+ specialChar);
@@ -413,7 +413,7 @@ public class DateRule extends TokenFilter {
 								yearValue = String.format("%04d",
 										Integer.parseInt(firstTermText));
 								formattedDateValue = yearValue + monthValue
-										+ dateValue;
+										+ dateValue + punctuations;
 								// Set the date to first token
 								firstToken.setTermText(formattedDateValue);
 								// Date formatted. No need of further
@@ -423,6 +423,10 @@ public class DateRule extends TokenFilter {
 						}
 
 					}
+					formattedDateValue = yearValue + monthValue + dateValue
+							+ punctuations;
+					// Set the date to first token
+					firstToken.setTermText(formattedDateValue);
 				}
 			}
 
