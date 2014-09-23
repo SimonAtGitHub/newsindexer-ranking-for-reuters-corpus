@@ -238,15 +238,14 @@ public class DateRule extends TokenFilter {
 											return;
 										}
 									}
-								} else {
-									// If the value was not a number,
-									// default it to
-									// 1900
-									yearValue = "1900";
-									firstToken.setTermText(yearValue
-											+ monthValue + dateValue
-											+ punctuations);
 								}
+								// If the value was not a number,
+								// default it to
+								// 1900
+								yearValue = "1900";
+								firstToken.setTermText(yearValue + monthValue
+										+ dateValue + punctuations);
+
 							}
 						}
 						// Remove the month token
