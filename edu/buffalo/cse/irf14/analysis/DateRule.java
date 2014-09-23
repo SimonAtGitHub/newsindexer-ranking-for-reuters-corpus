@@ -30,7 +30,7 @@ public class DateRule extends TokenFilter {
 
 	}
 
-	private void handleDateAndTime(TokenStream stream) {
+	private String handleDateAndTime(TokenStream stream) {
 		// Check for Date, Month, Year or Date, Month
 		// Get the first token
 		Token firstToken = stream.getCurrent();
@@ -98,7 +98,8 @@ public class DateRule extends TokenFilter {
 										firstToken.setTermText(yearValue
 												+ monthValue + dateValue
 												+ punctuations);
-										return;
+										return yearValue + monthValue
+												+ dateValue + punctuations;
 									}
 								} else if (thirdTermText
 										.matches(RegExp.REGEX_YEAR
@@ -120,7 +121,8 @@ public class DateRule extends TokenFilter {
 										firstToken.setTermText(yearValue
 												+ monthValue + dateValue
 												+ punctuations);
-										return;
+										return yearValue + monthValue
+												+ dateValue + punctuations;
 									}
 								} else {
 									// If the value was not a number, default it
@@ -130,7 +132,8 @@ public class DateRule extends TokenFilter {
 									firstToken.setTermText(yearValue
 											+ monthValue + dateValue
 											+ punctuations);
-									return;
+									return yearValue + monthValue + dateValue
+											+ punctuations;
 								}
 
 							}
@@ -138,7 +141,8 @@ public class DateRule extends TokenFilter {
 							// punctuation
 							firstToken.setTermText(yearValue + monthValue
 									+ dateValue + punctuations);
-							return;
+							return yearValue + monthValue + dateValue
+									+ punctuations;
 						}
 					} else {
 						// Assuming that the number is just a number and not a
@@ -213,7 +217,8 @@ public class DateRule extends TokenFilter {
 											firstToken.setTermText(yearValue
 													+ monthValue + dateValue
 													+ punctuations);
-											return;
+											return yearValue + monthValue
+													+ dateValue + punctuations;
 										}
 									} else if (thirdTermText
 											.matches(RegExp.REGEX_YEAR
@@ -235,7 +240,8 @@ public class DateRule extends TokenFilter {
 											firstToken.setTermText(yearValue
 													+ monthValue + dateValue
 													+ punctuations);
-											return;
+											return yearValue + monthValue
+													+ dateValue + punctuations;
 										}
 									}
 								}
@@ -328,7 +334,8 @@ public class DateRule extends TokenFilter {
 											+ specialChar);
 									// Date formatted. No need of further
 									// processing.
-									return;
+									return yearValue + monthValue + dateValue
+											+ punctuations;
 								}
 							}
 						} else {
@@ -343,7 +350,8 @@ public class DateRule extends TokenFilter {
 							firstToken.setTermText(formattedDateValue);
 							// Date formatted. No need of further
 							// processing.
-							return;
+							return yearValue + monthValue + dateValue
+									+ punctuations;
 						}
 					}
 
@@ -401,7 +409,8 @@ public class DateRule extends TokenFilter {
 												+ specialChar);
 										// Date formatted. No need of further
 										// processing.
-										return;
+										return yearValue + monthValue
+												+ dateValue + punctuations;
 									}
 								}
 							} else {
@@ -417,7 +426,8 @@ public class DateRule extends TokenFilter {
 								firstToken.setTermText(formattedDateValue);
 								// Date formatted. No need of further
 								// processing.
-								return;
+								return yearValue + monthValue + dateValue
+										+ punctuations;
 							}
 						}
 
@@ -428,6 +438,16 @@ public class DateRule extends TokenFilter {
 					firstToken.setTermText(formattedDateValue);
 				}
 			}
+			// If the date is separated by a hyphen
+			// if (firstTermText.contains("-")) {
+			// // Split the token into constituent dates and recurse through
+			// // this method
+			// String[] splitDates = firstTermText.split(firstTermText);
+			// String finalDateValue="";
+			// for (String splitDate : splitDates) {
+			// han
+			// }
+			// }
 
 			String hours = "00", minutes = "00", seconds = "00";
 			// Handling Time formats which might or mightnot have AM/PM in the
@@ -449,7 +469,7 @@ public class DateRule extends TokenFilter {
 						hours = String.format("%02d", Integer.parseInt(hours));
 					} else {
 						// No hours means no time
-						return;
+						return null;
 					}
 					// If minutes is present, next two groups will have the same
 					// value because of the pattern grouping else, next group
@@ -520,6 +540,7 @@ public class DateRule extends TokenFilter {
 						+ punctuations);
 			}
 		}
+		return null;
 	}
 
 	private String convertMonthToEquivalentNumber(String month) {
