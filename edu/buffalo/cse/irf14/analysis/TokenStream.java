@@ -88,9 +88,10 @@ public class TokenStream implements Iterator<Token> {
 	}
 
 	/**
-	 * Method to return the previous Token in the stream. Move the pointer
-	 * backwards to retrieve the previous token and then move it back to the
-	 * current.
+	 * Method to return the previous Token in the stream. Doesn't Move the
+	 * pointer backwards or anywhere.<br>
+	 * PLEASE DON'T USE THIS METHODS IN COMBINATION WITH MODIFICATION OPERATIONS
+	 * AS IT WILL LEAD TO CONCURRENT MODIFICATION EXCEPTION
 	 */
 	public Token getPrevious() {
 		if (tokenListIterator.nextIndex() > 1) {
