@@ -175,7 +175,7 @@ public class IndexWriter {
 		try {
 			fileOut= new FileOutputStream(indexDir+File.separatorChar +fileName);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
-			out.writeObject(DocumentDictionary.getInstance().getMap());
+			out.writeObject(object);
 			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
