@@ -12,6 +12,21 @@ public class FilterChains {
 			TokenFilterType.SPECIALCHARS, TokenFilterType.DATE,
 			TokenFilterType.NUMERIC, TokenFilterType.STOPWORD,
 			TokenFilterType.STEMMER };
-
+	
 	public static final TokenFilterType[] FILTERS_FOR_NEWSDATE = { TokenFilterType.DATE };
+
+	public static final TokenFilterType[] CATEGORY = {};
+	
+	public static final TokenFilterType[] TITLE = { TokenFilterType.CAPITALIZATION, TokenFilterType.SYMBOL,
+		                                             TokenFilterType.SPECIALCHARS, TokenFilterType.DATE,
+		                                             TokenFilterType.NUMERIC, TokenFilterType.STOPWORD,
+		                                             TokenFilterType.STEMMER };
+	
+	public static final TokenFilterType[] AUTHOR = { TokenFilterType.CAPITALIZATION };
+	
+	public static final TokenFilterType[] AUTHORORG = { TokenFilterType.CAPITALIZATION };
+	
+	public static final TokenFilterType[] PLACE = { TokenFilterType.CAPITALIZATION };
+	
+	
 }
