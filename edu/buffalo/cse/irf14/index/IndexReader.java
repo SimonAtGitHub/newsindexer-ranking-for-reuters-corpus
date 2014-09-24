@@ -3,12 +3,14 @@
  */
 package edu.buffalo.cse.irf14.index;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.List;
 import java.util.Map;
 
+import edu.buffalo.cse.irf14.common.CommonConstants;
 import edu.buffalo.cse.irf14.common.CommonUtil;
 
 /**
@@ -39,11 +41,15 @@ public class IndexReader {
 	/**
 	 * Map in the dictionary for the index type
 	 */
-	Map<String,Integer> dictionaryMap=null;
+	Map<String,Integer> dictionaryForIndexType=null;
 	/**
 	 * Map in the index for the type
 	 */
 	Map<String,Integer> indexMap = null;
+	/**
+	 * Document dictionary
+	 */
+	Map<String,Integer> docDictionary = null;
 	/**
 	 * Default constructor
 	 * @param indexDir : The root directory from which the index is to be read.
@@ -60,9 +66,13 @@ public class IndexReader {
 		
 		String indexFilePath = CommonUtil.getIndexPath(indexDir, type);
 		
-		dictionaryMap = (Map<String,Integer>)readObject(dictionaryFilePath);
+		String docDictionaryFilePath =  indexDir+File.separatorChar +CommonConstants.DOCUMENT_DICTIONARY_FILENAME;
+		
+		dictionaryForIndexType = (Map<String,Integer>)readObject(dictionaryFilePath);
 		
 		indexMap = (Map<String,Integer>)readObject(indexFilePath);
+		
+		docDictionary = (Map<String,Integer>)readObject(docDictionaryFilePath);
 		
 	}
 	
@@ -73,7 +83,7 @@ public class IndexReader {
 	 */
 	public int getTotalKeyTerms() {
 		//TODO : YOU MUST IMPLEMENT THIS
-		int size = dictionaryMap.size();
+		int size = dictionaryForIndexType.size();
 		return size;
 	}
 	
@@ -84,7 +94,7 @@ public class IndexReader {
 	 */
 	public int getTotalValueTerms() {
 		//TODO: YOU MUST IMPLEMENT THIS
-		int size = indexMap.size();
+		int size = docDictionary.size();
 		return size;
 	}
 	
