@@ -3,6 +3,10 @@
  */
 package edu.buffalo.cse.irf14.index;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,12 +26,15 @@ import edu.buffalo.cse.irf14.document.FieldNames;
  * Class responsible for writing indexes to disk
  */
 public class IndexWriter {
+	
+	private String indexDir=null;
 	/**
 	 * Default constructor
 	 * @param indexDir : The root directory to be sued for indexing
 	 */
 	public IndexWriter(String indexDir) {
 		//TODO : YOU MUST IMPLEMENT THIS
+		this.indexDir=indexDir;
 	}
 	
 	/**
@@ -147,9 +154,33 @@ public class IndexWriter {
 	 * @throws IndexerException : In case any error occurs
 	 */
 	public void close() throws IndexerException {
-		//TODO
+	    writeToDisk(DocumentDictionary.getInstance().getMap(),"DocumentDictionary");
+	    writeToDisk(TermDictionary.getInstance().getMap(),"TermDictionary");
+	    writeToDisk(AuthorDictionary.getInstance().getMap(),"AuthorDictionary");
+	    writeToDisk(PlaceDictionary.getInstance().getMap(),"PlaceDictionary");
+	    writeToDisk(CategoryDictionary.getInstance().getMap(),"CategoryDictionary");
+	    writeToDisk(TermIndex.getInstance().getMap(),"TermIndex");
+	    writeToDisk(AuthorIndex.getInstance().getMap(),"AuthorIndex");
+	    writeToDisk(PlaceIndex.getInstance().getMap(),"PlaceIndex");
+	    writeToDisk(CategoryIndex.getInstance().getMap(),"CategoryIndex");
 	}
-	
+ 
+	/**
+	 * Method that is used to write all the dictionaries and indexes to disk
+	 * @throws IOException 
+	 */
+	public void writeToDisk(Object object,String fileName) {
+		//TODO
+		FileOutputStream fileOut=null;
+		try {
+			fileOut= new FileOutputStream(indexDir+File.separatorChar +fileName);
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(DocumentDictionary.getInstance().getMap());
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	/**
 	 * Method that creates the term dictionary and term index
 	 * @param d
