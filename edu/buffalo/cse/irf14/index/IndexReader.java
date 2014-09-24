@@ -11,6 +11,35 @@ import java.util.Map;
  * Class that emulates reading data back from a written index
  */
 public class IndexReader {
+	
+	/**
+	 * The root directory from which the index is to be read.
+	 */
+	String indexDir;
+	
+	/**
+	 * Type of the index
+	 */
+	IndexType type;
+	/**
+	 * dictionary to be used for the index type
+	 */
+	
+	NewsDictionary dictionary;
+	
+	/**
+	 * Index to be used for the index type
+	 */
+	NewsIndex index;
+	
+	/**
+	 * Filename of the dictionary for the given type
+	 */
+	String dictionaryFileName;
+	/**
+	 * Filename of the index for the given type
+	 */
+	String indexFileName;
 	/**
 	 * Default constructor
 	 * @param indexDir : The root directory from which the index is to be read.
@@ -20,6 +49,8 @@ public class IndexReader {
 	 */
 	public IndexReader(String indexDir, IndexType type) {
 		//TODO
+		this.indexDir = indexDir;
+		this.type = type;
 	}
 	
 	/**

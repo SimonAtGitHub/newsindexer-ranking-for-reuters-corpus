@@ -17,6 +17,7 @@ import edu.buffalo.cse.irf14.analysis.Token;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
+import edu.buffalo.cse.irf14.common.CommonConstants;
 import edu.buffalo.cse.irf14.common.CommonUtil;
 import edu.buffalo.cse.irf14.common.StringUtil;
 import edu.buffalo.cse.irf14.document.Document;
@@ -155,15 +156,15 @@ public class IndexWriter {
 	 * @throws IndexerException : In case any error occurs
 	 */
 	public void close() throws IndexerException {
-		writeToDisk(DocumentDictionary.getInstance().getMap(),"DocumentDictionary");
-		writeToDisk(TermDictionary.getInstance().getMap(),"TermDictionary");
-		writeToDisk(AuthorDictionary.getInstance().getMap(),"AuthorDictionary");
-		writeToDisk(PlaceDictionary.getInstance().getMap(),"PlaceDictionary");
-		writeToDisk(CategoryDictionary.getInstance().getMap(),"CategoryDictionary");
-	    writeToDisk(TermIndex.getInstance().getMap(),"TermIndex");
-	    writeToDisk(AuthorIndex.getInstance().getMap(),"AuthorIndex");
-	    writeToDisk(PlaceIndex.getInstance().getMap(),"PlaceIndex");
-	    writeToDisk(CategoryIndex.getInstance().getMap(),"CategoryIndex");
+		writeToDisk(DocumentDictionary.getInstance().getMap(),CommonConstants.DOCUMENT_DICTIONARY_FILENAME);
+		writeToDisk(TermDictionary.getInstance().getMap(),CommonConstants.TERM_DICTIONARY_FILENAME);
+		writeToDisk(AuthorDictionary.getInstance().getMap(),CommonConstants.AUTHOR_DICTIONARY_FILENAME);
+		writeToDisk(PlaceDictionary.getInstance().getMap(),CommonConstants.PLACE_DICTIONARY_FILENAME);
+		writeToDisk(CategoryDictionary.getInstance().getMap(),CommonConstants.CATEGORY_DICTIONARY_FILENAME);
+	    writeToDisk(TermIndex.getInstance().getMap(),CommonConstants.TERM_INDEX_FILENAME);
+	    writeToDisk(AuthorIndex.getInstance().getMap(),CommonConstants.AUTHOR_INDEX_FILENAME);
+	    writeToDisk(PlaceIndex.getInstance().getMap(),CommonConstants.PLACE_INDEX_FILENAME);
+	    writeToDisk(CategoryIndex.getInstance().getMap(),CommonConstants.CATEGORY_INDEX_FILENAME);
 	}
  
 	/**
