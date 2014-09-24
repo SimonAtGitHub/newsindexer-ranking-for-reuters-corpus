@@ -115,7 +115,7 @@ public class CommonUtil {
 					break;
 		}
 		if(fileName!=null){
-			fileName = indexDir+File.separatorChar +fileName;
+			filePath = indexDir+File.separatorChar +fileName;
 		}
 		return filePath;
 	}
@@ -144,7 +144,7 @@ public class CommonUtil {
 					break;
 		}
 		if(fileName!=null){
-			fileName = indexDir+File.separatorChar +fileName;
+			filePath = indexDir+File.separatorChar +fileName;
 		}
 		return filePath;
 	}

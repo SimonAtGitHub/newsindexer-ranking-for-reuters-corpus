@@ -3,8 +3,13 @@
  */
 package edu.buffalo.cse.irf14.index;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.List;
 import java.util.Map;
+
+import edu.buffalo.cse.irf14.common.CommonUtil;
 
 /**
  * @author nikhillo
@@ -21,16 +26,6 @@ public class IndexReader {
 	 * Type of the index
 	 */
 	IndexType type;
-	/**
-	 * dictionary to be used for the index type
-	 */
-	
-	NewsDictionary dictionary;
-	
-	/**
-	 * Index to be used for the index type
-	 */
-	NewsIndex index;
 	
 	/**
 	 * Filename of the dictionary for the given type
@@ -40,6 +35,15 @@ public class IndexReader {
 	 * Filename of the index for the given type
 	 */
 	String indexFileName;
+	
+	/**
+	 * Map in the dictionary for the index type
+	 */
+	Map<String,Integer> dictionaryMap=null;
+	/**
+	 * Map in the index for the type
+	 */
+	Map<String,Integer> indexMap = null;
 	/**
 	 * Default constructor
 	 * @param indexDir : The root directory from which the index is to be read.
@@ -51,6 +55,15 @@ public class IndexReader {
 		//TODO
 		this.indexDir = indexDir;
 		this.type = type;
+		
+		String dictionaryFilePath = CommonUtil.getDictionaryPath(indexDir, type);
+		
+		String indexFilePath = CommonUtil.getIndexPath(indexDir, type);
+		
+		dictionaryMap = (Map<String,Integer>)readObject(dictionaryFilePath);
+		
+		indexMap = (Map<String,Integer>)readObject(indexFilePath);
+		
 	}
 	
 	/**
@@ -60,7 +73,8 @@ public class IndexReader {
 	 */
 	public int getTotalKeyTerms() {
 		//TODO : YOU MUST IMPLEMENT THIS
-		return -1;
+		int size = dictionaryMap.size();
+		return size;
 	}
 	
 	/**
@@ -70,7 +84,8 @@ public class IndexReader {
 	 */
 	public int getTotalValueTerms() {
 		//TODO: YOU MUST IMPLEMENT THIS
-		return -1;
+		int size = indexMap.size();
+		return size;
 	}
 	
 	/**
@@ -111,5 +126,31 @@ public class IndexReader {
 	public Map<String, Integer> query(String...terms) {
 		//TODO : BONUS ONLY
 		return null;
+	}
+	
+	/**
+	 * Reads a object given by the path
+	 * @param filePath
+	 * @return
+	 */
+	public Object readObject(String filePath){
+		  Object retObject=null;
+	      try
+	      {
+	         FileInputStream fileIn = new FileInputStream(filePath);
+	         ObjectInputStream in = new ObjectInputStream(fileIn);
+	         retObject = in.readObject();
+	         in.close();
+	         fileIn.close();
+	      }catch(IOException i)
+	      {
+	         i.printStackTrace();
+	         retObject=null;
+	      }catch(ClassNotFoundException c)
+	      {
+	         c.printStackTrace();
+	         retObject=null;
+	      }
+	      return retObject;
 	}
 }
