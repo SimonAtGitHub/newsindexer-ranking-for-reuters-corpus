@@ -15,9 +15,6 @@ import java.util.regex.Pattern;
  */
 public class Parser {
 
-	// declared content as a global var as it would be used by different
-	// functions
-	private static String content = "";
 
 	/**
 	 * Static method to parse the given file into the Document object
@@ -41,7 +38,7 @@ public class Parser {
 		Document document = new Document();
 		try {
 			// variables to hold the "Document" attributes
-			String title, place = "", newsDate;
+			String title, place = "", newsDate,content ="";
 
 			// flags to hold if the fields have been populated or not
 			boolean hasAuthor = false;
@@ -73,7 +70,7 @@ public class Parser {
 						String placeDateContent[] = line.split("-");
 						if (placeDateContent != null
 								&& placeDateContent.length > 1) {
-							fetchAndSetPlaceAndDate(document, placeDateContent);
+							content=content+fetchAndSetPlaceAndDate(document, placeDateContent,content);
 						}
 						hasPlaceDate = true;
 					} else {
@@ -106,8 +103,8 @@ public class Parser {
 	 * @param docObj
 	 * @param content
 	 */
-	private static void fetchAndSetPlaceAndDate(Document document,
-			String[] placeDateContent) {
+	private static String fetchAndSetPlaceAndDate(Document document,
+			String[] placeDateContent,String content) {
 
 		String place = "", newsDate = "";
 		String placeDate = placeDateContent[0];
@@ -135,6 +132,7 @@ public class Parser {
 		} else {
 			System.out.println("No place and date");
 		}
+		return content;
 
 	}
 
