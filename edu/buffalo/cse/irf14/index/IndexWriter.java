@@ -71,9 +71,11 @@ public class IndexWriter {
 			
 			for(FieldNames fieldName:FieldNames.values()){
 				//analyze the tokenstream and apply filter chaining except for FileId
-				if(fieldName.equals(FieldNames.CONTENT)){
+				if(!fieldName.equals(FieldNames.FILEID)){
 					stream=analyzeStream(fieldName,d);
-					createDictionaryAndIndex(fieldName,stream,fileId,docId);
+					if(stream!=null){
+					   createDictionaryAndIndex(fieldName,stream,fileId,docId);
+					}
 				}
 			}
 			
@@ -232,8 +234,6 @@ public class IndexWriter {
 							List<Posting> postings = new ArrayList<Posting>();
 							postings.add(posting);
 							index.getMap().put(id, postings);
-							Map<Integer, List<Posting>> map=index.getMap();
-							System.out.println("\nIndex prepared");
 							
 						}
 						//if the term is already present in the dictionary
