@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
 import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
@@ -231,6 +232,8 @@ public class IndexWriter {
 							List<Posting> postings = new ArrayList<Posting>();
 							postings.add(posting);
 							index.getMap().put(id, postings);
+							Map<Integer, List<Posting>> map=index.getMap();
+							System.out.println("\nIndex prepared");
 							
 						}
 						//if the term is already present in the dictionary
@@ -256,16 +259,15 @@ public class IndexWriter {
 									}
 								}
 								//if the term is not mapped to the doc in the postings list , create a new posting for the term
+								//and map it to the term
 								if(!hasPosting){
 									//enter the term in the postings list
 									Posting posting1= new Posting();
 									posting1.setDocId(docId);
 									posting1.setFileId(fileId);
 									posting1.setFrequency(1);
-									List<Posting> postings1 = new ArrayList<Posting>();
-									postings1.add(posting1);
-									Integer id = dictionary.nextVal();
-									index.getMap().put(id, postings1);
+									//add it to the same postings list
+									postings.add(posting1);
 								}
 							}
 						}
