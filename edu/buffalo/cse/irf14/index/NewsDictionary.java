@@ -39,5 +39,15 @@ public abstract class NewsDictionary {
 		return ++sequence;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "NewsDictionary [map=" + map + "]";
+	}
+	
+	
+
 
 }

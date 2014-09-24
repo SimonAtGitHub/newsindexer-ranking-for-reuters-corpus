@@ -3,6 +3,7 @@
  */
 package edu.buffalo.cse.irf14.index;
 
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -154,11 +155,11 @@ public class IndexWriter {
 	 * @throws IndexerException : In case any error occurs
 	 */
 	public void close() throws IndexerException {
-	    writeToDisk(DocumentDictionary.getInstance().getMap(),"DocumentDictionary");
-	    writeToDisk(TermDictionary.getInstance().getMap(),"TermDictionary");
-	    writeToDisk(AuthorDictionary.getInstance().getMap(),"AuthorDictionary");
-	    writeToDisk(PlaceDictionary.getInstance().getMap(),"PlaceDictionary");
-	    writeToDisk(CategoryDictionary.getInstance().getMap(),"CategoryDictionary");
+		writeToDisk(DocumentDictionary.getInstance().getMap(),"DocumentDictionary");
+		writeToDisk(TermDictionary.getInstance().getMap(),"TermDictionary");
+		writeToDisk(AuthorDictionary.getInstance().getMap(),"AuthorDictionary");
+		writeToDisk(PlaceDictionary.getInstance().getMap(),"PlaceDictionary");
+		writeToDisk(CategoryDictionary.getInstance().getMap(),"CategoryDictionary");
 	    writeToDisk(TermIndex.getInstance().getMap(),"TermIndex");
 	    writeToDisk(AuthorIndex.getInstance().getMap(),"AuthorIndex");
 	    writeToDisk(PlaceIndex.getInstance().getMap(),"PlaceIndex");
@@ -181,6 +182,24 @@ public class IndexWriter {
 			e.printStackTrace();
 		}
 	}
+	
+	 
+	/**
+	 * Method that is used to write all the dictionaries and indexes to disk
+	 * @throws IOException 
+	 */
+	public void writeToDiskUTF(Object object,String fileName) {
+			//TODO
+			FileOutputStream fileOut=null;
+			try {
+				fileOut= new FileOutputStream(indexDir+File.separatorChar +fileName);
+				DataOutputStream out = new DataOutputStream(fileOut);
+				out.writeUTF(object.toString());
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    }
 	/**
 	 * Method that creates the term dictionary and term index
 	 * @param d

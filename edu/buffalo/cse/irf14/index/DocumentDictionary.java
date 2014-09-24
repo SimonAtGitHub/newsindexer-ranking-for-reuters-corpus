@@ -30,7 +30,6 @@ public class DocumentDictionary extends NewsDictionary implements Serializable{
 		return instance;
 	}
 	
-
 	
 	
 
