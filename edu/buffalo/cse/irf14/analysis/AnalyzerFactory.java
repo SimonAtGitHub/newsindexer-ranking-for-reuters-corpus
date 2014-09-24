@@ -47,8 +47,26 @@ public class AnalyzerFactory {
 		//TODO : YOU NEED TO IMPLEMENT THIS METHOD
 		Analyzer analyzer=null;
 		switch(name){
+		    case CATEGORY:
+		    	analyzer = new AnalyzerForCategory(stream,FilterChains.FILTERS_FOR_CONTENT);
+		    	break;
+		    case TITLE:
+		    	analyzer = new AnalyzerForTitle(stream,FilterChains.FILTERS_FOR_TITLE);
+		    	break;
+		    case AUTHOR:
+		    	analyzer = new AnalyzerForAuthor(stream,FilterChains.FILTERS_FOR_AUTHOR);
+		    	break;
+		    case AUTHORORG:
+		    	analyzer = new AnalyzerForAuthorOrg(stream,FilterChains.FILTERS_FOR_AUTHORORG);
+		    	break;
+		    case PLACE:
+		    	analyzer = new AnalyzerForPlace(stream,FilterChains.FILTERS_FOR_PLACE);
+		    	break;
+		    case NEWSDATE:
+		    	analyzer = new AnalyzerForNewsDate(stream,FilterChains.FILTERS_FOR_NEWSDATE);
+		    	break;
 		    case CONTENT:
-		    	analyzer = new AnalyzerContent(stream,FilterChains.FILTERS_FOR_CONTENT);
+		    	analyzer = new AnalyzerForContent(stream,FilterChains.FILTERS_FOR_CONTENT);
 		    	break;
 		    default:
 		    	break;

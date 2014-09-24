@@ -4,7 +4,7 @@ import edu.buffalo.cse.irf14.common.RegExp;
 
 /**
  * @author animeshk
- *
+ * 
  */
 public class SymbolRule extends TokenFilter {
 
@@ -16,8 +16,8 @@ public class SymbolRule extends TokenFilter {
 	@Override
 	public void applyFilter() {
 		Token token = stream.getCurrent();
-		String termText = token.getTermText();
-		if (termText != null) {
+		if (token != null) {
+			String termText = token.getTermText();
 			termText = filterSymbols(termText);
 			if (termText == null || termText.isEmpty()) {
 				stream.remove();

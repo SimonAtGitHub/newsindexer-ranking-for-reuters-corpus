@@ -4,7 +4,7 @@ import edu.buffalo.cse.irf14.common.RegExp;
 
 /**
  * @author animeshk
- *
+ * 
  */
 public class SpecialCharactersRule extends TokenFilter {
 
@@ -16,9 +16,9 @@ public class SpecialCharactersRule extends TokenFilter {
 	@Override
 	public void applyFilter() {
 		Token token = stream.getCurrent();
-		String termText = token.getTermText();
+		if (token != null) {
+			String termText = token.getTermText();
 
-		if (termText != null) {
 			termText = filterSpecialCharacters(termText);
 			if (termText.isEmpty()) {
 				stream.remove();

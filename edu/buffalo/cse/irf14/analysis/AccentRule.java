@@ -8,7 +8,7 @@ import java.text.Normalizer;
  * -utf-8-accents-from-a-string
  * 
  * @author Priyankar
- *
+ * 
  */
 
 public class AccentRule extends TokenFilter {
@@ -25,9 +25,12 @@ public class AccentRule extends TokenFilter {
 
 	private void filterAccents() {
 		Token token = stream.getCurrent();
-		String termText = token.getTermText();
-		termText = Normalizer.normalize(termText, Normalizer.Form.NFD);
-		termText = termText.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-		token.setTermText(termText);
+		if (token != null) {
+			String termText = token.getTermText();
+			termText = Normalizer.normalize(termText, Normalizer.Form.NFD);
+			termText = termText.replaceAll("\\p{InCombiningDiacriticalMarks}+",
+					"");
+			token.setTermText(termText);
+		}
 	}
 }

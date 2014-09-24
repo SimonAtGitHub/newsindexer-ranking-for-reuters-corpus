@@ -1,7 +1,11 @@
 package edu.buffalo.cse.irf14.analysis;
 
-public class AnalyzerContent implements Analyzer {
-
+/**
+ * Analyzer implementation
+ * @author Priyankar
+ *
+ */
+public class AnalyzerImpl implements Analyzer{
 	private TokenStream stream;
 
 	private TokenFilterType[] filterTypes;
@@ -11,14 +15,14 @@ public class AnalyzerContent implements Analyzer {
 	 * @param stream
 	 * @param filters
 	 */
-	public AnalyzerContent(TokenStream stream, TokenFilterType... filterTypes) {
+	public AnalyzerImpl(TokenStream stream, TokenFilterType... filterTypes) {
 		this.stream = stream;
 		this.filterTypes = filterTypes;
 	}
 
 	/**
 	 * 
-	 * 1. Iterates over the token stream and applies all the filters to it if it
+	 * 1. Iterates over the token stream and applies all the filters to it(a single token) if it
 	 * is not null 2. Moves the pointer to the next token and returns true if
 	 * there is any more tokens to be processed
 	 */
@@ -45,5 +49,4 @@ public class AnalyzerContent implements Analyzer {
 		// TODO Auto-generated method stub
 		return stream;
 	}
-
 }

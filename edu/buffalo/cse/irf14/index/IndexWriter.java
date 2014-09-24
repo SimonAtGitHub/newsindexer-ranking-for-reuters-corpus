@@ -3,10 +3,7 @@
  */
 package edu.buffalo.cse.irf14.index;
 
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.List;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;

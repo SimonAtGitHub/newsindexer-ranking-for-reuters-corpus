@@ -14,12 +14,13 @@ public class StopWordsRule extends TokenFilter {
 	 */
 	public void applyFilter() {
 		Token token = stream.getCurrent();
-		String termText = token.getTermText();
-		if (termText != null
-				&& StopWords.stopWordsSet.contains(StopWords
-						.valueOfDesc(termText))) {
-			stream.remove();
+		if (token != null) {
+			String termText = token.getTermText();
+			if (termText != null
+					&& StopWords.stopWordsSet.contains(StopWords
+							.valueOfDesc(termText))) {
+				stream.remove();
+			}
 		}
 	}
-
 }
