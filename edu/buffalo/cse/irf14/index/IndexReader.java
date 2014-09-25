@@ -46,7 +46,7 @@ public class IndexReader {
 	/**
 	 * Map in the index for the type
 	 */
-	Map<Integer,List<Posting>> indexMap = null;
+	Map<Integer,PostingWrapper> indexMap = null;
 	/**
 	 * Document dictionary
 	 *
@@ -72,7 +72,7 @@ public class IndexReader {
 		
 		dictionaryForIndexType = (Map<String,Integer>)readObject(dictionaryFilePath);
 		
-		indexMap = (Map<Integer,List<Posting>>)readObject(indexFilePath);
+		indexMap = (Map<Integer,PostingWrapper>)readObject(indexFilePath);
 		
 		docDictionary = (Map<Integer,String>)readObject(docDictionaryFilePath);
 		
@@ -110,19 +110,23 @@ public class IndexReader {
 	 */
 	public Map<String, Integer> getPostings(String term) {
 		//TODO:YOU MUST IMPLEMENT THIS
-		//get the term id from the dictionary
-		Integer termId = (Integer)dictionaryForIndexType.get(term);
-		//get the postings list from the index
-		List<Posting> postings = (List<Posting>)indexMap.get(termId);
-		
 		//prepare the map to be returned for postings
 		Map<String,Integer> postingsMap=null; 
-		
-		if(postings!=null && postings.size()>0)
-		{   postingsMap  = new HashMap<String,Integer>();
-			for(Posting posting:postings){
-				String fileId = docDictionary.get(posting.getDocId());
-				postingsMap.put(fileId, posting.getFrequency());
+		//get the term id from the dictionary
+		Integer termId = (Integer)dictionaryForIndexType.get(term);
+		if(termId!=null){
+			//get the postings list from the index
+			PostingWrapper postingWrapper = (PostingWrapper)indexMap.get(termId);
+			List<Posting> postings = postingWrapper.getPostings();
+			
+	
+			
+			if(postings!=null && postings.size()>0)
+			{   postingsMap  = new HashMap<String,Integer>();
+				for(Posting posting:postings){
+					String fileId = docDictionary.get(posting.getDocId());
+					postingsMap.put(fileId, posting.getFrequency());
+				}
 			}
 		}
 		

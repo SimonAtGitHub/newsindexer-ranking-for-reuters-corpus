@@ -226,6 +226,10 @@ public class IndexWriter {
 							Integer id = dictionary.nextVal();
 							dictionary.getMap().put(term, id);
 							
+							//create the Posting wrapper and set the total frequency 1
+							PostingWrapper postingWrapper = new PostingWrapper();
+							postingWrapper.setTotalFrequency(1);
+							
 							//enter the term in the postings list
 							Posting posting= new Posting();
 							posting.setDocId(docId);
@@ -233,7 +237,9 @@ public class IndexWriter {
 							posting.setFrequency(1);
 							List<Posting> postings = new ArrayList<Posting>();
 							postings.add(posting);
-							index.getMap().put(id, postings);
+							postingWrapper.setPostings(postings);
+							
+							index.getMap().put(id, postingWrapper);
 							
 						}
 						//if the term is already present in the dictionary
@@ -241,8 +247,15 @@ public class IndexWriter {
 	                        boolean hasPosting=false;
 	                        //get the id from the dictionary
 	                        Integer termId = dictionary.getMap().get(term);
-	                        //get the postings list from the index
-							List<Posting> postings=index.getMap().get(termId);
+	                        //get the postings list and total frequency from the index 
+	                        
+	                        PostingWrapper postingWrapper = index.getMap().get(termId);
+							List<Posting> postings=postingWrapper.getPostings();
+							Integer totalFrequency = postingWrapper.getTotalFrequency();
+							
+							//increase the total frequency and set it in the posting wrapper
+							totalFrequency++;
+							postingWrapper.setTotalFrequency(totalFrequency);
 							
 							//prepare the new posting object
 							Posting posting= new Posting();
