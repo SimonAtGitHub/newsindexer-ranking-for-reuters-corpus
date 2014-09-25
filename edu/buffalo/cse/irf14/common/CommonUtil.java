@@ -1,6 +1,14 @@
 package edu.buffalo.cse.irf14.common;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import edu.buffalo.cse.irf14.document.FieldNames;
 import edu.buffalo.cse.irf14.index.AuthorDictionary;
@@ -13,6 +21,7 @@ import edu.buffalo.cse.irf14.index.NewsDictionary;
 import edu.buffalo.cse.irf14.index.NewsIndex;
 import edu.buffalo.cse.irf14.index.PlaceDictionary;
 import edu.buffalo.cse.irf14.index.PlaceIndex;
+import edu.buffalo.cse.irf14.index.PostingWrapper;
 import edu.buffalo.cse.irf14.index.TermDictionary;
 import edu.buffalo.cse.irf14.index.TermIndex;
 
@@ -146,4 +155,36 @@ public class CommonUtil {
 		}
 		return filePath;
 	}
+	
+	/**
+	 * Method that sorts the index by the total no. of frequencies of a term
+	 * @param map
+	 * @return
+	 * Reference taken from - http://javarevisited.blogspot.com/2012/12/how-to-sort-hashmap-java-by-key-and-value.html
+	 */
+	
+	public static <Integer extends Comparable,PostingWrapper extends Comparable> Map<Integer,PostingWrapper> sortByTotalFrequency(Map<Integer,PostingWrapper> map){
+        List<Map.Entry<Integer,PostingWrapper>> entries = new LinkedList<Map.Entry<Integer,PostingWrapper>>(map.entrySet());
+      
+        Collections.sort(entries, new Comparator<Map.Entry<Integer,PostingWrapper>>() {
+
+            @Override
+            public int compare(Entry<Integer, PostingWrapper> o1, Entry<Integer, PostingWrapper> o2) {
+            	PostingWrapper wrapper1 = o1.getValue();
+            	PostingWrapper wrapper2 = o2.getValue();
+            	return o1.getValue().compareTo(o2.getValue());
+                
+            }
+        });
+      
+        //LinkedHashMap will keep the keys in the order they are inserted
+        //which is currently sorted on natural ordering
+        Map<Integer,PostingWrapper> sortedMap = new LinkedHashMap<Integer,PostingWrapper>();
+      
+        for(Map.Entry<Integer,PostingWrapper> entry: entries){
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+      
+        return sortedMap;
+    }
 }

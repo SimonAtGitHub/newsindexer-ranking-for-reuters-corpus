@@ -7,9 +7,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import edu.buffalo.cse.irf14.common.CommonConstants;
 import edu.buffalo.cse.irf14.common.CommonUtil;
@@ -142,7 +146,32 @@ public class IndexReader {
 	 */
 	public List<String> getTopK(int k) {
 		//TODO YOU MUST IMPLEMENT THIS
-		return null;
+		List<String> topTerms=null;
+		if(k>0){
+			Map<Integer,PostingWrapper> sortedMap = CommonUtil.sortByTotalFrequency(indexMap);
+			int counter=1;
+			topTerms = new ArrayList<String>();
+			
+			for (Map.Entry<Integer,PostingWrapper> entry : sortedMap.entrySet())
+			{
+				if(counter==k+1){
+			    	break;
+			    }
+				//get the term key from the index
+				Integer termKey=entry.getKey();
+				//get the term value from the dictionary
+				//Inefficient but doing it as we are not maintaing a reverse dictionary
+				for (Entry<String,Integer> entry1 : dictionaryForIndexType.entrySet()) {
+			        if (termKey.equals(entry1.getValue())) {
+			            String str = entry1.getKey();
+			            topTerms.add(str);
+			            break;
+			        }
+			    }
+				counter++;
+			}
+		}
+		return topTerms;
 	}
 	
 	/**

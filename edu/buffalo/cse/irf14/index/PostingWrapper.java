@@ -1,14 +1,17 @@
 package edu.buffalo.cse.irf14.index;
 
+
+
 import java.io.Serializable;
 import java.util.List;
 
-public class PostingWrapper implements Serializable{
+public class PostingWrapper implements Serializable,Comparable<PostingWrapper>{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2773983949295484356L;
+
 	/**
 	 * total frequency of a term in the index
 	 */
@@ -45,5 +48,11 @@ public class PostingWrapper implements Serializable{
 	 */
 	public void setPostings(List<Posting> postings) {
 		this.postings = postings;
+	}
+
+	@Override
+	public int compareTo(PostingWrapper o) {
+		// TODO Auto-generated method stub
+		return (o.totalFrequency).compareTo(this.totalFrequency);
 	}
 }
