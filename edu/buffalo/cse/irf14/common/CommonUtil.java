@@ -18,51 +18,50 @@ import edu.buffalo.cse.irf14.index.TermIndex;
 
 public class CommonUtil {
 	/**
-	 * returns the corresponding index based on field 
+	 * returns the corresponding index based on field
+	 * 
 	 * @param fieldName
 	 * @return
 	 */
 	public static NewsIndex getIndexByType(FieldNames fieldName) {
 		NewsIndex newIndex = null;
 		switch (fieldName) {
-				case CATEGORY:
-					newIndex = CategoryIndex.getInstance();
-					break;
-				case TITLE:
-					newIndex = TermIndex.getInstance();
-					break;
-				case AUTHOR:
-					newIndex = AuthorIndex.getInstance();
-					break;
-				case AUTHORORG:
-					newIndex = AuthorIndex.getInstance();
-					break;
-				case PLACE:
-					newIndex = PlaceIndex.getInstance();
-					break;
-				case CONTENT:
-					newIndex = TermIndex.getInstance();
-					break;
-				case NEWSDATE:
-					newIndex = TermIndex.getInstance();
-					break;
-				default:
-					break;
+		case CATEGORY:
+			newIndex = CategoryIndex.getInstance();
+			break;
+		case TITLE:
+			newIndex = TermIndex.getInstance();
+			break;
+		case AUTHOR:
+			newIndex = AuthorIndex.getInstance();
+			break;
+		case AUTHORORG:
+			newIndex = AuthorIndex.getInstance();
+			break;
+		case PLACE:
+			newIndex = PlaceIndex.getInstance();
+			break;
+		case CONTENT:
+			newIndex = TermIndex.getInstance();
+			break;
+		case NEWSDATE:
+			newIndex = TermIndex.getInstance();
+			break;
+		default:
+			break;
 		}
 		return newIndex;
 	}
-	
+
 	/**
 	 * returns the corresponding dictionary object based on field
+	 * 
 	 * @param fieldName
 	 * @return
 	 */
 	public static NewsDictionary getDictionaryByType(FieldNames fieldName) {
 		NewsDictionary newsDictionary = null;
 		switch (fieldName) {
-		case FILEID:
-			newsDictionary = DocumentDictionary.getInstance();
-			break;
 		case CATEGORY:
 			newsDictionary = CategoryDictionary.getInstance();
 			break;
@@ -89,62 +88,61 @@ public class CommonUtil {
 		}
 		return newsDictionary;
 	}
-	
-	
+
 	/**
-	 * Finds the dictionary file name based on the index type
-	 * Returns the dictionary path based on the type
+	 * Finds the dictionary file name based on the index type Returns the
+	 * dictionary path based on the type
 	 */
-	public static String getDictionaryPath(String indexDir,IndexType type){
-		String filePath=null;
-		String fileName=null;
+	public static String getDictionaryPath(String indexDir, IndexType type) {
+		String filePath = null;
+		String fileName = null;
 		switch (type) {
-				case TERM:
-					fileName = CommonConstants.TERM_DICTIONARY_FILENAME;
-					break;
-				case AUTHOR:
-					fileName = CommonConstants.AUTHOR_DICTIONARY_FILENAME;
-					break;
-				case CATEGORY:
-					fileName = CommonConstants.CATEGORY_DICTIONARY_FILENAME;
-					break;
-				case PLACE:
-					fileName = CommonConstants.PLACE_DICTIONARY_FILENAME;
-					break;
-				default:
-					break;
+		case TERM:
+			fileName = CommonConstants.TERM_DICTIONARY_FILENAME;
+			break;
+		case AUTHOR:
+			fileName = CommonConstants.AUTHOR_DICTIONARY_FILENAME;
+			break;
+		case CATEGORY:
+			fileName = CommonConstants.CATEGORY_DICTIONARY_FILENAME;
+			break;
+		case PLACE:
+			fileName = CommonConstants.PLACE_DICTIONARY_FILENAME;
+			break;
+		default:
+			break;
 		}
-		if(fileName!=null){
-			filePath = indexDir+File.separatorChar +fileName;
+		if (fileName != null) {
+			filePath = indexDir + File.separatorChar + fileName;
 		}
 		return filePath;
 	}
-	
+
 	/**
-	 * Finds the index file name based on the index type
-	 * Returns the dictionary path based on the type
+	 * Finds the index file name based on the index type Returns the dictionary
+	 * path based on the type
 	 */
-	public static String getIndexPath(String indexDir,IndexType type){
-		String filePath=null;
-		String fileName=null;
+	public static String getIndexPath(String indexDir, IndexType type) {
+		String filePath = null;
+		String fileName = null;
 		switch (type) {
-				case TERM:
-					fileName = CommonConstants.TERM_INDEX_FILENAME;
-					break;
-				case AUTHOR:
-					fileName = CommonConstants.AUTHOR_INDEX_FILENAME;
-					break;
-				case CATEGORY:
-					fileName = CommonConstants.CATEGORY_INDEX_FILENAME;
-					break;
-				case PLACE:
-					fileName = CommonConstants.PLACE_INDEX_FILENAME;
-					break;
-				default:
-					break;
+		case TERM:
+			fileName = CommonConstants.TERM_INDEX_FILENAME;
+			break;
+		case AUTHOR:
+			fileName = CommonConstants.AUTHOR_INDEX_FILENAME;
+			break;
+		case CATEGORY:
+			fileName = CommonConstants.CATEGORY_INDEX_FILENAME;
+			break;
+		case PLACE:
+			fileName = CommonConstants.PLACE_INDEX_FILENAME;
+			break;
+		default:
+			break;
 		}
-		if(fileName!=null){
-			filePath = indexDir+File.separatorChar +fileName;
+		if (fileName != null) {
+			filePath = indexDir + File.separatorChar + fileName;
 		}
 		return filePath;
 	}

@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,11 +46,12 @@ public class IndexReader {
 	/**
 	 * Map in the index for the type
 	 */
-	Map<String,Integer> indexMap = null;
+	Map<Integer,List<Posting>> indexMap = null;
 	/**
 	 * Document dictionary
+	 *
 	 */
-	Map<String,Integer> docDictionary = null;
+	Map<Integer,String> docDictionary = null;
 	/**
 	 * Default constructor
 	 * @param indexDir : The root directory from which the index is to be read.
@@ -70,9 +72,9 @@ public class IndexReader {
 		
 		dictionaryForIndexType = (Map<String,Integer>)readObject(dictionaryFilePath);
 		
-		indexMap = (Map<String,Integer>)readObject(indexFilePath);
+		indexMap = (Map<Integer,List<Posting>>)readObject(indexFilePath);
 		
-		docDictionary = (Map<String,Integer>)readObject(docDictionaryFilePath);
+		docDictionary = (Map<Integer,String>)readObject(docDictionaryFilePath);
 		
 	}
 	
@@ -108,7 +110,23 @@ public class IndexReader {
 	 */
 	public Map<String, Integer> getPostings(String term) {
 		//TODO:YOU MUST IMPLEMENT THIS
-		return null;
+		//get the term id from the dictionary
+		Integer termId = (Integer)dictionaryForIndexType.get(term);
+		//get the postings list from the index
+		List<Posting> postings = (List<Posting>)indexMap.get(termId);
+		
+		//prepare the map to be returned for postings
+		Map<String,Integer> postingsMap=null; 
+		
+		if(postings!=null && postings.size()>0)
+		{   postingsMap  = new HashMap<String,Integer>();
+			for(Posting posting:postings){
+				String fileId = docDictionary.get(posting.getDocId());
+				postingsMap.put(fileId, posting.getFrequency());
+			}
+		}
+		
+		return postingsMap;
 	}
 	
 	/**

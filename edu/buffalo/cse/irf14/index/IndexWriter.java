@@ -56,12 +56,12 @@ public class IndexWriter {
 			/**
 			 * create document dictionary
 			 */
-			String fileId = StringUtil.convertStrArrToString(d.getField(FieldNames.FILEID));
+			String fileId = StringUtil.convertStrArrToString2(d.getField(FieldNames.FILEID));
 			//document id to be put in the postings list
 			Integer docId = DocumentDictionary.getInstance().nextVal();
 			//create document dictionary
 			DocumentDictionary docDictionary = DocumentDictionary.getInstance();
-			docDictionary.getMap().put(fileId, docId);
+			docDictionary.getMap().put(docId, fileId);
 			
 			/*FileOutputStream fileOut  = new FileOutputStream("E://ser//test2.ser");
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);

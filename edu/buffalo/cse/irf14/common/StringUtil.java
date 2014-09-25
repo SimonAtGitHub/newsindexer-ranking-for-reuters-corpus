@@ -60,5 +60,22 @@ public class StringUtil {
 		return rv.toString();
 	}
 	
+	/**
+	 * Converts string array to string
+	 * @param strArr
+	 * @return
+	 */
+	public static String convertStrArrToString2(String [] array){
+		StringBuilder builder = new StringBuilder();
+		for(String str:array){
+			builder.append(str);
+			//builder.append(" ");
+		}
+		/*if(builder.length()>1){
+			builder.substring(0, builder.length()-1);
+		}*/
+		return builder.toString();
+	}
+	
 	 
 }
