@@ -319,23 +319,26 @@ public class DateRule extends TokenFilter {
 								thirdTermText = thirdToken.getTermText();
 								if (thirdTermText.matches(RegExp.REGEX_DATE
 										+ RegExp.REGEX_EXT_PUNCTUATION)) {
-									String[] dateStringSplit = thirdTermText
-											.split(RegExp.REGEX_EXT_PUNCTUATION);
-									String dateString = dateStringSplit[0];
-									char specialChar = thirdTermText
-											.charAt(thirdTermText.length() - 1);
-									dateValue = String.format("%02d",
-											Integer.parseInt(dateString));
-									stream.remove();
-									dateString = yearValue + monthValue
-											+ dateValue;
-									// Set the date to first token
-									firstToken.setTermText(dateString
-											+ specialChar);
-									// Date formatted. No need of further
-									// processing.
-									return yearValue + monthValue + dateValue
-											+ punctuations;
+									Pattern datePattern = Pattern
+											.compile(RegExp.REGEX_DATE
+													+ RegExp.REGEX_EXT_PUNCTUATION);
+									Matcher dateGroup = datePattern
+											.matcher(thirdTermText);
+									if (dateGroup.matches()) {
+										date = dateGroup.group(1);
+										punctuations = dateGroup.group(2);
+										dateValue = String.format("%02d",
+												Integer.parseInt(date));
+										stream.remove();
+										// Set the date to first token
+										firstToken.setTermText(yearValue
+												+ monthValue + dateValue
+												+ punctuations);
+										// Date formatted. No need of further
+										// processing.
+										return yearValue + monthValue
+												+ dateValue + punctuations;
+									}
 								}
 							}
 						} else {
@@ -394,23 +397,26 @@ public class DateRule extends TokenFilter {
 									thirdTermText = thirdToken.getTermText();
 									if (thirdTermText.matches(RegExp.REGEX_DATE
 											+ RegExp.REGEX_EXT_PUNCTUATION)) {
-										String[] dateStringSplit = thirdTermText
-												.split(RegExp.REGEX_EXT_PUNCTUATION);
-										String dateString = dateStringSplit[0];
-										char specialChar = thirdTermText
-												.charAt(thirdTermText.length() - 1);
-										dateValue = String.format("%02d",
-												Integer.parseInt(dateString));
-										stream.remove();
-										dateString = yearValue + monthValue
-												+ dateValue + punctuations;
-										// Set the date to first token
-										firstToken.setTermText(dateString
-												+ specialChar);
-										// Date formatted. No need of further
-										// processing.
-										return yearValue + monthValue
-												+ dateValue + punctuations;
+										Pattern datePattern = Pattern
+												.compile(RegExp.REGEX_DATE
+														+ RegExp.REGEX_EXT_PUNCTUATION);
+										Matcher dateGroup = datePattern
+												.matcher(thirdTermText);
+										if (dateGroup.matches()) {
+											date = dateGroup.group(1);
+											punctuations = dateGroup.group(2);
+											dateValue = String.format("%02d",
+													Integer.parseInt(date));
+											stream.remove();
+											// Set the date to first token
+											firstToken.setTermText(yearValue
+													+ monthValue + dateValue
+													+ punctuations);
+											// Date formatted. No need of further
+											// processing.
+											return yearValue + monthValue
+													+ dateValue + punctuations;
+										}
 									}
 								}
 							} else {

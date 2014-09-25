@@ -50,6 +50,8 @@ public class RegExp {
 
 	public static final String REGEX_YEAR_BC_AD = "(\\d{1,4})(bc|BC|ad|AD)";
 
+	public static final String REGEX_BC_AD = "(bc|BC|ad|AD)";
+
 	public static final String REGEX_YEAR = "(\\d{1,4})";
 
 	public static final String REGEX_ALPHABETS = "([a-zA-Z]+)";
