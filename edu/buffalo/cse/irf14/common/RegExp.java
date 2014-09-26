@@ -58,6 +58,8 @@ public class RegExp {
 
 	public static final String REGEX_YEAR = "(\\d{1,4})";
 
+	public static final String REGEX_COMPOSITE_YEAR = "(\\d{4}[-]\\d{2})";
+
 	public static final String REGEX_ALPHABETS = "([a-zA-Z]+)";
 
 	// Regular Expression for time

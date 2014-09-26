@@ -549,15 +549,23 @@ public class DateRule extends TokenFilter {
 				}
 			}
 			// If the date is separated by a hyphen
-			// if (firstTermText.contains("-")) {
-			// // Split the token into constituent dates and recurse through
-			// // this method
-			// String[] splitDates = firstTermText.split(firstTermText);
-			// String finalDateValue="";
-			// for (String splitDate : splitDates) {
-			// han
-			// }
-			// }
+			// 2011-12 or 867BC-876AD or
+			if (firstTermText.matches(RegExp.REGEX_COMPOSITE_YEAR
+					+ RegExp.REGEX_EXT_PUNCTUATION)) {
+				// Split the token into constituent dates and recurse through
+				// this method
+				String[] splitDates = firstTermText.split("-");
+				punctuations = "";
+				if (splitDates.length == 2) {
+					String year1 = formatYearWithoutBCAD(splitDates[0]);
+					// Since the part two will be only two digits, add first two
+					// digits for split[0]
+					String year2 = formatYearWithoutBCAD(splitDates[0]
+							.substring(0, 2) + splitDates[1]);
+					firstToken.setTermText(year1 + monthValue + dateValue + "-"
+							+ year2 + monthValue + dateValue + punctuations);
+				}
+			}
 
 			String hours = "00", minutes = "00", seconds = "00";
 			// Handling Time formats which might or mightnot have AM/PM in the
