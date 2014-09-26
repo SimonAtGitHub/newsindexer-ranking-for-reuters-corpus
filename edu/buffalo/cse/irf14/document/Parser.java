@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
  */
 public class Parser {
 
-
 	/**
 	 * Static method to parse the given file into the Document object
 	 * 
@@ -27,7 +26,7 @@ public class Parser {
 	 */
 	public static Document parse(String filename) throws ParserException {
 		// TODO YOU MUST IMPLEMENT THIS
-		//System.out.println("\nFileName:: " + filename);
+		// System.out.println("\nFileName:: " + filename);
 		if (filename == null) {
 			throw new ParserException();
 		} else if (filename.isEmpty()) {
@@ -38,7 +37,7 @@ public class Parser {
 		Document document = new Document();
 		try {
 			// variables to hold the "Document" attributes
-			String title, place = "", newsDate,content ="";
+			String title, place = "", newsDate, content = "";
 
 			// flags to hold if the fields have been populated or not
 			boolean hasAuthor = false;
@@ -63,14 +62,17 @@ public class Parser {
 						document.setField(FieldNames.TITLE, title);
 						hasTitle = true;
 
-					} else if (line.contains("<AUTHOR>")) {
+					} else if (line.contains("<AUTHOR>")
+							|| line.contains("<author>")) {
 						fetchAndSetAuthorDetails(document, line.trim());
 						hasAuthor = true;
 					} else if (!hasPlaceDate) {
 						String placeDateContent[] = line.split("-");
 						if (placeDateContent != null
 								&& placeDateContent.length > 1) {
-							content=content+fetchAndSetPlaceAndDate(document, placeDateContent,content);
+							content = content
+									+ fetchAndSetPlaceAndDate(document,
+											placeDateContent, content);
 						}
 						hasPlaceDate = true;
 					} else {
@@ -104,7 +106,7 @@ public class Parser {
 	 * @param content
 	 */
 	private static String fetchAndSetPlaceAndDate(Document document,
-			String[] placeDateContent,String content) {
+			String[] placeDateContent, String content) {
 
 		String place = "", newsDate = "";
 		String placeDate = placeDateContent[0];
@@ -123,14 +125,11 @@ public class Parser {
 			for (int i = 0; i <= placeDateArrLength - 2; i++) {
 				place = place + "," + placeDateArr[i];
 			}
-			//System.out.println("\nPlace " + place);
 			place = place.substring(1, place.length());
 			place = place.trim();
 			document.setField(FieldNames.PLACE, place);
 			newsDate = newsDate.trim();
 			document.setField(FieldNames.NEWSDATE, newsDate);
-		} else {
-			System.out.println("No place and date");
 		}
 		return content;
 
@@ -172,10 +171,12 @@ public class Parser {
 		}
 		docObj.setField(FieldNames.AUTHOR, authorName.trim());
 		docObj.setField(FieldNames.AUTHORORG, authorOrg.trim());
-/*		System.out.println("Author Name ::"
-				+ docObj.getField(FieldNames.AUTHOR)[0]);
-		System.out.println("Author Org ::"
-				+ docObj.getField(FieldNames.AUTHORORG)[0]);*/
+		/*
+		 * System.out.println("Author Name ::" +
+		 * docObj.getField(FieldNames.AUTHOR)[0]);
+		 * System.out.println("Author Org ::" +
+		 * docObj.getField(FieldNames.AUTHORORG)[0]);
+		 */
 	}
 
 	/**
@@ -192,7 +193,7 @@ public class Parser {
 			int length = arrFolders.length;
 			document.setField(FieldNames.FILEID, arrFolders[length - 1]);
 			document.setField(FieldNames.CATEGORY, arrFolders[length - 2]);
-			//System.out.println("\nCategory ::" + arrFolders[length - 2]);
+			// System.out.println("\nCategory ::" + arrFolders[length - 2]);
 		}
 	}
 

@@ -75,10 +75,12 @@ public class TokenStream implements Iterator<Token> {
 	 * is called at the beginning of the stream, when all tokens have already
 	 * been iterated, return null
 	 */
-	// public Token previous() {
-	// previousToken = tokenListIterator.previous();
-	// return previousToken;
-	// }
+	public Token previous() {
+		if (tokenListIterator.hasPrevious()) {
+			return tokenListIterator.previous();
+		}
+		return null;
+	}
 
 	public boolean isFirstToken() {
 		if (tokenListIterator.previousIndex() == 0) {

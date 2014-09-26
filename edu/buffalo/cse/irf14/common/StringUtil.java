@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import edu.buffalo.cse.irf14.analysis.Token;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
-import edu.buffalo.cse.irf14.document.FieldNames;
 
 public class StringUtil {
 

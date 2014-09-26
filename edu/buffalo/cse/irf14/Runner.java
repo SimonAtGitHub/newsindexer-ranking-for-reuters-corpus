@@ -30,45 +30,46 @@ public class Runner {
 	public static void main(String[] args) {
 		String ipDir = args[0];
 		String indexDir = args[1];
-		//more? idk!
-		
+		// more? idk!
+
 		File ipDirectory = new File(ipDir);
 		String[] catDirectories = ipDirectory.list();
-		
+
 		String[] files;
 		File dir;
-		
+
 		Document d = null;
 		IndexWriter writer = new IndexWriter(indexDir);
 		long startime = System.currentTimeMillis();
 		try {
 			for (String cat : catDirectories) {
-				dir = new File(ipDir+ File.separator+ cat);
+				dir = new File(ipDir + File.separator + cat);
 				files = dir.list();
-				
+
 				if (files == null)
 					continue;
-				
+
 				for (String f : files) {
 					try {
-						d = Parser.parse(dir.getAbsolutePath() + File.separator +f);
-						//writer.addDocument(d);
+						d = Parser.parse(dir.getAbsolutePath() + File.separator
+								+ f);
+						writer.addDocument(d);
 					} catch (ParserException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					} 
-					
+					}
+
 				}
-				
+
 			}
-			
+
 			writer.close();
 		} catch (IndexerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		long endtime = System.currentTimeMillis();
-		System.out.println("\nTotal time "+((endtime-startime)/1000.));
+		System.out.println("\nTotal time " + ((endtime - startime) / 1000.));
 	}
 
 }

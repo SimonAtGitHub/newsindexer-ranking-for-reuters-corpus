@@ -112,7 +112,10 @@ public class Token {
 	@Override
 	public String toString() {
 		// TODO: YOU MUST IMPLEMENT THIS METHOD
-		return termText.toString();
+		if (termText != null) {
+			return termText.toString();
+		}
+		return "";
 	}
 
 }

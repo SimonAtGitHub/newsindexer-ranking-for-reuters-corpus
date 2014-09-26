@@ -13,6 +13,15 @@ import edu.buffalo.cse.irf14.common.RegExp;
  */
 public class DateRule extends TokenFilter {
 
+	// private ArrayList<String> punctuationList = null;
+
+	// Indicates whether a string passed is a valid month
+	private boolean validMonth = false;
+	// Indicates that the next token is an year prefix or not.
+	private boolean validYearPrefix = false;
+
+	private String punctuations = "";
+
 	private HashSet<String> months = new HashSet<String>(
 			Arrays.asList("JAN", "JANUARY", "FEB", "FEBRUARY", "MAR", "MARCH",
 					"APR", "APRIL", "MAY", "JUN", "JUNE", "JUL", "JULY", "AUG",
@@ -30,13 +39,109 @@ public class DateRule extends TokenFilter {
 
 	}
 
+	private String formatYearWithBCADinSameToken(String termText) {
+
+		String year = "1990", yearPrefix = "";
+		// Check if term matches a year with BC or AD as suffix, with or
+		// without punctuations
+		Pattern yearPattern = Pattern.compile(RegExp.REGEX_YEAR_BC_AD
+				+ RegExp.REGEX_EXT_PUNCTUATION);
+		Matcher yearGroup = yearPattern.matcher(termText);
+		if (yearGroup.matches()) {
+			year = yearGroup.group(1);
+			yearPrefix = yearGroup.group(2);
+			punctuations = yearGroup.group(3);
+			year = String.format("%04d", Integer.parseInt(year));
+			if (yearPrefix.equalsIgnoreCase("BC")) {
+				year = "-" + year;
+			}
+		}
+		return year;
+
+	}
+
+	private String formatYearWithoutBCAD(String termText) {
+		String year = "1990";
+		Pattern yearPattern = Pattern.compile(RegExp.REGEX_YEAR
+				+ RegExp.REGEX_EXT_PUNCTUATION);
+		Matcher yearGroup = yearPattern.matcher(termText);
+		if (yearGroup.matches()) {
+			year = yearGroup.group(1);
+			punctuations = yearGroup.group(2);
+			year = String.format("%04d", Integer.parseInt(year));
+		}
+		return year;
+	}
+
+	/**
+	 * Should be called after formatYearWithoutBCAD() only and never else.
+	 * 
+	 * @param termText
+	 * @return
+	 */
+	private String formatYearBasedOnNextToken(String termText) {
+		String yearPrefix = "";
+		validYearPrefix = false;
+		// Check if next Token consists of BC or AD
+		if (termText != null
+				&& (termText.matches(RegExp.REGEX_BC_AD
+						+ RegExp.REGEX_EXT_PUNCTUATION))) {
+			Pattern yearPrefixPattern = Pattern.compile(RegExp.REGEX_BC_AD
+					+ RegExp.REGEX_EXT_PUNCTUATION);
+			Matcher yearPrefixGroup = yearPrefixPattern.matcher(termText);
+			if (yearPrefixGroup.matches()) {
+				yearPrefix = yearPrefixGroup.group(1);
+				validYearPrefix = true;
+				if (yearPrefix.equalsIgnoreCase("BC")) {
+					yearPrefix = "-";
+				} else {
+					yearPrefix = "";
+				}
+				punctuations = yearPrefixGroup.group(2);
+			}
+		}
+		return yearPrefix;
+	}
+
+	private String formatMonth(String termText) {
+		String month = "00";
+		validMonth = false;
+		Pattern monthPattern = Pattern.compile(RegExp.REGEX_ALPHABETS
+				+ RegExp.REGEX_EXT_PUNCTUATION);
+		Matcher monthGroup = monthPattern.matcher(termText);
+		if (monthGroup.matches()) {
+			month = monthGroup.group(1);
+			punctuations = monthGroup.group(2);
+			if (months.contains(month.toUpperCase())) {
+				month = convertMonthToEquivalentNumber(month);
+				validMonth = true;
+			}
+		}
+		return month;
+	}
+
+	private String formatDate(String termText) {
+		String date = "00";
+		// Check if is a date with or without punction
+		Pattern datePattern = Pattern.compile(RegExp.REGEX_DATE
+				+ RegExp.REGEX_EXT_PUNCTUATION);
+		Matcher dateGroup = datePattern.matcher(termText);
+		if (dateGroup.matches()) {
+			date = dateGroup.group(1);
+			punctuations = dateGroup.group(2);
+			date = String.format("%02d", Integer.parseInt(date));
+		}
+		return date;
+	}
+
 	private String handleDateAndTime(TokenStream stream) {
 		// Check for Date, Month, Year or Date, Month
 		// Get the first token
 		Token firstToken = stream.getCurrent();
-		Token secondToken = null, thirdToken = null;
-		String firstTermText = null, secondTermText = null, thirdTermText = null, monthValue = "01", dateValue = "01", yearValue = "1900";
-		String month = "", punctuations = "", date = "", year = "", yearPrefix = "";
+		Token secondToken = null, thirdToken = null, fourthToken = null;
+		String firstTermText = null, secondTermText = null, thirdTermText = null, fourthTermText = null;
+		String monthValue = "01", dateValue = "01", yearValue = "1900";
+		String month = "", date = "", year = "", yearPrefix = "";
 		String formattedDateValue = yearValue + monthValue + dateValue
 				+ punctuations;
 		// Handle Case 1 : Eg 01 January 1990 or 31 Jan 2000 or 28 Feb or 02
@@ -47,8 +152,7 @@ public class DateRule extends TokenFilter {
 			// and hence can't have any punctuations. So match it in entirety
 			// Check if the first token is a date i.e., 1-31
 			if (firstTermText.matches(RegExp.REGEX_DATE)) {
-				dateValue = String.format("%02d",
-						Integer.parseInt(firstTermText));
+				dateValue = formatDate(firstTermText);
 				// Valid Date Value found. Now Check for a month
 				// Get the next token
 				secondToken = stream.next();
@@ -56,74 +160,142 @@ public class DateRule extends TokenFilter {
 					secondTermText = secondToken.getTermText();
 					// Second Term being a month can have a punctuation. Eg. 01
 					// January!!!!, 28 Feb, 2014
-					Pattern monthPattern = Pattern
-							.compile(RegExp.REGEX_ALPHABETS
-									+ RegExp.REGEX_EXT_PUNCTUATION);
-					Matcher monthGroup = monthPattern.matcher(secondTermText);
+					if (secondTermText.matches(RegExp.REGEX_ALPHABETS
+							+ RegExp.REGEX_EXT_PUNCTUATION)) {
+						monthValue = formatMonth(secondTermText);
+						if (!validMonth) {
+							monthValue = "01";
+						}
+						// Remove the month token
+						stream.remove();
+						// It may or maynot be followed by an year
+						thirdToken = stream.next();
+						if (thirdToken != null) {
+							thirdTermText = thirdToken.getTermText();
+							// Check if term matches a normal year with or
+							// without punctuations
+							if (thirdTermText.matches(RegExp.REGEX_YEAR_BC_AD
+									+ RegExp.REGEX_EXT_PUNCTUATION)) {
+								yearValue = formatYearWithBCADinSameToken(thirdTermText);
+								// Remove the year token
+								stream.remove();
+								// Update the first token by the
+								// correct date value
+								firstToken.setTermText(yearValue + monthValue
+										+ dateValue + punctuations);
+								return yearValue + monthValue + dateValue
+										+ punctuations;
+							} else if (thirdTermText.matches(RegExp.REGEX_YEAR
+									+ RegExp.REGEX_EXT_PUNCTUATION)) {
+								// Get the fourth token to check whether it's BC
+								// or AD
+								yearValue = formatYearWithoutBCAD(thirdTermText);
+								// Remove the year token
+								stream.remove();
+								fourthToken = stream.next();
+								if (fourthToken != null) {
+									fourthTermText = fourthToken.getTermText();
+									yearPrefix = formatYearBasedOnNextToken(fourthTermText);
+									yearValue = yearPrefix + yearValue;
+									if (validYearPrefix) {
+										stream.remove();
+									} else {
+										stream.previous();
+									}
 
-					if (monthGroup.matches()) {
-						month = monthGroup.group(1);
-						punctuations = monthGroup.group(2);
-
-						if (months.contains(month.toUpperCase())) {
-							monthValue = convertMonthToEquivalentNumber(secondTermText);
-							// Remove the month token
+								}
+								// Update the first token by the
+								// correct date value
+								firstToken.setTermText(yearValue + monthValue
+										+ dateValue + punctuations);
+								return yearValue + monthValue + dateValue
+										+ punctuations;
+							} else {
+								// If the value was not a number, default it
+								// to
+								// 1900
+								yearValue = "1900";
+								firstToken.setTermText(yearValue + monthValue
+										+ dateValue + punctuations);
+								return yearValue + monthValue + dateValue
+										+ punctuations;
+							}
+						} else {
+							// Move the pointer back to the original position
+							stream.previous();
+							// Set the date value
+							firstToken.setTermText(yearValue + monthValue
+									+ dateValue + punctuations);
+						}
+					}
+				}
+			}
+			// The first Token might be a month too, Eg. Jan 7 2014 or Feb 2010
+			if (firstTermText.matches(RegExp.REGEX_ALPHABETS
+					+ RegExp.REGEX_EXT_PUNCTUATION)) {
+				monthValue = formatMonth(firstTermText);
+				if (validMonth) {
+					yearValue = "1990";
+					dateValue = "01";
+					// Now check for Date or Year
+					// Get the next token
+					secondToken = stream.next();
+					if (secondToken != null) {
+						secondTermText = secondToken.getTermText();
+						// Check if is a date with or without punction
+						if (secondTermText.matches(RegExp.REGEX_DATE
+								+ RegExp.REGEX_EXT_PUNCTUATION)) {
+							dateValue = formatDate(secondTermText);
 							stream.remove();
-							// Find the third token and check if it's an year
-							// else default it to 1900
+							// Find the third token and check if it's an
+							// year else default it to 1900
 							thirdToken = stream.next();
 							if (thirdToken != null) {
 								thirdTermText = thirdToken.getTermText();
 								// Check if term matches a normal year with or
 								// without punctuations
 								if (thirdTermText
-										.matches(RegExp.REGEX_YEAR_BC_AD)) {
-									Pattern yearPattern = Pattern
-											.compile(RegExp.REGEX_YEAR_BC_AD);
-									Matcher yearGroup = yearPattern
-											.matcher(thirdTermText);
-									if (yearGroup.matches()) {
-										year = yearGroup.group(1);
-										yearPrefix = yearGroup.group(2);
-										punctuations = yearGroup.group(3);
-										yearValue = String.format("%04d",
-												Integer.parseInt(year));
-										if (yearPrefix.equalsIgnoreCase("BC")) {
-											yearValue = "-" + yearValue;
-										}
-										// Remove the year token
-										stream.remove();
-										// Update the first token by the
-										// correct date value
-										firstToken.setTermText(yearValue
-												+ monthValue + dateValue
-												+ punctuations);
-										return yearValue + monthValue
-												+ dateValue + punctuations;
-									}
+										.matches(RegExp.REGEX_YEAR_BC_AD
+												+ RegExp.REGEX_EXT_PUNCTUATION)) {
+									yearValue = formatYearWithBCADinSameToken(thirdTermText);
+									// Remove the year token
+									stream.remove();
+									// Update the first token by the
+									// correct date value
+									firstToken.setTermText(yearValue
+											+ monthValue + dateValue
+											+ punctuations);
+									return yearValue + monthValue + dateValue
+											+ punctuations;
 								} else if (thirdTermText
 										.matches(RegExp.REGEX_YEAR
 												+ RegExp.REGEX_EXT_PUNCTUATION)) {
-									Pattern yearPattern = Pattern
-											.compile(RegExp.REGEX_YEAR
-													+ RegExp.REGEX_EXT_PUNCTUATION);
-									Matcher yearGroup = yearPattern
-											.matcher(thirdTermText);
-									if (yearGroup.matches()) {
-										year = yearGroup.group(1);
-										punctuations = yearGroup.group(2);
-										yearValue = String.format("%04d",
-												Integer.parseInt(year));
-										// Remove the year token
-										stream.remove();
-										// Update the first token by the
-										// correct date value
-										firstToken.setTermText(yearValue
-												+ monthValue + dateValue
-												+ punctuations);
-										return yearValue + monthValue
-												+ dateValue + punctuations;
+									// Get the fourth token to check whether
+									// it's BC
+									// or AD
+									yearValue = formatYearWithoutBCAD(thirdTermText);
+									// Remove the year token
+									stream.remove();
+									fourthToken = stream.next();
+									if (fourthToken != null) {
+										fourthTermText = fourthToken
+												.getTermText();
+										yearPrefix = formatYearBasedOnNextToken(fourthTermText);
+										yearValue = yearPrefix + yearValue;
+										if (validYearPrefix) {
+											stream.remove();
+										} else {
+											stream.previous();
+										}
+
 									}
+									// Update the first token by the
+									// correct date value
+									firstToken.setTermText(yearValue
+											+ monthValue + dateValue
+											+ punctuations);
+									return yearValue + monthValue + dateValue
+											+ punctuations;
 								} else {
 									// If the value was not a number, default it
 									// to
@@ -135,143 +307,74 @@ public class DateRule extends TokenFilter {
 									return yearValue + monthValue + dateValue
 											+ punctuations;
 								}
+							} else {
+								// If the value was not a number,
+								// default it to 1900
+								yearValue = "1900";
+								firstToken.setTermText(yearValue + monthValue
+										+ dateValue + punctuations);
+							}
+						} else if (secondTermText
+								.matches(RegExp.REGEX_YEAR_BC_AD
+										+ RegExp.REGEX_EXT_PUNCTUATION)) {
+							yearValue = formatYearWithBCADinSameToken(secondTermText);
+							// We don't expect the date to come after the Year,
+							// hence default it to 01
+							dateValue = "01";
+							// Remove the year token
+							stream.remove();
+							// Update the first token by the
+							// correct date value
+							firstToken.setTermText(yearValue + monthValue
+									+ dateValue + punctuations);
+							return yearValue + monthValue + dateValue
+									+ punctuations;
+						} else if (secondTermText.matches(RegExp.REGEX_YEAR
+								+ RegExp.REGEX_EXT_PUNCTUATION)) {
+							yearValue = formatYearWithoutBCAD(secondTermText);
+							// Remove the year token
+							stream.remove();
+							// Get the third token to check whether
+							// it's BC or AD
+							thirdToken = stream.next();
+							if (thirdToken != null) {
+								thirdTermText = thirdToken.getTermText();
+								yearPrefix = formatYearBasedOnNextToken(thirdTermText);
+								yearValue = yearPrefix + yearValue;
+								if (validYearPrefix) {
+									stream.remove();
+								} else {
+									stream.previous();
+								}
 
 							}
-							// Default the value for year, date and
-							// punctuation
+							// Update the first token by the
+							// correct date value
 							firstToken.setTermText(yearValue + monthValue
 									+ dateValue + punctuations);
 							return yearValue + monthValue + dateValue
 									+ punctuations;
 						}
-					} else {
-						// Assuming that the number is just a number and not a
-						// date
-					}
-				}
 
-			}
-			// The first Token might be a month too
-			if (firstTermText.matches(RegExp.REGEX_ALPHABETS
-					+ RegExp.REGEX_EXT_PUNCTUATION)) {
-				Pattern monthPattern = Pattern.compile(RegExp.REGEX_ALPHABETS
-						+ RegExp.REGEX_EXT_PUNCTUATION);
-				Matcher monthGroup = monthPattern.matcher(firstTermText);
-				if (monthGroup.matches()) {
-					month = monthGroup.group(1);
-					punctuations = monthGroup.group(2);
-				}
-				if (months.contains(month.toUpperCase())) {
-					monthValue = convertMonthToEquivalentNumber(firstTermText);
-					yearValue = "1990";
-					dateValue = "01";
-					// Now check for Date or Year
-					// Get the next token
-					secondToken = stream.next();
-					if (secondToken != null) {
-						secondTermText = secondToken.getTermText();
-						// Check if is a date with or without punction
-						if (secondTermText.matches(RegExp.REGEX_DATE
-								+ RegExp.REGEX_EXT_PUNCTUATION)) {
-							Pattern datePattern = Pattern
-									.compile(RegExp.REGEX_DATE
-											+ RegExp.REGEX_EXT_PUNCTUATION);
-							Matcher dateGroup = datePattern
-									.matcher(secondTermText);
-							if (dateGroup.matches()) {
-								date = dateGroup.group(1);
-								punctuations = dateGroup.group(2);
-								dateValue = String.format("%02d",
-										Integer.parseInt(date));
-								stream.remove();
-								// Find the third token and check if it's an
-								// year else
-								// default it to 1900
-								thirdToken = stream.next();
-								if (thirdToken != null) {
-									thirdTermText = thirdToken.getTermText();
-									// The third token might be the one with
-									// puntuation Eg. Jan 01 2014
-									if (thirdTermText
-											.matches(RegExp.REGEX_YEAR_BC_AD
-													+ RegExp.REGEX_EXT_PUNCTUATION)) {
-										Pattern yearPattern = Pattern
-												.compile(RegExp.REGEX_YEAR_BC_AD
-														+ RegExp.REGEX_EXT_PUNCTUATION);
-										Matcher yearGroup = yearPattern
-												.matcher(thirdTermText);
-										if (yearGroup.matches()) {
-											year = yearGroup.group(1);
-											yearPrefix = yearGroup.group(2);
-											punctuations = yearGroup.group(3);
-											yearValue = String.format("%04d",
-													Integer.parseInt(year));
-											if (yearPrefix
-													.equalsIgnoreCase("BC")) {
-												yearValue = "-" + yearValue;
-											}
-											// Remove the year token
-											stream.remove();
-											// Update the first token by the
-											// correct date value
-											firstToken.setTermText(yearValue
-													+ monthValue + dateValue
-													+ punctuations);
-											return yearValue + monthValue
-													+ dateValue + punctuations;
-										}
-									} else if (thirdTermText
-											.matches(RegExp.REGEX_YEAR
-													+ RegExp.REGEX_EXT_PUNCTUATION)) {
-										Pattern yearPattern = Pattern
-												.compile(RegExp.REGEX_YEAR
-														+ RegExp.REGEX_EXT_PUNCTUATION);
-										Matcher yearGroup = yearPattern
-												.matcher(thirdTermText);
-										if (yearGroup.matches()) {
-											year = yearGroup.group(1);
-											punctuations = yearGroup.group(2);
-											yearValue = String.format("%04d",
-													Integer.parseInt(year));
-											// Remove the year token
-											stream.remove();
-											// Update the first token by the
-											// correct date value
-											firstToken.setTermText(yearValue
-													+ monthValue + dateValue
-													+ punctuations);
-											return yearValue + monthValue
-													+ dateValue + punctuations;
-										}
-									}
-								}
-								// If the value was not a number,
-								// default it to
-								// 1900
-								yearValue = "1900";
-								firstToken.setTermText(yearValue + monthValue
-										+ dateValue + punctuations);
-
-							}
+						else {
+							// Bring back the pointer
+							stream.previous();
+							firstToken.setTermText(yearValue + monthValue
+									+ dateValue + punctuations);
 						}
-						// Remove the month token
-						// stream.remove();
 
-						// dateValue = String.format("%02d",
-						// Integer.parseInt(firstTermText));
-						// // Valid Date Value found. Now Check for a month
-
+					} else {
+						// Bring back the pointer
+						stream.previous();
+						// Also since month is already found, set the date
+						firstToken.setTermText(yearValue + monthValue
+								+ dateValue + punctuations);
 					}
 
-				} else {
-					// Assuming that the number is just a number and not a
-					// date
 				}
 			}
 
-			// Don't use else if otherwise for two digit numbers it won't come
-			// here
-			// for BC and AD and years
+			// The firsToken might be an year too . 2014. or 2014 January 01
 			if (firstTermText.matches(RegExp.REGEX_YEAR
 					+ RegExp.REGEX_EXT_PUNCTUATION)) {
 				// Check if BC or AD exists
@@ -412,7 +515,8 @@ public class DateRule extends TokenFilter {
 											firstToken.setTermText(yearValue
 													+ monthValue + dateValue
 													+ punctuations);
-											// Date formatted. No need of further
+											// Date formatted. No need of
+											// further
 											// processing.
 											return yearValue + monthValue
 													+ dateValue + punctuations;

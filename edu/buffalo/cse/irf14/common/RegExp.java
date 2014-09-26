@@ -13,6 +13,10 @@ public class RegExp {
 	public static final String REGEX_CONTAINS_PUNCTUATION = "(.*)[.!?]+(.*)";
 	// regular expression that denotes that a string is in caps
 	public static final String REGEX_ANY_CAPS = "(.*)[A-Z+](.*)";
+	// regular expression that denotes that a formatted date i.e., yyyymmdd
+	public static final String REGEX_FORMATTED_DATE = "[-]{0,1}([\\d]{8})";
+	// regular expression that denotes that a formatted time i.e., HH:mm:ss
+	public static final String REGEX_FORMATTED_TIME = "([\\d]{2}[:][\\d]{2}:[\\d]{2})";
 	// regular expression that denotes a number e.g. 12 , 98.22
 	public static final String REGEX_REAL_NUM = "^([\\d]+[,]?)*[\\.]?([\\d]*)$";
 	// regular expression that denotes a number or a number which is prior to
