@@ -21,26 +21,38 @@ public class CapitalizationRule extends TokenFilter {
 			// of the stream or the previous token was end of a sentence.
 			boolean firstToken = stream.isFirstToken();
 			Token previousToken = stream.getPrevious();
+			String prevTermText = "", nextTermText = "";
+			Token nextToken = null;
+			// get the next token
+			nextToken = stream.getNext();
+			if (null != nextToken)
+				nextTermText = nextToken.getTermText();
 			if (firstToken
 					|| (previousToken != null && previousToken
 							.isEndOfSentence())) {
+				// For lowercasing an ALL CAPS sentence, check if this or next
+				// term is ALL CAPS. If yes, keep iterating till hasNext() is
+				// true
+				if (termText.matches(RegExp.REGEX_ALL_CAPS)
+						&& nextTermText.matches(RegExp.REGEX_ALL_CAPS)) {
+					while (stream.hasNext()) {
+						nextToken = stream.next();
+						nextToken.setTermText(nextToken.getTermText()
+								.toLowerCase());
+					}
+				}
 				termText = termText.toLowerCase();
 				token.setTermText(termText);
 				return;
 			} else {
-				String prevTermText = null;
 				if (null != previousToken) {
 					prevTermText = previousToken.getTermText();
 				}
-				// get the next token
-				Token nextToken = stream.getNext();
-				String nextTermText = null;
-				if (null != nextToken)
-					nextTermText = nextToken.getTermText();
 				// check for all capital letters in a word
 				if (null != termText
 						&& StringUtil.matchRegex(termText,
 								RegExp.REGEX_ALL_CAPS)) {
+
 					// Do Nothing
 				}
 				// check for tokens like biwords 'Stanford University'
