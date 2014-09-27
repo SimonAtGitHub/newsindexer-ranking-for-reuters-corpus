@@ -76,7 +76,10 @@ public class Parser {
 						}
 						hasPlaceDate = true;
 					} else {
-						content = content + line;
+						// Whenever adding a line, add a space between two lines
+						// so that last word and first word of next line don't
+						// combine.
+						content = content + " " + line;
 					}
 
 				}

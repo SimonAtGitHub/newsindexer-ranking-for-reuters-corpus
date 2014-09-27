@@ -17,6 +17,10 @@ public class NumberRule extends TokenFilter {
 		Token token = stream.getCurrent();
 		if (token != null) {
 			String termText = token.getTermText();
+			// Don't apply this rule if the Token Doesn't start with a digit
+			if (termText.isEmpty() || !Character.isDigit(termText.charAt(0))) {
+				return;
+			}
 			// If the token is a formatted date or time, ignore it
 			if (termText.matches(RegExp.REGEX_FORMATTED_DATE
 					+ RegExp.REGEX_EXT_PUNCTUATION)
