@@ -34,7 +34,7 @@ public class FilterChains {
 
 	public static final TokenFilterType[] FILTERS_FOR_AUTHOR = {
 			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS,
-			TokenFilterType.CAPITALIZATION, TokenFilterType.ACCENT };
+			TokenFilterType.ACCENT };
 
 	public static final TokenFilterType[] FILTERS_FOR_AUTHORORG = {
 			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS,

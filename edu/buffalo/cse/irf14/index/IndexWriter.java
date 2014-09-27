@@ -123,6 +123,9 @@ public class IndexWriter {
 				termArr = d.getField(FieldNames.TITLE);
 				break;
 			case AUTHOR:
+				// For Author the delimiter should be "and"
+				// so that multiple authors can be separated.
+				tknizer = new Tokenizer("and|AND");
 				termArr = d.getField(FieldNames.AUTHOR);
 				break;
 			case AUTHORORG:
