@@ -18,8 +18,9 @@ public class StopWordsRule extends TokenFilter {
 		if (token != null) {
 			String termText = token.getTermText();
 			if (termText != null
-					&& termText.matches("[aA-zZ]+"
-							+ RegExp.REGEX_EXT_PUNCTUATION)) {
+					&& Character.isAlphabetic(termText.charAt(0))
+					&& (termText.matches("[aA-zZ]+"
+							+ RegExp.REGEX_EXT_PUNCTUATION))) {
 				if (StopWords.stopWordsSet.contains(StopWords
 						.valueOfDesc(termText))) {
 					stream.remove();

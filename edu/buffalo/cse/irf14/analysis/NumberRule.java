@@ -22,17 +22,19 @@ public class NumberRule extends TokenFilter {
 				return;
 			}
 			// If the token is a formatted date or time, ignore it
-			if (termText.matches(RegExp.REGEX_FORMATTED_DATE
-					+ RegExp.REGEX_EXT_PUNCTUATION)
-					|| termText.matches(RegExp.REGEX_FORMATTED_TIME
-							+ RegExp.REGEX_EXT_PUNCTUATION)) {
+			// For date or time, the length should be 8
+			if ((termText.length() == 8)
+					&& (termText.matches(RegExp.REGEX_FORMATTED_DATE
+							+ RegExp.REGEX_EXT_PUNCTUATION) || termText
+								.matches(RegExp.REGEX_FORMATTED_TIME
+										+ RegExp.REGEX_EXT_PUNCTUATION))) {
 				// Do nothing
 				return;
 			}
 			// if the token is a real number delete the token
 			else if (StringUtil.matchRegex(termText, RegExp.REGEX_REAL_NUM)) {
 				stream.remove();
-				//stream.next();
+				// stream.next();
 			}
 			// if the token is a composite number (i.e. fractions or
 			// percentages

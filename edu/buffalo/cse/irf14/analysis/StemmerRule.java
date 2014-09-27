@@ -25,7 +25,9 @@ public class StemmerRule extends TokenFilter {
 			// Apply the stemming only if the termText is not null and
 			// contains alphabet.
 			if (termText != null) {
-				if (termText.matches("[aA-zZ]+" + RegExp.REGEX_EXT_PUNCTUATION)) {
+				if (Character.isAlphabetic(termText.charAt(0))
+						&& (termText.matches("[aA-zZ]+"
+								+ RegExp.REGEX_EXT_PUNCTUATION))) {
 					stemmer.add(termText.toCharArray(), termText.length());
 					stemmer.stem();
 					termText = stemmer.toString();

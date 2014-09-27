@@ -27,10 +27,13 @@ public class AccentRule extends TokenFilter {
 		Token token = stream.getCurrent();
 		if (token != null) {
 			String termText = token.getTermText();
-			termText = Normalizer.normalize(termText, Normalizer.Form.NFD);
-			termText = termText.replaceAll("\\p{InCombiningDiacriticalMarks}+",
-					"");
-			token.setTermText(termText);
+			// Don't process if starts with digits
+			if (!(Character.isDigit(termText.charAt(0)))) {
+				termText = Normalizer.normalize(termText, Normalizer.Form.NFD);
+				termText = termText.replaceAll(
+						"\\p{InCombiningDiacriticalMarks}+", "");
+				token.setTermText(termText);
+			}
 		}
 	}
 }

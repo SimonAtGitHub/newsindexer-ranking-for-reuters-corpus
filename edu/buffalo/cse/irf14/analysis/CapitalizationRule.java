@@ -16,6 +16,10 @@ public class CapitalizationRule extends TokenFilter {
 		if (token != null) {
 			// get the current token
 			String termText = token.getTermText();
+			// Don't apply if starts with digit
+			if (Character.isDigit(termText.charAt(0))) {
+				return;
+			}
 			// The token in first token of a sentence if it's either the first
 			// token
 			// of the stream or the previous token was end of a sentence.

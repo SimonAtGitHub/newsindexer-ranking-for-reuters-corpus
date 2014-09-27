@@ -151,7 +151,8 @@ public class DateRule extends TokenFilter {
 			// Assuming that First Token being a date won't be sufficient alone
 			// and hence can't have any punctuations. So match it in entirety
 			// Check if the first token is a date i.e., 1-31
-			if (firstTermText.matches(RegExp.REGEX_DATE)) {
+			if (Character.isDigit(firstTermText.charAt(0))
+					&& (firstTermText.matches(RegExp.REGEX_DATE))) {
 				dateValue = formatDate(firstTermText);
 				// Valid Date Value found. Now Check for a month
 				// Get the next token
@@ -233,8 +234,9 @@ public class DateRule extends TokenFilter {
 				}
 			}
 			// The first Token might be a month too, Eg. Jan 7 2014 or Feb 2010
-			if (firstTermText.matches(RegExp.REGEX_ALPHABETS
-					+ RegExp.REGEX_EXT_PUNCTUATION)) {
+			if (Character.isAlphabetic(firstTermText.charAt(0))
+					&& (firstTermText.matches(RegExp.REGEX_ALPHABETS
+							+ RegExp.REGEX_EXT_PUNCTUATION))) {
 				monthValue = formatMonth(firstTermText);
 				if (validMonth) {
 					yearValue = "1990";
@@ -358,8 +360,9 @@ public class DateRule extends TokenFilter {
 			}
 
 			// The firsToken might be an year too . 2014. or 2014 January 01
-			if (firstTermText.matches(RegExp.REGEX_YEAR
-					+ RegExp.REGEX_EXT_PUNCTUATION)) {
+			if (Character.isDigit(firstTermText.charAt(0))
+					&& (firstTermText.matches(RegExp.REGEX_YEAR
+							+ RegExp.REGEX_EXT_PUNCTUATION))) {
 				// Check if BC or AD exists
 				if (firstTermText.toUpperCase().endsWith("BC")) {
 					firstTermText = firstTermText.replace("BC", "");
@@ -450,8 +453,9 @@ public class DateRule extends TokenFilter {
 
 			}
 
-			if (firstTermText.matches(RegExp.REGEX_YEAR_BC_AD
-					+ RegExp.REGEX_EXT_PUNCTUATION)) {
+			if (Character.isDigit(firstTermText.charAt(0))
+					&& (firstTermText.matches(RegExp.REGEX_YEAR_BC_AD
+							+ RegExp.REGEX_EXT_PUNCTUATION))) {
 				Pattern yearPattern = Pattern.compile(RegExp.REGEX_YEAR_BC_AD
 						+ RegExp.REGEX_EXT_PUNCTUATION);
 				Matcher yearGroup = yearPattern.matcher(firstTermText);
@@ -535,8 +539,9 @@ public class DateRule extends TokenFilter {
 			}
 			// If the date is separated by a hyphen
 			// 2011-12 or 867BC-876AD or
-			if (firstTermText.matches(RegExp.REGEX_COMPOSITE_YEAR
-					+ RegExp.REGEX_EXT_PUNCTUATION)) {
+			if (Character.isDigit(firstTermText.charAt(0))
+					&& (firstTermText.matches(RegExp.REGEX_COMPOSITE_YEAR
+							+ RegExp.REGEX_EXT_PUNCTUATION))) {
 				// Split the token into constituent dates and recurse through
 				// this method
 				String[] splitDates = firstTermText.split("-");
@@ -561,7 +566,8 @@ public class DateRule extends TokenFilter {
 					+ RegExp.REGEX_TIME_SEPARATOR
 					+ RegExp.REGEX_MINUTES_SECONDS + RegExp.REGEX_TIME_AM_PM
 					+ RegExp.REGEX_EXT_PUNCTUATION;
-			if (firstTermText.matches(regexForTime)) {
+			if (Character.isDigit(firstTermText.charAt(0))
+					&& firstTermText.matches(regexForTime)) {
 				Pattern timePattern = Pattern.compile(regexForTime);
 				Matcher timeGroup = timePattern.matcher(firstTermText);
 				if (timeGroup.matches()) {
