@@ -141,7 +141,7 @@ public class DateRule extends TokenFilter {
 		Token secondToken = null, thirdToken = null, fourthToken = null;
 		String firstTermText = null, secondTermText = null, thirdTermText = null, fourthTermText = null;
 		String monthValue = "01", dateValue = "01", yearValue = "1900";
-		String month = "", date = "", year = "", yearPrefix = "";
+		String date = "", year = "", yearPrefix = "";
 		String formattedDateValue = yearValue + monthValue + dateValue
 				+ punctuations;
 		// Handle Case 1 : Eg 01 January 1990 or 31 Jan 2000 or 28 Feb or 02
@@ -199,8 +199,6 @@ public class DateRule extends TokenFilter {
 									yearValue = yearPrefix + yearValue;
 									if (validYearPrefix) {
 										stream.remove();
-									} else {
-										stream.previous();
 									}
 
 								}
@@ -221,8 +219,6 @@ public class DateRule extends TokenFilter {
 										+ punctuations;
 							}
 						} else {
-							// Move the pointer back to the original position
-							stream.previous();
 							// Set the date value
 							firstToken.setTermText(yearValue + monthValue
 									+ dateValue + punctuations);
@@ -284,8 +280,6 @@ public class DateRule extends TokenFilter {
 										yearValue = yearPrefix + yearValue;
 										if (validYearPrefix) {
 											stream.remove();
-										} else {
-											stream.previous();
 										}
 
 									}
@@ -343,10 +337,7 @@ public class DateRule extends TokenFilter {
 								yearValue = yearPrefix + yearValue;
 								if (validYearPrefix) {
 									stream.remove();
-								} else {
-									stream.previous();
 								}
-
 							}
 							// Update the first token by the
 							// correct date value
@@ -356,21 +347,7 @@ public class DateRule extends TokenFilter {
 									+ punctuations;
 						}
 
-						else {
-							// Bring back the pointer
-							stream.previous();
-							firstToken.setTermText(yearValue + monthValue
-									+ dateValue + punctuations);
-						}
-
-					} else {
-						// Bring back the pointer
-						stream.previous();
-						// Also since month is already found, set the date
-						firstToken.setTermText(yearValue + monthValue
-								+ dateValue + punctuations);
 					}
-
 				}
 			}
 

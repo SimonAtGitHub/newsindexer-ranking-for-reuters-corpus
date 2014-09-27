@@ -61,15 +61,24 @@ public class Tokenizer {
 			// Temp list to hold the tokens
 			LinkedList<Token> tempList = new LinkedList<Token>();
 
+			// Flag to mark the beginning of a sentence
+			// True by default for the first token
+			boolean beginningOfSentence = true;
 			// iterate over the items in the array
 			for (int index = 0; index < arr.length; index++) {
 				Token token = new Token();
 				token.setTermText(arr[index]);
 				token.setTermBuffer(token.getTermText().toCharArray());
+				// If previous token was marked as beginning of a sentence.
+				if (beginningOfSentence) {
+					token.setBeginningOfSentence(true);
+					beginningOfSentence = false;
+				}
 				// For Sentence ending with punctuation, mark the end of
 				// sentence
 				if (token.getTermText().matches(RegExp.REGEX_SENT_ENDS)) {
 					token.setEndOfSentence(true);
+					beginningOfSentence = true;
 				}
 				tempList.add(token);
 			}

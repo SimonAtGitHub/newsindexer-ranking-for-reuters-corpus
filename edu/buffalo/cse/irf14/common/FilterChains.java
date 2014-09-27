@@ -32,10 +32,14 @@ public class FilterChains {
 			TokenFilterType.DATE, TokenFilterType.NUMERIC,
 			TokenFilterType.STEMMER };
 
-	public static final TokenFilterType[] FILTERS_FOR_AUTHOR = { TokenFilterType.CAPITALIZATION };
+	public static final TokenFilterType[] FILTERS_FOR_AUTHOR = {
+			TokenFilterType.CAPITALIZATION, TokenFilterType.SYMBOL,
+			TokenFilterType.SPECIALCHARS };
 
-	public static final TokenFilterType[] FILTERS_FOR_AUTHORORG = { TokenFilterType.CAPITALIZATION };
+	public static final TokenFilterType[] FILTERS_FOR_AUTHORORG = {
+			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS };
 
-	public static final TokenFilterType[] FILTERS_FOR_PLACE = { TokenFilterType.CAPITALIZATION };
+	public static final TokenFilterType[] FILTERS_FOR_PLACE = {
+			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS };
 
 }

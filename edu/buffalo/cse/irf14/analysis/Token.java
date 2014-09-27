@@ -22,6 +22,9 @@ public class Token {
 	// Whenever an end of sentence punctuation is removed, set it to true.
 	private boolean endOfSentence = false;
 
+	// Marks the beginning of the sentence
+	private boolean beginningOfSentence = false;
+
 	/**
 	 * Method to set the termText to given text. This is a sample implementation
 	 * and you CAN change this to suit your class definition and data structure
@@ -96,6 +99,14 @@ public class Token {
 
 	public void setEndOfSentence(boolean endOfSentence) {
 		this.endOfSentence = endOfSentence;
+	}
+
+	public boolean isBeginningOfSentence() {
+		return beginningOfSentence;
+	}
+
+	public void setBeginningOfSentence(boolean beginningOfSentence) {
+		this.beginningOfSentence = beginningOfSentence;
 	}
 
 	/**
