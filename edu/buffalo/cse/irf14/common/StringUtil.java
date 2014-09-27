@@ -65,7 +65,6 @@ public class StringUtil {
 		rv = list.toArray(rv);
 		tstream = null;
 		list = null;
-		System.out.println(rv);
 		return rv.toString();
 	}
 

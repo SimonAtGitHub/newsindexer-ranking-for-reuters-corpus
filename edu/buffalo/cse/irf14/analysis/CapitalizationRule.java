@@ -21,7 +21,7 @@ public class CapitalizationRule extends TokenFilter {
 			// of the stream or the previous token was end of a sentence.
 			boolean firstToken = stream.isFirstToken();
 			Token previousToken = stream.getPrevious();
-			String prevTermText = "", nextTermText = "";
+			String nextTermText = "";
 			Token nextToken = null;
 			// get the next token
 			nextToken = stream.getNext();
@@ -29,25 +29,32 @@ public class CapitalizationRule extends TokenFilter {
 				nextTermText = nextToken.getTermText();
 			if (firstToken
 					|| (previousToken != null && previousToken
-							.isEndOfSentence())) {
+							.isEndOfSentence())
+					|| token.isBeginningOfSentence()) {
 				// For lowercasing an ALL CAPS sentence, check if this or next
 				// term is ALL CAPS. If yes, keep iterating till hasNext() is
 				// true
 				if (termText.matches(RegExp.REGEX_ALL_CAPS)
 						&& nextTermText.matches(RegExp.REGEX_ALL_CAPS)) {
+					termText = termText.toLowerCase();
+					token.setTermText(termText);
 					while (stream.hasNext()) {
 						nextToken = stream.next();
 						nextToken.setTermText(nextToken.getTermText()
 								.toLowerCase());
 					}
+					return;
+				} else if (termText.matches(RegExp.REGEX_ALL_CAPS)
+						&& !nextTermText.matches(RegExp.REGEX_ALL_CAPS)) {
+					// If first term is all CAPS and not the next word. keep it
+					// do nothing
+					return;
+				} else {
+					termText = termText.toLowerCase();
+					token.setTermText(termText);
 				}
-				termText = termText.toLowerCase();
-				token.setTermText(termText);
 				return;
 			} else {
-				if (null != previousToken) {
-					prevTermText = previousToken.getTermText();
-				}
 				// check for all capital letters in a word
 				if (null != termText
 						&& StringUtil.matchRegex(termText,
@@ -56,15 +63,44 @@ public class CapitalizationRule extends TokenFilter {
 					// Do Nothing
 				}
 				// check for tokens like biwords 'Stanford University'
-				else if (null != termText
+				if (null != termText
 						&& null != nextToken
 						&& StringUtil.matchRegex(termText,
 								RegExp.REGEX_FIRST_CAPS)
 						&& StringUtil.matchRegex(nextTermText,
-								RegExp.REGEX_FIRST_CAPS)) {
+								RegExp.REGEX_FIRST_CAPS)
+						&& !(token.isEndOfSentence() && nextToken
+								.isBeginningOfSentence())) {
+					// Make sure that the merging doesn't merge Beggining of one
+					// sentence & end of previous statement
 					token.merge(nextToken);
+					// If merged token was end of sentence, make the previous
+					// token as end of sentence
+					if (nextToken.isEndOfSentence()) {
+						token.setEndOfSentence(true);
+					}
 					stream.next();
 					stream.remove();
+					while (stream.hasNext()) {
+						// Look ahead without moving the pointer
+						nextToken = stream.getNext();
+						nextTermText = nextToken.getTermText();
+						if (StringUtil.matchRegex(nextTermText,
+								RegExp.REGEX_FIRST_CAPS)
+								&& !(token.isEndOfSentence() && nextToken
+										.isBeginningOfSentence())) {
+							token.merge(nextToken);
+							// If merged token was end of sentence, make the
+							// previous token as end of sentence
+							if (nextToken.isEndOfSentence()) {
+								token.setEndOfSentence(true);
+							}
+							stream.next();
+							stream.remove();
+						} else {
+							break;
+						}
+					}
 				}
 
 				// If the preceding token IS NOT sentence end and the current

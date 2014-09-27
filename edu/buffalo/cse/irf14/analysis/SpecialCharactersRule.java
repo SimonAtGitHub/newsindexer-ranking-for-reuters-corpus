@@ -39,7 +39,7 @@ public class SpecialCharactersRule extends TokenFilter {
 
 		// First remove all unwanted special characters other than hyphens and
 		// punctuation.
-
+		// Preserve whitespaces
 		termText = termText.replaceAll(
 				RegExp.REGEX_FOR_SPECIAL_CHARS_EXCLUDE_HYPHENS_PUNCTUATION, "");
 		// Replace all characters missed by symbols rule - ideally this will be

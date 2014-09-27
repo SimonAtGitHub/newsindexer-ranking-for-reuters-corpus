@@ -2,10 +2,11 @@ package edu.buffalo.cse.irf14.analysis;
 
 /**
  * Analyzer implementation
+ * 
  * @author Priyankar
  *
  */
-public class AnalyzerImpl implements Analyzer{
+public class AnalyzerImpl implements Analyzer {
 	private TokenStream stream;
 
 	private TokenFilterType[] filterTypes;
@@ -22,26 +23,26 @@ public class AnalyzerImpl implements Analyzer{
 
 	/**
 	 * 
-	 * 1. Iterates over the token stream and applies all the filters to it(a single token) if it
-	 * is not null 2. Moves the pointer to the next token and returns true if
-	 * there is any more tokens to be processed
+	 * 1. Iterates over the token stream and applies all the filters to it(a
+	 * single token) if it is not null 2. Moves the pointer to the next token
+	 * and returns true if there is any more tokens to be processed
 	 */
 	@Override
 	public boolean increment() throws TokenizerException {
 
 		TokenFilter tokenFilter = null;
-		if (stream.getCurrent() != null) {
-			for (TokenFilterType tokenFilterType : filterTypes) {
-				tokenFilter = TokenFilterFactory.getInstance().getFilterByType(
-						tokenFilterType, stream);
-				tokenFilter.applyFilter();
+		// For each filter apply it on all the tokens in the stream
+		// Reset the stream and then proceed to next stream. It's faster!!
+		for (TokenFilterType tokenFilterType : filterTypes) {
+			tokenFilter = TokenFilterFactory.getInstance().getFilterByType(
+					tokenFilterType, stream);
+			stream.reset();
+			while (tokenFilter.increment()) {
+				// Do Nothing
 			}
 		}
-		if (stream.hasNext()) {
-			stream.next();
-			return true;
-		}
 		return false;
+
 	}
 
 	@Override

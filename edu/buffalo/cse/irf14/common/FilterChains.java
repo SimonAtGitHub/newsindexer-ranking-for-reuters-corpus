@@ -15,31 +15,33 @@ public class FilterChains {
 	 * </ul>
 	 */
 	public static final TokenFilterType[] FILTERS_FOR_CONTENT = {
-			TokenFilterType.CAPITALIZATION, TokenFilterType.STOPWORD,
 			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS,
+			TokenFilterType.CAPITALIZATION, TokenFilterType.STOPWORD,
 			TokenFilterType.DATE, TokenFilterType.NUMERIC,
-			TokenFilterType.STEMMER };
+			TokenFilterType.ACCENT, TokenFilterType.STEMMER };
 
 	public static final TokenFilterType[] FILTERS_FOR_NEWSDATE = { TokenFilterType.DATE };
 
 	public static final TokenFilterType[] FILTERS_FOR_CATEGORY = {
-			TokenFilterType.CAPITALIZATION, TokenFilterType.SYMBOL,
-			TokenFilterType.SPECIALCHARS };
+			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS,
+			TokenFilterType.CAPITALIZATION, TokenFilterType.ACCENT };
 
 	public static final TokenFilterType[] FILTERS_FOR_TITLE = {
-			TokenFilterType.CAPITALIZATION, TokenFilterType.STOPWORD,
 			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS,
+			TokenFilterType.CAPITALIZATION, TokenFilterType.STOPWORD,
 			TokenFilterType.DATE, TokenFilterType.NUMERIC,
-			TokenFilterType.STEMMER };
+			TokenFilterType.STEMMER, TokenFilterType.ACCENT };
 
 	public static final TokenFilterType[] FILTERS_FOR_AUTHOR = {
-			TokenFilterType.CAPITALIZATION, TokenFilterType.SYMBOL,
-			TokenFilterType.SPECIALCHARS };
+			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS,
+			TokenFilterType.CAPITALIZATION, TokenFilterType.ACCENT };
 
 	public static final TokenFilterType[] FILTERS_FOR_AUTHORORG = {
-			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS };
+			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS,
+			TokenFilterType.ACCENT };
 
 	public static final TokenFilterType[] FILTERS_FOR_PLACE = {
-			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS };
+			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS,
+			TokenFilterType.ACCENT };
 
 }

@@ -45,7 +45,6 @@ public class TFRuleBaseTest {
 		tstream = null;
 		filter = null;
 		list = null;
-		System.out.println(rv);
 		return rv;
 	}
 

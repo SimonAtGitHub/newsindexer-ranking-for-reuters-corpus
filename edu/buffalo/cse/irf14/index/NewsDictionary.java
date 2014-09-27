@@ -1,7 +1,7 @@
 package edu.buffalo.cse.irf14.index;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * The abstract class for dictionary. All dictionaries must implement this abstract class
@@ -13,9 +13,9 @@ public abstract class NewsDictionary {
 	/**
 	 * Map which holds the mapping between dictionary key and dictionary value
 	 */
-	private Map<String,Integer> map=new HashMap<String,Integer>();
+	private Map<String,Integer> map=new TreeMap<String,Integer>();
 	
-	transient private static int sequence=0;
+	transient private int sequence=0;
 
 	/**
 	 * @return the map

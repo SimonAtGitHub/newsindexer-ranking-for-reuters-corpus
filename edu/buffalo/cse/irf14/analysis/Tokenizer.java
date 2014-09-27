@@ -70,7 +70,7 @@ public class Tokenizer {
 				token.setTermText(arr[index]);
 				token.setTermBuffer(token.getTermText().toCharArray());
 				// If previous token was marked as beginning of a sentence.
-				if (beginningOfSentence) {
+				if (beginningOfSentence && !token.getTermText().isEmpty()) {
 					token.setBeginningOfSentence(true);
 					beginningOfSentence = false;
 				}

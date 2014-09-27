@@ -41,7 +41,7 @@ public class RegExp {
 	// Eg. a-- , ++b
 	public static final String REGEX_FOR_HYPHEN_AT_END_OR_START = "([aA-zZ]+[-]+$)|(^[-]+[aA-zZ]+$)";
 
-	public static final String REGEX_FOR_SPECIAL_CHARS_EXCLUDE_HYPHENS_PUNCTUATION = "[^a-zA-Z0-9!?.-]";
+	public static final String REGEX_FOR_SPECIAL_CHARS_EXCLUDE_HYPHENS_PUNCTUATION = "[^ a-zA-Z0-9!?.-]";
 
 	public static final String REGEX_FOR_SPECIAL_CHARS = "[^a-zA-Z0-9]";
 

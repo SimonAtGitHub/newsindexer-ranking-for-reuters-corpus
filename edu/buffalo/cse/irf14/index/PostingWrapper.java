@@ -1,11 +1,9 @@
 package edu.buffalo.cse.irf14.index;
 
-
-
 import java.io.Serializable;
 import java.util.List;
 
-public class PostingWrapper implements Serializable,Comparable<PostingWrapper>{
+public class PostingWrapper implements Serializable, Comparable<PostingWrapper> {
 
 	/**
 	 * 
@@ -36,7 +34,8 @@ public class PostingWrapper implements Serializable,Comparable<PostingWrapper>{
 	}
 
 	/**
-	 * @param totalFrequency the totalFrequency to set
+	 * @param totalFrequency
+	 *            the totalFrequency to set
 	 */
 	public void setTotalFrequency(Integer totalFrequency) {
 		this.totalFrequency = totalFrequency;
@@ -54,5 +53,11 @@ public class PostingWrapper implements Serializable,Comparable<PostingWrapper>{
 	public int compareTo(PostingWrapper o) {
 		// TODO Auto-generated method stub
 		return (o.totalFrequency).compareTo(this.totalFrequency);
+	}
+
+	@Override
+	public String toString() {
+		return "PostingWrapper [totalFrequency=" + totalFrequency
+				+ ", postings=" + postings + "]";
 	}
 }

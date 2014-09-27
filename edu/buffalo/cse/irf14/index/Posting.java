@@ -2,7 +2,7 @@ package edu.buffalo.cse.irf14.index;
 
 import java.io.Serializable;
 
-public class Posting implements Serializable{
+public class Posting implements Serializable {
 
 	/**
 	 * 
@@ -15,7 +15,7 @@ public class Posting implements Serializable{
 	/**
 	 * File Id
 	 */
-	private String fileId;
+	private transient String fileId;
 	/**
 	 * no. of occurences
 	 */
@@ -65,23 +65,28 @@ public class Posting implements Serializable{
 	public void setFrequency(Integer frequency) {
 		this.frequency = frequency;
 	}
-	
+
 	/**
-	 * Overriding equals.To check if a postings list contains a posting of a particular
-	 * file id
+	 * Overriding equals.To check if a postings list contains a posting of a
+	 * particular file id
 	 */
 	@Override
-	public boolean equals(Object object){
-		if(object instanceof Posting){
+	public boolean equals(Object object) {
+		if (object instanceof Posting) {
 			Posting posting = (Posting) object;
-			if(object instanceof Posting
-					&& this.getDocId()!=null
-					&& this.getDocId().equals(posting.getDocId())){
+			if (object instanceof Posting && this.getDocId() != null
+					&& this.getDocId().equals(posting.getDocId())) {
 				return true;
 			}
-			
+
 		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "Posting [docId=" + docId + ", fileId=" + fileId
+				+ ", frequency=" + frequency + "]";
 	}
 
 }

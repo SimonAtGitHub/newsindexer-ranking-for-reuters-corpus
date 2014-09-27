@@ -135,6 +135,7 @@ public class TokenStream implements Iterator<Token> {
 		// TODO : YOU MUST IMPLEMENT THIS
 		// Reset the iterator to point to the beginning of the tokenlist
 		tokenListIterator = tokenList.listIterator();
+		currentToken = null;
 	}
 
 	/**
