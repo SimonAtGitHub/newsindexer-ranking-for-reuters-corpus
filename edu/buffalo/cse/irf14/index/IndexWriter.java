@@ -132,6 +132,10 @@ public class IndexWriter {
 				termArr = d.getField(FieldNames.AUTHORORG);
 				break;
 			case PLACE:
+				// For Place the delimiter should be ","
+				// so that city, state and country can be separated.
+				// If it's only country, only first word will be taken
+				tknizer = new Tokenizer(",");
 				termArr = d.getField(FieldNames.PLACE);
 				break;
 			case CONTENT:
