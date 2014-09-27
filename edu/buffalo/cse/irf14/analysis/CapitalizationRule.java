@@ -17,7 +17,7 @@ public class CapitalizationRule extends TokenFilter {
 			// get the current token
 			String termText = token.getTermText();
 			// Don't apply if starts with digit
-			if (Character.isDigit(termText.charAt(0))) {
+			if (!Character.isAlphabetic(termText.charAt(0))) {
 				return;
 			}
 			// The token in first token of a sentence if it's either the first
