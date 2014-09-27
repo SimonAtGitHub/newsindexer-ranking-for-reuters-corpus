@@ -18,7 +18,10 @@ public class SymbolRule extends TokenFilter {
 		Token token = stream.getCurrent();
 		if (token != null) {
 			String termText = token.getTermText();
-			termText = filterSymbols(termText);
+			// Only if symbols exist
+			if (!termText.matches("\\w{1,}")) {
+				termText = filterSymbols(termText);
+			}
 			if (termText == null || termText.isEmpty()) {
 				stream.remove();
 			}

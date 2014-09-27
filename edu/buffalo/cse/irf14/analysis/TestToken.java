@@ -1,28 +1,16 @@
 package edu.buffalo.cse.irf14.analysis;
 
-
+import java.util.regex.Pattern;
 
 public class TestToken {
-    public static void main(String [] args) throws TokenizerException{
-     /* Token token1= new Token(); 
-      token1.setTermText("A");
-      Token token2= new Token(); 
-      token2.setTermText("B");
-      Token token3= new Token(); 
-      token3.setTermText("C");
-      List lst = new ArrayList();
-      lst.add(token1);
-      lst.add(token2);
-      lst.add(token3);
-      TokenStream tokenStream = new TokenStream(lst);
-      while(tokenStream.hasNext()){
-    	  Token token = tokenStream.next();
-    	  System.out.println(token.getTermText());
-      }*/
-		// TFRuleBaseTest.runTest("I am a good boy.");
-		// TFRuleBaseTest.runTest("I am a good boy?");
-		// TFRuleBaseTest.runTest("I am a good boy?.");
-		// TFRuleBaseTest.runTest("I am a good-boy.");
-		// TFRuleBaseTest.runTest("I am a good-3224 boy.");
-    }
+	public static void main(String[] args) throws TokenizerException {
+		String regex = "\\w{1,}";
+		Pattern pattern = Pattern.compile(regex);
+		String[] matcherArray = new String[] { "1#", "ABCD", "AB12", "12DE",
+				"12$", "//ABC", "ABC." };
+		for (String string : matcherArray) {
+			System.out
+					.println(string + ":" + pattern.matcher(string).matches());
+		}
+	}
 }

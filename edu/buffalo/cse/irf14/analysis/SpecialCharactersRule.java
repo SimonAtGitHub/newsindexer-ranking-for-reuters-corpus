@@ -28,6 +28,10 @@ public class SpecialCharactersRule extends TokenFilter {
 	}
 
 	private String filterSpecialCharacters(String termText) {
+		// Only if special characters exist
+		if (termText.matches("\\w{1,}")) {
+			return termText;
+		}
 		// We assume here that all the filters higher in priority have finished
 		// their job and we just have to preserve the ones where special
 		// characters were preserved and apply filtering after that. For Eg. In

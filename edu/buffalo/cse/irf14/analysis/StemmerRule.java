@@ -1,5 +1,7 @@
 package edu.buffalo.cse.irf14.analysis;
 
+import edu.buffalo.cse.irf14.common.RegExp;
+
 /**
  * This class does nothing but call the stem() on a word. Stemming is done by
  * Porter Algorithm implemented by Tartarus. <br>
@@ -21,14 +23,14 @@ public class StemmerRule extends TokenFilter {
 		if (token != null) {
 			String termText = token.getTermText();
 			// Apply the stemming only if the termText is not null and
-			// begins with alphabet.
+			// contains alphabet.
 			if (termText != null) {
-				if (termText.matches("^[a-zA-Z]+")) {
+				if (termText.matches("[aA-zZ]+" + RegExp.REGEX_EXT_PUNCTUATION)) {
 					stemmer.add(termText.toCharArray(), termText.length());
 					stemmer.stem();
 					termText = stemmer.toString();
+					token.setTermText(termText);
 				}
-				token.setTermText(termText);
 			}
 		}
 	}
