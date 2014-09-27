@@ -48,7 +48,7 @@ public class AnalyzerFactory {
 		Analyzer analyzer=null;
 		switch(name){
 		    case CATEGORY:
-		    	analyzer = new AnalyzerForCategory(stream,FilterChains.FILTERS_FOR_CONTENT);
+		    	analyzer = new AnalyzerForCategory(stream,FilterChains.FILTERS_FOR_CATEGORY);
 		    	break;
 		    case TITLE:
 		    	analyzer = new AnalyzerForTitle(stream,FilterChains.FILTERS_FOR_TITLE);

@@ -22,7 +22,9 @@ public class FilterChains {
 
 	public static final TokenFilterType[] FILTERS_FOR_NEWSDATE = { TokenFilterType.DATE };
 
-	public static final TokenFilterType[] FILTERS_FOR_CATEGORY = {};
+	public static final TokenFilterType[] FILTERS_FOR_CATEGORY = {
+			TokenFilterType.CAPITALIZATION, TokenFilterType.SYMBOL,
+			TokenFilterType.SPECIALCHARS };
 
 	public static final TokenFilterType[] FILTERS_FOR_TITLE = {
 			TokenFilterType.CAPITALIZATION, TokenFilterType.STOPWORD,

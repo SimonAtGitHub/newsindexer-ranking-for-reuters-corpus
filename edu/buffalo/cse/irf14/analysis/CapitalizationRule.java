@@ -71,7 +71,7 @@ public class CapitalizationRule extends TokenFilter {
 				// token
 				// contains one or more
 				// capital letter then do not convert it into lowercase
-				else if (prevTermText != null
+				else if (previousToken != null
 						&& termText != null
 						&& !previousToken.isEndOfSentence()
 						&& StringUtil.matchRegex(termText,

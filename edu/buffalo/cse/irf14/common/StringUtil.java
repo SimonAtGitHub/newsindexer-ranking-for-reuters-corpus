@@ -12,29 +12,39 @@ public class StringUtil {
 
 	/**
 	 * Checks if a regex matches with the input
+	 * 
 	 * @param input
 	 * @param regex
 	 * @return
 	 */
-	public static boolean matchRegex(String input,String regex){
+	public static boolean matchRegex(String input, String regex) {
 		Pattern pattern = Pattern.compile(regex);
-		boolean flag=false;
-        Matcher m = pattern.matcher(input);
-        if(m.find()){
-        	flag = true;
-        }
-       
-        return flag;
+		boolean flag = false;
+		Matcher m = pattern.matcher(input);
+		if (m.find()) {
+			flag = true;
+		}
+
+		return flag;
 	}
-	
-	public static String convertStrArrToString(String [] strArr){
-		if(null!=strArr && strArr.length>0 ){
-			return Arrays.deepToString(strArr);
+
+	public static String convertStrArrToString(String[] strArr) {
+		if (null != strArr && strArr.length > 0) {
+			String stringEnclosedInArray = Arrays.deepToString(strArr);
+			// The above method returns with enclosing brackets, remove them.
+			int length = stringEnclosedInArray.length();
+			if (length > 2) {
+				stringEnclosedInArray = stringEnclosedInArray.substring(1,
+						length - 1);
+			} else {
+				stringEnclosedInArray = "";
+			}
+			return stringEnclosedInArray;
 		}
 		return null;
 	}
-	
-	private String convertTokenStreamToString(TokenStream tstream){
+
+	private String convertTokenStreamToString(TokenStream tstream) {
 
 		ArrayList<String> list = new ArrayList<String>();
 		String s;
@@ -45,12 +55,12 @@ public class StringUtil {
 
 			if (t != null) {
 				s = t.toString();
-				
-				if (s!= null && !s.isEmpty())
-					list.add(s);	
+
+				if (s != null && !s.isEmpty())
+					list.add(s);
 			}
 		}
-		
+
 		String[] rv = new String[list.size()];
 		rv = list.toArray(rv);
 		tstream = null;
@@ -58,23 +68,23 @@ public class StringUtil {
 		System.out.println(rv);
 		return rv.toString();
 	}
-	
+
 	/**
 	 * Converts string array to string
+	 * 
 	 * @param strArr
 	 * @return
 	 */
-	public static String convertStrArrToString2(String [] array){
+	public static String convertStrArrToString2(String[] array) {
 		StringBuilder builder = new StringBuilder();
-		for(String str:array){
+		for (String str : array) {
 			builder.append(str);
-			//builder.append(" ");
+			// builder.append(" ");
 		}
-		/*if(builder.length()>1){
-			builder.substring(0, builder.length()-1);
-		}*/
+		/*
+		 * if(builder.length()>1){ builder.substring(0, builder.length()-1); }
+		 */
 		return builder.toString();
 	}
-	
-	 
+
 }
