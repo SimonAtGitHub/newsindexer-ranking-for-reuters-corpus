@@ -210,7 +210,7 @@ public class IndexReader {
 				postingsList.add(postings);
 				// Find the minimum since result of boolean 'and' query can
 				// never be more than the size of the smallest of each
-				// Constituent.
+				// Constituent. After all INTERSECTION it is!!!
 				if (postings.size() < min) {
 					min = i;
 				}
