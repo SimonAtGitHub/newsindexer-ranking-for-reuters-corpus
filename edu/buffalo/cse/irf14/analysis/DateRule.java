@@ -1,11 +1,10 @@
 package edu.buffalo.cse.irf14.analysis;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.buffalo.cse.irf14.common.CommonConstants;
+import edu.buffalo.cse.irf14.common.Month;
 import edu.buffalo.cse.irf14.common.RegExp;
 
 /**
@@ -22,12 +21,6 @@ public class DateRule extends TokenFilter {
 	private boolean validYearPrefix = false;
 
 	private String punctuations = "";
-
-	private HashSet<String> months = new HashSet<String>(
-			Arrays.asList("JAN", "JANUARY", "FEB", "FEBRUARY", "MAR", "MARCH",
-					"APR", "APRIL", "MAY", "JUN", "JUNE", "JUL", "JULY", "AUG",
-					"AUGUST", "SEP", "SEPTEMBER", "OCT", "OCTOBER", "NOV",
-					"NOVEMBER", "DEC", "DECEMBER"));
 
 	public DateRule(TokenStream stream) {
 		super(stream);
@@ -108,8 +101,8 @@ public class DateRule extends TokenFilter {
 		if (monthGroup.matches()) {
 			month = monthGroup.group(1);
 			punctuations = monthGroup.group(2);
-			if (months.contains(month.toUpperCase())) {
-				month = convertMonthToEquivalentNumber(month);
+			month = Month.valueOfDesc(month);
+			if (month != null) {
 				validMonth = true;
 			}
 		}
@@ -415,7 +408,8 @@ public class DateRule extends TokenFilter {
 					&& (firstTermText.matches(RegExp.REGEX_YEAR
 							+ RegExp.REGEX_EXT_PUNCTUATION))) {
 				yearValue = formatYearWithoutBCAD(firstTermText);
-				// If less than 4 digits, number alone is not sufficient for year
+				// If less than 4 digits, number alone is not sufficient for
+				// year
 				// Check if next token is BC or AD
 				// Get the next token
 				secondToken = stream.next();
@@ -612,59 +606,4 @@ public class DateRule extends TokenFilter {
 		return null;
 	}
 
-	private String convertMonthToEquivalentNumber(String month) {
-		month = month.toUpperCase();
-		switch (month) {
-		case "JAN":
-		case "JANUARY":
-			month = "01";
-			break;
-		case "FEB":
-		case "FEBRUARY":
-			month = "02";
-			break;
-		case "MAR":
-		case "MARCH":
-			month = "03";
-			break;
-		case "APR":
-		case "APRIL":
-			month = "04";
-			break;
-		case "MAY":
-			month = "05";
-			break;
-		case "JUN":
-		case "JUNE":
-			month = "06";
-			break;
-		case "JUL":
-		case "JULY":
-			month = "07";
-			break;
-		case "AUG":
-		case "AUGUST":
-			month = "08";
-			break;
-		case "SEP":
-		case "SEPTEMBER":
-			month = "09";
-			break;
-		case "OCT":
-		case "OCTOBER":
-			month = "10";
-			break;
-		case "NOV":
-		case "NOVEMBER":
-			month = "11";
-			break;
-		case "DEC":
-		case "DECEMBER":
-			month = "12";
-			break;
-		default:
-			month = "00";
-		}
-		return month;
-	}
 }
