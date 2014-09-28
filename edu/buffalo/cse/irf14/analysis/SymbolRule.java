@@ -87,16 +87,60 @@ public class SymbolRule extends TokenFilter {
 		if (termText.matches(RegExp.REGEX_FOR_JUST_HYPHEN)) {
 			return null;
 		}
-		// This regex should handle preserving of hyphens in case of alphnumeric
-		// or completely numeric combinations with hyphens like 6-6, BB3-A,
-		// BB3B-A, BB3-A9 etc.
-		// So, just check if it's completely alphabetic with hyphen. If not.
-		// Chuck out the hyphens.
-		if (termText.matches(RegExp.REGEX_FOR_ALPHABETS_HYPHEN)
-				&& !termText.matches(RegExp.REGEX_FOR_HYPHEN_AT_END_OR_START)) {
-			termText = termText.replaceAll("-", " ");
-		} else if (termText.matches(RegExp.REGEX_FOR_HYPHEN_AT_END_OR_START)) {
-			termText = termText.replaceAll("-", "");
+
+		// Remove all hyphens from start or end
+		if (termText.matches(RegExp.REGEX_FOR_HYPHEN_AT_END_OR_START)) {
+			if (termText.startsWith("-")) {
+				int i = 0;
+				while (termText.charAt(i) == '-') {
+					// Increment the pointer
+					i++;
+				}
+				// Substring from i+1
+				termText = termText.substring(i);
+
+			}
+			// Remove trailing -
+			if (termText.endsWith("-")) {
+				int i = termText.length() - 1;
+				while (termText.charAt(i) == '-') {
+					// Decrement the pointer
+					i--;
+				}
+				// Substring from i+1
+				termText = termText.substring(0, i + 1);
+
+			}
+		}
+
+		// Remove all the hyphens between alphabets.
+		if (termText.contains("-")) {
+			String[] hyphenSplits = termText.split("-");
+			// Updated termText
+			String updatedTermText = hyphenSplits[0];
+			boolean isDigit = false;
+			for (int i = 0; i < hyphenSplits.length; i++) {
+				// Check each element of left and right
+				if (i + 1 < hyphenSplits.length) {
+					String split1 = hyphenSplits[i] + hyphenSplits[i + 1];
+					for (int j = 0; j < split1.length(); j++) {
+						if (Character.isDigit(split1.charAt(j))) {
+							isDigit = true;
+							// Preserve hyphen
+							break;
+						}
+					}
+					if (isDigit) {
+						updatedTermText = updatedTermText + "-"
+								+ hyphenSplits[i + 1];
+					} else {
+						updatedTermText = updatedTermText + " "
+								+ hyphenSplits[i + 1];
+					}
+					isDigit = false;
+				}
+			}
+			termText = updatedTermText;
 		}
 		return termText;
 	}

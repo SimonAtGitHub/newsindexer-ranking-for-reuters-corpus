@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.buffalo.cse.irf14.common.RegExp;
+import edu.buffalo.cse.irf14.common.CommonConstants;
 
 /**
  * @author nikhillo Class that parses a given file into a Document
@@ -121,10 +121,10 @@ public class Parser {
 			content = content + placeDateContent[i];
 		}
 		// Populate place and date
-		Pattern pattern = Pattern.compile(RegExp.REGEX_FOR_PLACE_DATE);
 		// Trim the string before matching so that all unwanted spaces are gone
 		placeDate = placeDate.trim();
-		Matcher matcher = pattern.matcher(placeDate);
+		Matcher matcher = CommonConstants.PATTERN_FOR_PLACE_DATE
+				.matcher(placeDate);
 		if (matcher.matches()) {
 			// Find place and set it
 			place = matcher.group(1);

@@ -18,7 +18,7 @@ public class RegExp {
 	// regular expression that denotes that a formatted time i.e., HH:mm:ss
 	public static final String REGEX_FORMATTED_TIME = "([\\d]{2}[:][\\d]{2}:[\\d]{2})";
 	// regular expression that denotes a number e.g. 12 , 98.22
-	public static final String REGEX_REAL_NUM = "^([\\d]+[,]?)*[\\.]?([\\d]*)$";
+	public static final String REGEX_REAL_NUM = "^([+-]?[.]?[\\d]+[,]?)*[\\.]?([\\d]*)$";
 	// regular expression that denotes a number or a number which is prior to
 	// its derived form like 98/100, 1*2,98.22%
 	public static final String REGEX_COMPOSITE_NUM = "^[\\d]+[/|*|.]?[\\d]+[%]?$";
@@ -39,7 +39,7 @@ public class RegExp {
 	public static final String REGEX_FOR_HYPHEN_ALPHANUMERIC = "((\\d)+[-](\\d)+)|(([a-zA-Z]*)(\\d)+([a-zA-Z]*)[-](\\d)*[aA-zZ]+(\\d)*)|((\\d)*([a-zA-Z]+)(\\d)*[-][aA-zZ]*(\\d)+[aA-zZ]*)";
 
 	// Eg. a-- , ++b
-	public static final String REGEX_FOR_HYPHEN_AT_END_OR_START = "([aA-zZ]+[-]+$)|(^[-]+[aA-zZ]+$)";
+	public static final String REGEX_FOR_HYPHEN_AT_END_OR_START = "([-]{1,}[^0-9]*|[^0-9]*[-]{1,})"; /* "([aA-zZ]+[-]+$)|(^[-]+[aA-zZ]+$)" */
 
 	public static final String REGEX_FOR_SPECIAL_CHARS_EXCLUDE_HYPHENS_PUNCTUATION = "[^ a-zA-Z0-9!?.-]";
 
@@ -60,7 +60,7 @@ public class RegExp {
 
 	public static final String REGEX_COMPOSITE_YEAR = "(\\d{4}[-]\\d{2})";
 
-	public static final String REGEX_ALPHABETS = "([a-zA-Z]+)";
+	public static final String REGEX_MONTHS = "([a-zA-Z]{3,9})";
 
 	// Regular Expression for time
 	public static final String REGEX_HOURS = "([01]?[0-9]|2[0-3])";

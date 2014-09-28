@@ -18,7 +18,7 @@ public class NumberRule extends TokenFilter {
 		if (token != null) {
 			String termText = token.getTermText();
 			// Don't apply this rule if the Token Doesn't start with a digit
-			if (termText.isEmpty() || !Character.isDigit(termText.charAt(0))) {
+			if (termText.isEmpty()) {
 				return;
 			}
 			// If the token is a formatted date or time, ignore it
@@ -34,7 +34,6 @@ public class NumberRule extends TokenFilter {
 			// if the token is a real number delete the token
 			else if (StringUtil.matchRegex(termText, RegExp.REGEX_REAL_NUM)) {
 				stream.remove();
-				// stream.next();
 			}
 			// if the token is a composite number (i.e. fractions or
 			// percentages
@@ -43,8 +42,12 @@ public class NumberRule extends TokenFilter {
 			else if (StringUtil
 					.matchRegex(termText, RegExp.REGEX_COMPOSITE_NUM)) {
 				termText = termText.replaceAll(RegExp.REGEX_NUM_PERIOD, "");
+				if (termText.isEmpty()) {
+					stream.remove();
+				} else {
+					token.setTermText(termText);
+				}
 			}
-			token.setTermText(termText);
 		}
 	}
 }

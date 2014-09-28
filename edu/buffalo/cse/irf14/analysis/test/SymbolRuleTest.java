@@ -143,7 +143,14 @@ public class SymbolRuleTest extends TFRuleBaseTest {
 			// retained as a single token (week-day => week day).
 			// Any other hyphens padded by spaces on either or both sides
 			// should be removed.
-
+			assertArrayEquals(new String[] { "100-dlr a share" },
+					runTest(TokenFilterType.SYMBOL, "100-dlr-a-share"));
+			assertArrayEquals(new String[] { "Daimler Puch" },
+					runTest(TokenFilterType.SYMBOL, "-Daimler-Puch"));
+			assertArrayEquals(new String[] { "......END JUNE" },
+					runTest(TokenFilterType.SYMBOL, "......END-JUNE"));
+			assertArrayEquals(new String[] { "1.93-billion mark" },
+					runTest(TokenFilterType.SYMBOL, "1.93-billion-mark"));
 			// whitespace padded hyphens
 			assertArrayEquals(new String[] { "hyphen", "test" },
 					runTest(TokenFilterType.SYMBOL, "hyphen - test"));
@@ -165,8 +172,17 @@ public class SymbolRuleTest extends TFRuleBaseTest {
 			// code style
 			assertArrayEquals(new String[] { "c" },
 					runTest(TokenFilterType.SYMBOL, "c--"));
+			assertArrayEquals(new String[] { "Club", "Cabana" },
+					runTest(TokenFilterType.SYMBOL, "Club Cabana------"));
+			assertArrayEquals(new String[] { "Club", "Cabana" },
+					runTest(TokenFilterType.SYMBOL, "Club Cabana------"));
 			assertArrayEquals(new String[] { "c" },
 					runTest(TokenFilterType.SYMBOL, "--c"));
+			assertArrayEquals(new String[] { "Club", "Cabana" },
+					runTest(TokenFilterType.SYMBOL, "------Club Cabana"));
+			assertArrayEquals(new String[] { "Club", "Cabana" },
+					runTest(TokenFilterType.SYMBOL, "-Club Cabana"));
+
 		} catch (TokenizerException e) {
 
 		}

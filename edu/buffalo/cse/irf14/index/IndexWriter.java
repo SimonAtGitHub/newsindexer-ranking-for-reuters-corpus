@@ -67,7 +67,9 @@ public class IndexWriter {
 			// create document dictionary
 			DocumentDictionary docDictionary = DocumentDictionary.getInstance();
 			docDictionary.getMap().put(docId, fileId);
-
+			if (docId.intValue() == 14316) {
+				System.out.println(fileId);
+			}
 			/*
 			 * FileOutputStream fileOut = new
 			 * FileOutputStream("E://ser//test2.ser"); ObjectOutputStream out =
@@ -177,6 +179,7 @@ public class IndexWriter {
 				CommonConstants.DOCUMENT_DICTIONARY_FILENAME);
 		writeToDisk(TermDictionary.getInstance().getMap(),
 				CommonConstants.TERM_DICTIONARY_FILENAME);
+		System.out.println(TermDictionary.getInstance().getMap().size());
 		writeToDisk(AuthorDictionary.getInstance().getMap(),
 				CommonConstants.AUTHOR_DICTIONARY_FILENAME);
 		writeToDisk(PlaceDictionary.getInstance().getMap(),
