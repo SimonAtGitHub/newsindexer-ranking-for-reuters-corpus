@@ -71,4 +71,10 @@ public class RegExp {
 
 	public static final String REGEX_TIME_AM_PM = "((am|pm|AM|PM){0,1})";
 
+	// Regex For Place and Date Separations
+	// Assuming it will be always in the format
+	// Month DD. For month no word can be less than 3 (jan, feb) chars or more
+	// than 9 i.e., for September
+	public static final String REGEX_FOR_PLACE_DATE = "(.*)(\\s+([A-Za-z]{3,9}[\\s]+[0-9]{1,2}))";
+
 }

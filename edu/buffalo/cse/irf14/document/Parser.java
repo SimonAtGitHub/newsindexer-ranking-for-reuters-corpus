@@ -8,7 +8,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import edu.buffalo.cse.irf14.common.RegExp;
 
 /**
  * @author nikhillo Class that parses a given file into a Document
@@ -89,12 +92,10 @@ public class Parser {
 			reader.close();
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found ::" + filename);
-			e.printStackTrace();
 			throw new ParserException();
 		} catch (IOException e) {
 			System.out.println("I/O Error occured while reding the file ::"
 					+ filename);
-			e.printStackTrace();
 			throw new ParserException();
 		}
 
@@ -120,20 +121,44 @@ public class Parser {
 			content = content + placeDateContent[i];
 		}
 		// Populate place and date
-		String[] placeDateArr = placeDate.split(",");
-		if (placeDateArr != null && placeDateArr.length > 1) {
-			int placeDateArrLength = placeDateArr.length;
-			newsDate = placeDateArr[placeDateArrLength - 1];
-
-			for (int i = 0; i <= placeDateArrLength - 2; i++) {
-				place = place + "," + placeDateArr[i];
-			}
-			place = place.substring(1, place.length());
+		Pattern pattern = Pattern.compile(RegExp.REGEX_FOR_PLACE_DATE);
+		// Trim the string before matching so that all unwanted spaces are gone
+		placeDate = placeDate.trim();
+		Matcher matcher = pattern.matcher(placeDate);
+		if (matcher.matches()) {
+			// Find place and set it
+			place = matcher.group(1);
+			// Trim unwanted spaces if any
 			place = place.trim();
+			// It may contain a leading comma which is not a part of the place
+			// If it contains leading comma trim it
+			if (place.endsWith(",")) {
+				// Since substring eats a word
+				place = place.substring(0, place.length() - 1);
+			}
+			// Set the place to the document
 			document.setField(FieldNames.PLACE, place);
+			// Find date and set it
+			newsDate = matcher.group(2);
+			// Trim unwanted space
 			newsDate = newsDate.trim();
+			// Set the Date to the document
 			document.setField(FieldNames.NEWSDATE, newsDate);
 		}
+		// String[] placeDateArr = placeDate.split(",");
+		// if (placeDateArr != null && placeDateArr.length > 1) {
+		// int placeDateArrLength = placeDateArr.length;
+		// newsDate = placeDateArr[placeDateArrLength - 1];
+		//
+		// for (int i = 0; i <= placeDateArrLength - 2; i++) {
+		// place = place + "," + placeDateArr[i];
+		// }
+		// place = place.substring(1, place.length());
+		// place = place.trim();
+		// document.setField(FieldNames.PLACE, place);
+		// newsDate = newsDate.trim();
+		// document.setField(FieldNames.NEWSDATE, newsDate);
+		// }
 		return content;
 
 	}
