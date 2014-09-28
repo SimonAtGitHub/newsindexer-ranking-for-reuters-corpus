@@ -170,7 +170,7 @@ public class IndexWriter {
 				CommonConstants.DOCUMENT_DICTIONARY_FILENAME);
 		writeToDisk(TermDictionary.getInstance().getMap(),
 				CommonConstants.TERM_DICTIONARY_FILENAME);
-		System.out.println(TermDictionary.getInstance().getMap().size());
+		// System.out.println(TermDictionary.getInstance().getMap().size());
 		writeToDisk(AuthorDictionary.getInstance().getMap(),
 				CommonConstants.AUTHOR_DICTIONARY_FILENAME);
 		writeToDisk(PlaceDictionary.getInstance().getMap(),
@@ -200,7 +200,7 @@ public class IndexWriter {
 					+ fileName);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
 			out.writeObject(object);
-			//out.writeObject(object.toString());
+			// out.writeObject(object.toString());
 			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
