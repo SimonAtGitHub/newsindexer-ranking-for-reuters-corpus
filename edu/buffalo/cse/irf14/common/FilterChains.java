@@ -39,17 +39,18 @@ public class FilterChains {
 	 */
 	public static final TokenFilterType[] FILTERS_FOR_AUTHOR = {
 			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,
-			TokenFilterType.SPECIALCHARS };
+			TokenFilterType.SPECIALCHARS, TokenFilterType.CAPITALIZATION,
+			TokenFilterType.STOPWORD };
 
 	public static final TokenFilterType[] FILTERS_FOR_AUTHORORG = {
 			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,
-			TokenFilterType.SPECIALCHARS };
+			TokenFilterType.SPECIALCHARS, TokenFilterType.CAPITALIZATION };
 
 	/**
 	 * separate city, country based on ,
 	 */
 	public static final TokenFilterType[] FILTERS_FOR_PLACE = {
 			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,
-			TokenFilterType.SPECIALCHARS };
+			TokenFilterType.SPECIALCHARS, TokenFilterType.CAPITALIZATION };
 
 }

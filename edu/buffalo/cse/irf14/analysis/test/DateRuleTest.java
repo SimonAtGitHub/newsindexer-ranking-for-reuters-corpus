@@ -20,6 +20,8 @@ public class DateRuleTest extends TFRuleBaseTest {
 	public void testRule() {
 
 		try {
+//			assertArrayEquals(new String[] { "Mar", "13.2,", "Apr","10.0," },
+//					runTest(TokenFilterType.DATE, "March 13.2, Apr 10.0,"));
 			assertArrayEquals(new String[] { "Vidya", "Balan", "born",
 					"19780101", "is", "an", "Indian", "actress." },
 					runTest(TokenFilterType.DATE, "Vidya Balan born 1 January "

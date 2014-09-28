@@ -42,12 +42,21 @@ public class CapitalizationRule extends TokenFilter {
 						&& nextTermText.matches(RegExp.REGEX_ALL_CAPS)) {
 					termText = termText.toLowerCase();
 					token.setTermText(termText);
-					while (stream.hasNext()) {
+					while (stream.hasNext()
+							&& (nextToken != null && nextToken
+									.isEndOfSentence())) {
 						nextToken = stream.next();
 						nextToken.setTermText(nextToken.getTermText()
 								.toLowerCase());
 					}
 					return;
+				}
+				if (termText.matches(RegExp.REGEX_ALL_CAPS)
+						&& nextToken == null) {
+					// What if it's the only word in the stream and All CAPS
+					// lowercase it
+					termText = termText.toLowerCase();
+					token.setTermText(termText);
 				} else if (termText.matches(RegExp.REGEX_ALL_CAPS)
 						&& !nextTermText.matches(RegExp.REGEX_ALL_CAPS)) {
 					// If first term is all CAPS and not the next word. keep it

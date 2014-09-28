@@ -80,9 +80,6 @@ public class IndexWriter {
 				}
 			}
 
-			// String streamTest = convertTokenStreamToString(stream);
-			// System.out.println("Content ::: "+streamTest);
-
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -116,19 +113,12 @@ public class IndexWriter {
 				termArr = d.getField(FieldNames.TITLE);
 				break;
 			case AUTHOR:
-				// For Author the delimiter should be "and"
-				// so that multiple authors can be separated.
-				tknizer = new Tokenizer("and|AND");
 				termArr = d.getField(FieldNames.AUTHOR);
 				break;
 			case AUTHORORG:
 				termArr = d.getField(FieldNames.AUTHORORG);
 				break;
 			case PLACE:
-				// For Place the delimiter should be ","
-				// so that city, state and country can be separated.
-				// If it's only country, only first word will be taken
-				tknizer = new Tokenizer(",");
 				termArr = d.getField(FieldNames.PLACE);
 				break;
 			case CONTENT:

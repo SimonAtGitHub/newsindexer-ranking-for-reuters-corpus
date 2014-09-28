@@ -145,6 +145,8 @@ public class Parser {
 			// Set the Date to the document
 			document.setField(FieldNames.NEWSDATE, newsDate);
 		}
+		// This implementation fails for Places/Date like
+		// "LAKE SUCCESS, N.Y. March 3"
 		// String[] placeDateArr = placeDate.split(",");
 		// if (placeDateArr != null && placeDateArr.length > 1) {
 		// int placeDateArrLength = placeDateArr.length;
