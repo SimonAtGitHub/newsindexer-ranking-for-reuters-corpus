@@ -415,14 +415,7 @@ public class DateRule extends TokenFilter {
 					&& (firstTermText.matches(RegExp.REGEX_YEAR
 							+ RegExp.REGEX_EXT_PUNCTUATION))) {
 				yearValue = formatYearWithoutBCAD(firstTermText);
-				// Check if the punctuation ends the sentence. If it
-				// does, don't proceed
-				if (punctuations.matches(RegExp.REGEX_SENT_ENDS)) {
-					firstToken.setTermText(yearValue + monthValue + dateValue
-							+ punctuations);
-					firstToken.setDatetime(true);
-					return firstToken.getTermText();
-				}
+				// If less than 4 digits, number alone is not sufficient for year
 				// Check if next token is BC or AD
 				// Get the next token
 				secondToken = stream.next();

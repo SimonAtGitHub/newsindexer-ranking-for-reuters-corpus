@@ -22,8 +22,7 @@ public class NumberRule extends TokenFilter {
 				return;
 			}
 			// If the token is a formatted date or time, ignore it
-			// For date or time, the length should be 8
-			if ((termText.length() == 8) && token.isDatetime()) {
+			if (token.isDatetime()) {
 				// Do nothing
 				return;
 			}
