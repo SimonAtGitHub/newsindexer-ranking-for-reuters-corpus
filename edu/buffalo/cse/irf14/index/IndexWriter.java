@@ -67,15 +67,6 @@ public class IndexWriter {
 			// create document dictionary
 			DocumentDictionary docDictionary = DocumentDictionary.getInstance();
 			docDictionary.getMap().put(docId, fileId);
-			if (docId.intValue() == 14316) {
-				System.out.println(fileId);
-			}
-			/*
-			 * FileOutputStream fileOut = new
-			 * FileOutputStream("E://ser//test2.ser"); ObjectOutputStream out =
-			 * new ObjectOutputStream(fileOut); out.writeObject(docDictionary);
-			 * out.close(); fileOut.close();
-			 */
 
 			for (FieldNames fieldName : FieldNames.values()) {
 				// analyze the tokenstream and apply filter chaining except for
@@ -209,6 +200,7 @@ public class IndexWriter {
 					+ fileName);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
 			out.writeObject(object);
+			//out.writeObject(object.toString());
 			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();

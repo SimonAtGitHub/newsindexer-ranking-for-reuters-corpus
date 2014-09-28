@@ -15,22 +15,22 @@ public class FilterChains {
 	 * </ul>
 	 */
 	public static final TokenFilterType[] FILTERS_FOR_CONTENT = {
-			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS,
-			TokenFilterType.CAPITALIZATION, TokenFilterType.STOPWORD,
-			TokenFilterType.DATE, TokenFilterType.NUMERIC,
-			TokenFilterType.ACCENT, TokenFilterType.STEMMER };
+			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,
+			TokenFilterType.SPECIALCHARS, TokenFilterType.DATE,
+			TokenFilterType.NUMERIC, TokenFilterType.CAPITALIZATION,
+			TokenFilterType.STOPWORD, TokenFilterType.STEMMER };
 
 	public static final TokenFilterType[] FILTERS_FOR_NEWSDATE = { TokenFilterType.DATE };
 
 	public static final TokenFilterType[] FILTERS_FOR_CATEGORY = {
-			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS,
-			TokenFilterType.CAPITALIZATION, TokenFilterType.ACCENT };
+			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,
+			TokenFilterType.SPECIALCHARS, TokenFilterType.CAPITALIZATION };
 
 	public static final TokenFilterType[] FILTERS_FOR_TITLE = {
-			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS,
-			TokenFilterType.CAPITALIZATION, TokenFilterType.STOPWORD,
-			TokenFilterType.DATE, TokenFilterType.NUMERIC,
-			TokenFilterType.STEMMER, TokenFilterType.ACCENT };
+			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,
+			TokenFilterType.SPECIALCHARS, TokenFilterType.DATE,
+			TokenFilterType.NUMERIC, TokenFilterType.CAPITALIZATION,
+			TokenFilterType.STOPWORD, TokenFilterType.STEMMER };
 
 	/**
 	 * Use only symbol rule to remove Symbols like ' and accent rule to have
@@ -38,18 +38,18 @@ public class FilterChains {
 	 * is done based on 'and' and it is assumed that name is formatted fine.
 	 */
 	public static final TokenFilterType[] FILTERS_FOR_AUTHOR = {
-			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS,
-			TokenFilterType.ACCENT };
+			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,
+			TokenFilterType.SPECIALCHARS };
 
 	public static final TokenFilterType[] FILTERS_FOR_AUTHORORG = {
-			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS,
-			TokenFilterType.ACCENT };
+			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,
+			TokenFilterType.SPECIALCHARS };
 
 	/**
 	 * separate city, country based on ,
 	 */
 	public static final TokenFilterType[] FILTERS_FOR_PLACE = {
-			TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS,
-			TokenFilterType.ACCENT };
+			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,
+			TokenFilterType.SPECIALCHARS };
 
 }

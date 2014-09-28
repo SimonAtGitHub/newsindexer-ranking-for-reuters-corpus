@@ -5,9 +5,11 @@ public class RegExp {
 	// any sequence of characters
 	public static final String REGEX_FIRST_CAPS = "^[A-Z](.*)";
 	// regular expression that denotes all letters of a word as capital letters
-	public static final String REGEX_ALL_CAPS = "[A-Z]+$";
+	public static final String REGEX_ALL_CAPS = "[^a-z]+$";
 	// regular expression that denotes that a word ends with ! or . or ?
 	public static final String REGEX_SENT_ENDS = "(.*)[.!?]+$";
+	// regular expression that denotes that punctuations ! or . or ?
+	public static final String REGEX_PUNCTUATION = "[.!?]+$";
 	// regular expression that denotes that a word contains punctuation ! or .
 	// or ?
 	public static final String REGEX_CONTAINS_PUNCTUATION = "(.*)[.!?]+(.*)";
@@ -52,11 +54,15 @@ public class RegExp {
 	// punctuation.
 	public static final String REGEX_DATE = "([0]{0,1}[1-9]{1}|[12][0-9]|[3][0-1])";
 
-	public static final String REGEX_YEAR_BC_AD = "(\\d{1,4})(bc|BC|ad|AD)";
+	public static final String REGEX_YEAR_BC_AD = "(\\d{1,4})(BC|AD)";
 
-	public static final String REGEX_BC_AD = "(bc|BC|ad|AD)";
+	public static final String REGEX_BC_AD = "(BC|AD)";
 
 	public static final String REGEX_YEAR = "(\\d{1,4})";
+
+	public static final String REGEX_FULL_YEAR = "(\\d{4})";
+
+	public static final String REGEX_FULL_YEAR_BC_AD = "(\\d{4})(BC|AD)";
 
 	public static final String REGEX_COMPOSITE_YEAR = "(\\d{4}[-]\\d{2})";
 
@@ -69,7 +75,7 @@ public class RegExp {
 
 	public static final String REGEX_TIME_SEPARATOR = "([:]{0,1})";
 
-	public static final String REGEX_TIME_AM_PM = "((am|pm|AM|PM){0,1})";
+	public static final String REGEX_TIME_AM_PM = "((am|pm|AM|PM|hrs|HRS|hours|HOURS){0,1})";
 
 	// Regex For Place and Date Separations
 	// Assuming it will be always in the format

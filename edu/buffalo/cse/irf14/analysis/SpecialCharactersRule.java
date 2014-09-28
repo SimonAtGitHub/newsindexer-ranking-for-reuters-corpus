@@ -50,6 +50,8 @@ public class SpecialCharactersRule extends TokenFilter {
 						.matches(RegExp.REGEX_SENT_ENDS))) {
 			termText = termText.replaceAll(RegExp.REGEX_FOR_SPECIAL_CHARS, "");
 		}
+		// Trim any trailing or leading spaces
+		termText = termText.trim();
 		return termText;
 	}
 

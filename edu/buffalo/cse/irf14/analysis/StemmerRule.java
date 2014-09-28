@@ -32,6 +32,9 @@ public class StemmerRule extends TokenFilter {
 					stemmer.stem();
 					termText = stemmer.toString();
 					token.setTermText(termText);
+					if (termText.isEmpty()) {
+						stream.remove();
+					}
 				}
 			}
 		}

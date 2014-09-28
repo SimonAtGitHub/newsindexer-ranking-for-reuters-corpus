@@ -25,6 +25,9 @@ public class Token {
 	// Marks the beginning of the sentence
 	private boolean beginningOfSentence = false;
 
+	// Check if the token is a date/time
+	private boolean datetime = false;
+
 	/**
 	 * Method to set the termText to given text. This is a sample implementation
 	 * and you CAN change this to suit your class definition and data structure
@@ -107,6 +110,14 @@ public class Token {
 
 	public void setBeginningOfSentence(boolean beginningOfSentence) {
 		this.beginningOfSentence = beginningOfSentence;
+	}
+
+	public boolean isDatetime() {
+		return datetime;
+	}
+
+	public void setDatetime(boolean datetime) {
+		this.datetime = datetime;
 	}
 
 	/**

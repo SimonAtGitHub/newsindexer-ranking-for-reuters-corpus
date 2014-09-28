@@ -52,7 +52,7 @@ public class DateRule extends TokenFilter {
 			yearPrefix = yearGroup.group(2);
 			punctuations = yearGroup.group(3);
 			year = String.format("%04d", Integer.parseInt(year));
-			if (yearPrefix.equalsIgnoreCase("BC")) {
+			if (yearPrefix.equals("BC")) {
 				year = "-" + year;
 			}
 		}
@@ -89,7 +89,7 @@ public class DateRule extends TokenFilter {
 			if (yearPrefixGroup.matches()) {
 				yearPrefix = yearPrefixGroup.group(1);
 				validYearPrefix = true;
-				if (yearPrefix.equalsIgnoreCase("BC")) {
+				if (yearPrefix.equals("BC")) {
 					yearPrefix = "-";
 				} else {
 					yearPrefix = "";
@@ -166,6 +166,7 @@ public class DateRule extends TokenFilter {
 							if (punctuations.matches(RegExp.REGEX_SENT_ENDS)) {
 								firstToken.setTermText(yearValue + monthValue
 										+ dateValue + punctuations);
+								firstToken.setDatetime(true);
 								return firstToken.getTermText();
 							}
 							// It may or maynot be followed by an year
@@ -175,7 +176,7 @@ public class DateRule extends TokenFilter {
 								// Check if term matches a normal year with or
 								// without punctuations
 								if (thirdTermText
-										.matches(RegExp.REGEX_YEAR_BC_AD
+										.matches(RegExp.REGEX_FULL_YEAR_BC_AD
 												+ RegExp.REGEX_EXT_PUNCTUATION)) {
 									yearValue = formatYearWithBCADinSameToken(thirdTermText);
 									// Remove the year token
@@ -185,10 +186,11 @@ public class DateRule extends TokenFilter {
 									firstToken.setTermText(yearValue
 											+ monthValue + dateValue
 											+ punctuations);
+									firstToken.setDatetime(true);
 									return yearValue + monthValue + dateValue
 											+ punctuations;
 								} else if (thirdTermText
-										.matches(RegExp.REGEX_YEAR
+										.matches(RegExp.REGEX_FULL_YEAR
 												+ RegExp.REGEX_EXT_PUNCTUATION)) {
 									// Get the fourth token to check whether
 									// it's BC
@@ -204,6 +206,7 @@ public class DateRule extends TokenFilter {
 										firstToken.setTermText(yearValue
 												+ monthValue + dateValue
 												+ punctuations);
+										firstToken.setDatetime(true);
 										return firstToken.getTermText();
 									}
 									fourthToken = stream.next();
@@ -222,6 +225,7 @@ public class DateRule extends TokenFilter {
 									firstToken.setTermText(yearValue
 											+ monthValue + dateValue
 											+ punctuations);
+									firstToken.setDatetime(true);
 									return yearValue + monthValue + dateValue
 											+ punctuations;
 								} else {
@@ -232,6 +236,7 @@ public class DateRule extends TokenFilter {
 									firstToken.setTermText(yearValue
 											+ monthValue + dateValue
 											+ punctuations);
+									firstToken.setDatetime(true);
 									return yearValue + monthValue + dateValue
 											+ punctuations;
 								}
@@ -239,6 +244,7 @@ public class DateRule extends TokenFilter {
 								// Set the date value
 								firstToken.setTermText(yearValue + monthValue
 										+ dateValue + punctuations);
+								firstToken.setDatetime(true);
 							}
 						}
 					}
@@ -267,6 +273,7 @@ public class DateRule extends TokenFilter {
 							if (punctuations.matches(RegExp.REGEX_SENT_ENDS)) {
 								firstToken.setTermText(yearValue + monthValue
 										+ dateValue + punctuations);
+								firstToken.setDatetime(true);
 								return firstToken.getTermText();
 							}
 							// Find the third token and check if it's an
@@ -277,7 +284,7 @@ public class DateRule extends TokenFilter {
 								// Check if term matches a normal year with or
 								// without punctuations
 								if (thirdTermText
-										.matches(RegExp.REGEX_YEAR_BC_AD
+										.matches(RegExp.REGEX_FULL_YEAR_BC_AD
 												+ RegExp.REGEX_EXT_PUNCTUATION)) {
 									yearValue = formatYearWithBCADinSameToken(thirdTermText);
 									// Remove the year token
@@ -287,10 +294,11 @@ public class DateRule extends TokenFilter {
 									firstToken.setTermText(yearValue
 											+ monthValue + dateValue
 											+ punctuations);
+									firstToken.setDatetime(true);
 									return yearValue + monthValue + dateValue
 											+ punctuations;
 								} else if (thirdTermText
-										.matches(RegExp.REGEX_YEAR
+										.matches(RegExp.REGEX_FULL_YEAR
 												+ RegExp.REGEX_EXT_PUNCTUATION)) {
 									// Get the fourth token to check whether
 									// it's BC
@@ -306,6 +314,7 @@ public class DateRule extends TokenFilter {
 										firstToken.setTermText(yearValue
 												+ monthValue + dateValue
 												+ punctuations);
+										firstToken.setDatetime(true);
 										return firstToken.getTermText();
 									}
 									fourthToken = stream.next();
@@ -324,6 +333,7 @@ public class DateRule extends TokenFilter {
 									firstToken.setTermText(yearValue
 											+ monthValue + dateValue
 											+ punctuations);
+									firstToken.setDatetime(true);
 									return yearValue + monthValue + dateValue
 											+ punctuations;
 								} else {
@@ -334,6 +344,7 @@ public class DateRule extends TokenFilter {
 									firstToken.setTermText(yearValue
 											+ monthValue + dateValue
 											+ punctuations);
+									firstToken.setDatetime(true);
 									return yearValue + monthValue + dateValue
 											+ punctuations;
 								}
@@ -343,9 +354,10 @@ public class DateRule extends TokenFilter {
 								yearValue = "1900";
 								firstToken.setTermText(yearValue + monthValue
 										+ dateValue + punctuations);
+								firstToken.setDatetime(true);
 							}
 						} else if (secondTermText
-								.matches(RegExp.REGEX_YEAR_BC_AD
+								.matches(RegExp.REGEX_FULL_YEAR_BC_AD
 										+ RegExp.REGEX_EXT_PUNCTUATION)) {
 							yearValue = formatYearWithBCADinSameToken(secondTermText);
 							// We don't expect the date to come after the Year,
@@ -357,10 +369,12 @@ public class DateRule extends TokenFilter {
 							// correct date value
 							firstToken.setTermText(yearValue + monthValue
 									+ dateValue + punctuations);
+							firstToken.setDatetime(true);
 							return yearValue + monthValue + dateValue
 									+ punctuations;
-						} else if (secondTermText.matches(RegExp.REGEX_YEAR
-								+ RegExp.REGEX_EXT_PUNCTUATION)) {
+						} else if (secondTermText
+								.matches(RegExp.REGEX_FULL_YEAR
+										+ RegExp.REGEX_EXT_PUNCTUATION)) {
 							yearValue = formatYearWithoutBCAD(secondTermText);
 							// Remove the year token
 							stream.remove();
@@ -369,6 +383,7 @@ public class DateRule extends TokenFilter {
 							if (punctuations.matches(RegExp.REGEX_SENT_ENDS)) {
 								firstToken.setTermText(yearValue + monthValue
 										+ dateValue + punctuations);
+								firstToken.setDatetime(true);
 								return firstToken.getTermText();
 							}
 							// Get the third token to check whether
@@ -386,6 +401,7 @@ public class DateRule extends TokenFilter {
 							// correct date value
 							firstToken.setTermText(yearValue + monthValue
 									+ dateValue + punctuations);
+							firstToken.setDatetime(true);
 							return yearValue + monthValue + dateValue
 									+ punctuations;
 						}
@@ -394,7 +410,7 @@ public class DateRule extends TokenFilter {
 				}
 			}
 
-			// The firsToken might be an year too . 2014. or 2014 January 01
+			// The firsToken might be an year too . 2014.
 			if (Character.isDigit(firstTermText.charAt(0))
 					&& (firstTermText.matches(RegExp.REGEX_YEAR
 							+ RegExp.REGEX_EXT_PUNCTUATION))) {
@@ -404,6 +420,7 @@ public class DateRule extends TokenFilter {
 				if (punctuations.matches(RegExp.REGEX_SENT_ENDS)) {
 					firstToken.setTermText(yearValue + monthValue + dateValue
 							+ punctuations);
+					firstToken.setDatetime(true);
 					return firstToken.getTermText();
 				}
 				// Check if next token is BC or AD
@@ -411,7 +428,7 @@ public class DateRule extends TokenFilter {
 				secondToken = stream.next();
 				if (secondToken != null) {
 					secondTermText = secondToken.getTermText();
-					if (secondTermText.equalsIgnoreCase("BC")) {
+					if (secondTermText.equals("BC")) {
 						yearValue = "-"
 								+ String.format("%04d",
 										Integer.parseInt(firstTermText));
@@ -420,7 +437,8 @@ public class DateRule extends TokenFilter {
 								+ punctuations;
 						// Set the date to first token
 						firstToken.setTermText(formattedDateValue);
-					} else if (secondTermText.equalsIgnoreCase("AD")) {
+						firstToken.setDatetime(true);
+					} else if (secondTermText.equals("AD")) {
 						yearValue = String.format("%04d",
 								Integer.parseInt(firstTermText));
 						stream.remove();
@@ -428,17 +446,22 @@ public class DateRule extends TokenFilter {
 								+ punctuations;
 						// Set the date to first token
 						firstToken.setTermText(formattedDateValue);
+						firstToken.setDatetime(true);
 					} else {
 						// If it was just an year i.e., No BC or AD and NO
 						// Month or Date, Check if it's four digit to mark
 						// it as date
-						if (firstTermText.matches("\\d{4}")) {
+						if (firstTermText.matches("\\d{4}")
+								&& (Integer.parseInt(firstTermText) >= 1900)
+								&& !secondTermText
+										.matches(RegExp.REGEX_TIME_AM_PM)) {
 							yearValue = String.format("%04d",
 									Integer.parseInt(firstTermText));
 							formattedDateValue = yearValue + monthValue
 									+ dateValue + punctuations;
 							// Set the date to first token
 							firstToken.setTermText(formattedDateValue);
+							firstToken.setDatetime(true);
 							// Date formatted. No need of further
 							// processing.
 							return yearValue + monthValue + dateValue
@@ -471,6 +494,7 @@ public class DateRule extends TokenFilter {
 							+ punctuations;
 					// Set the date to first token
 					firstToken.setTermText(formattedDateValue);
+					firstToken.setDatetime(true);
 				}
 			}
 			// If the date is separated by a hyphen
@@ -490,6 +514,7 @@ public class DateRule extends TokenFilter {
 							.substring(0, 2) + splitDates[1]);
 					firstToken.setTermText(year1 + monthValue + dateValue + "-"
 							+ year2 + monthValue + dateValue + punctuations);
+					firstToken.setDatetime(true);
 				}
 			}
 
@@ -551,6 +576,7 @@ public class DateRule extends TokenFilter {
 						punctuations = timeGroup.group(10);
 						firstToken.setTermText(hours + ":" + minutes + ":"
 								+ seconds + punctuations);
+						firstToken.setDatetime(true);
 					} else {
 						// Check if next token has AM PM
 						secondToken = stream.next();
@@ -581,6 +607,7 @@ public class DateRule extends TokenFilter {
 									firstToken.setTermText(hours + ":"
 											+ minutes + ":" + seconds
 											+ punctuations);
+									firstToken.setDatetime(true);
 								}
 							}
 						}
