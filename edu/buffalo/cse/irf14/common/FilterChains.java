@@ -17,7 +17,7 @@ public class FilterChains {
 	public static final TokenFilterType[] FILTERS_FOR_CONTENT = {
 			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,
 			TokenFilterType.SPECIALCHARS, TokenFilterType.DATE,
-			TokenFilterType.NUMERIC, TokenFilterType.CAPITALIZATION,
+			TokenFilterType.CAPITALIZATION, TokenFilterType.NUMERIC,
 			TokenFilterType.STOPWORD, TokenFilterType.STEMMER };
 
 	public static final TokenFilterType[] FILTERS_FOR_NEWSDATE = { TokenFilterType.DATE };
@@ -29,7 +29,7 @@ public class FilterChains {
 	public static final TokenFilterType[] FILTERS_FOR_TITLE = {
 			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,
 			TokenFilterType.SPECIALCHARS, TokenFilterType.DATE,
-			TokenFilterType.NUMERIC, TokenFilterType.CAPITALIZATION,
+			TokenFilterType.CAPITALIZATION, TokenFilterType.NUMERIC,
 			TokenFilterType.STOPWORD, TokenFilterType.STEMMER };
 
 	/**
