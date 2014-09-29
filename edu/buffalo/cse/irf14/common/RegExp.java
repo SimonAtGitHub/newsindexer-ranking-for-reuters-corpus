@@ -48,7 +48,7 @@ public class RegExp {
 	public static final String REGEX_FOR_SPECIAL_CHARS = "[^a-zA-Z0-9]";
 
 	// Extended Punctuations for Date Handling - May or may not be there
-	public static final String REGEX_EXT_PUNCTUATION = "([,?.!;]{0,})";
+	public static final String REGEX_EXT_PUNCTUATION = "([,;]{0,}[?.!]{0,}$)";
 
 	// Match a valid date from 1-31 or 01-31. It might be followed by a
 	// punctuation.
@@ -64,7 +64,7 @@ public class RegExp {
 
 	public static final String REGEX_FULL_YEAR_BC_AD = "(\\d{4})(BC|AD)";
 
-	public static final String REGEX_COMPOSITE_YEAR = "(\\d{4}[-]\\d{2})";
+	public static final String REGEX_COMPOSITE_YEAR = "(\\d{4}[-/]\\d{2})";
 
 	public static final String REGEX_MONTHS = "([a-zA-Z]{3,9})";
 
