@@ -97,6 +97,8 @@ public class Parser {
 			System.out.println("I/O Error occured while reding the file ::"
 					+ filename);
 			throw new ParserException();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		return document;
