@@ -43,7 +43,7 @@ public class CapitalizationRule extends TokenFilter {
 					termText = termText.toLowerCase();
 					token.setTermText(termText);
 					while (stream.hasNext()
-							&& (nextToken != null && nextToken
+							&& (nextToken != null && !nextToken
 									.isEndOfSentence())) {
 						nextToken = stream.next();
 						nextToken.setTermText(nextToken.getTermText()
@@ -61,10 +61,42 @@ public class CapitalizationRule extends TokenFilter {
 						&& !nextTermText.matches(RegExp.REGEX_ALL_CAPS)) {
 					// If first term is all CAPS and not the next word. keep it
 					// do nothing
-					return;
 				} else {
 					termText = termText.toLowerCase();
 					token.setTermText(termText);
+				}
+				// Merging of Camel Cased tokens
+				if (termText.matches(RegExp.REGEX_ALL_CAPS)
+						&& nextTermText.matches(RegExp.REGEX_FIRST_CAPS)
+						&& !nextToken.isBeginningOfSentence()) {
+					token.merge(nextToken);
+					// If merged token was end of sentence, make the previous
+					// token as end of sentence
+					if (nextToken.isEndOfSentence()) {
+						token.setEndOfSentence(true);
+					}
+					stream.next();
+					stream.remove();
+					while (stream.hasNext()) {
+						// Look ahead without moving the pointer
+						nextToken = stream.getNext();
+						nextTermText = nextToken.getTermText();
+						if (StringUtil.matchRegex(nextTermText,
+								RegExp.REGEX_FIRST_CAPS)
+								&& !(token.isEndOfSentence() && nextToken
+										.isBeginningOfSentence())) {
+							token.merge(nextToken);
+							// If merged token was end of sentence, make the
+							// previous token as end of sentence
+							if (nextToken.isEndOfSentence()) {
+								token.setEndOfSentence(true);
+							}
+							stream.next();
+							stream.remove();
+						} else {
+							break;
+						}
+					}
 				}
 				return;
 			} else {
