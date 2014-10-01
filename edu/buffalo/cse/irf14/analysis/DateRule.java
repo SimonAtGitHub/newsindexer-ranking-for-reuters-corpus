@@ -244,7 +244,7 @@ public class DateRule extends TokenFilter {
 				}
 			}
 			// The first Token might be a month too, Eg. Jan 7 2014 or Feb 2010
-			if (Character.isAlphabetic(firstTermText.charAt(0))
+			if (Character.isLetter(firstTermText.charAt(0))
 					&& (firstTermText.matches(RegExp.REGEX_MONTHS
 							+ RegExp.REGEX_EXT_PUNCTUATION))) {
 				monthValue = formatMonth(firstTermText);
