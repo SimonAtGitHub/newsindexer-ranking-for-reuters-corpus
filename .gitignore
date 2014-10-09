@@ -1,5 +1,7 @@
 /bin/
+/index/
 /training/
+/training*/*
 /bin/
 /bin/
 /bin/
