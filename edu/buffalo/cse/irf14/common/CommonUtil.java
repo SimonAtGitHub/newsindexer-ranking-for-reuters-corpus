@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import edu.buffalo.cse.irf14.analysis.Analyzer;
+import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
+import edu.buffalo.cse.irf14.analysis.TokenStream;
+import edu.buffalo.cse.irf14.analysis.Tokenizer;
+import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.document.FieldNames;
 import edu.buffalo.cse.irf14.index.AuthorDictionary;
 import edu.buffalo.cse.irf14.index.AuthorIndex;
@@ -156,6 +161,55 @@ public class CommonUtil {
 		return filePath;
 	}
 	
+	
+	/**
+	 * Finds the index file name based on the index type
+	 */
+	public static String getDictionaryPath(IndexType type) {
+		String fileName = null;
+		switch (type) {
+				case TERM:
+					fileName = CommonConstants.TERM_DICTIONARY_FILENAME;
+					break;
+				case AUTHOR:
+					fileName = CommonConstants.AUTHOR_DICTIONARY_FILENAME;
+					break;
+				case CATEGORY:
+					fileName = CommonConstants.CATEGORY_DICTIONARY_FILENAME;
+					break;
+				case PLACE:
+					fileName = CommonConstants.PLACE_DICTIONARY_FILENAME;
+					break;
+				default:
+			        break;
+		}
+		return fileName;
+	}
+
+	/**
+	 * Finds the index file name based on the index type 
+	 */
+	public static String getIndexPath(IndexType type) {
+		String fileName = null;
+		switch (type) {
+			case TERM:
+				fileName = CommonConstants.TERM_INDEX_FILENAME;
+				break;
+			case AUTHOR:
+				fileName = CommonConstants.AUTHOR_INDEX_FILENAME;
+				break;
+			case CATEGORY:
+				fileName = CommonConstants.CATEGORY_INDEX_FILENAME;
+				break;
+			case PLACE:
+				fileName = CommonConstants.PLACE_INDEX_FILENAME;
+				break;
+			default:
+				break;
+		}
+		return fileName;
+	}
+	
 	/**
 	 * Method that sorts the index by the total no. of frequencies of a term
 	 * @param map
@@ -187,4 +241,119 @@ public class CommonUtil {
       
         return sortedMap;
     }
+	
+	
+	
+	/**
+	 * Method to get the analyzed term based on the index type
+	 * Input should be of the type Term:hello or Term:”hello world”
+	 * @param string
+	 * @return
+	 */
+	public static String getAnalyzedTerm(String string) {
+		
+		TermIndexDetails termIndexDetails = null;
+		String rawIndexType = null;
+		String rawQueryString = null;
+		String analyzedStr = null;
+		
+		//parse the input string to get the raw index type and the raw string
+		
+		if(StringUtil.isNotEmpty(string)){
+			String [] strArr = string.split(CommonConstants.COLON);
+			/*after splitting length of the string array should be 2.
+			 * First Index contain the raw index type and the second index contains the raw string
+			 */
+			if(strArr.length!=2){
+				System.out.println("\nQuery not supported");
+				return null;
+			}
+			else{
+				rawIndexType = strArr[0];
+				rawQueryString = strArr[1];
+				//in case of phrase queries remove the double quotes
+				rawQueryString=rawQueryString.replaceAll(CommonConstants.DOUBLE_QUOTES,"");
+				termIndexDetails = getTermIndexDetails(rawIndexType);
+			}
+		}
+		
+		//Analyze the query term
+		if(StringUtil.isNotEmpty(rawQueryString) && termIndexDetails!=null){
+			Tokenizer tknizer = new Tokenizer();
+			AnalyzerFactory fact = AnalyzerFactory.getInstance();
+			
+			try {
+				TokenStream stream = tknizer.consume(rawQueryString);
+				Analyzer analyzer = fact.getAnalyzerForField(termIndexDetails.getFieldName(),
+						stream);
+
+				while (analyzer.increment()) {
+
+				}
+
+				stream.reset();
+				analyzedStr=StringUtil.convertTokenStreamToString(stream);
+			} catch (TokenizerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return analyzedStr;
+	}
+	
+	
+	/**
+	 * Finds the indexType based on the raw String
+	 * If the termType  is "Term" dictionary is TERM
+	 */
+	public static IndexType getTermIndexType(String termType) {
+		
+		IndexType indexType = null;
+		
+		if(termType.equals(CommonConstants.TYPE_TERM)){
+			indexType = IndexType.TERM;
+		}else if(termType.equals(CommonConstants.TYPE_CATEGORY)){
+			indexType = IndexType.CATEGORY;
+		}else if(termType.equals(CommonConstants.TYPE_AUTHOR)){
+			indexType = IndexType.AUTHOR;
+		}else if(termType.equals(CommonConstants.TYPE_PLACE)){
+			indexType = IndexType.PLACE;
+		}
+		
+		return indexType;
+   }
+	
+	
+	/**
+	 * Finds the indexing details  based on the raw Index Type
+	 */
+	public static TermIndexDetails getTermIndexDetails(String termType) {
+		
+		TermIndexDetails termIndexDetails = new TermIndexDetails();
+		
+		if(termType.equals(CommonConstants.TYPE_TERM)){
+			termIndexDetails.setIndexType(IndexType.TERM);
+			termIndexDetails.setDictionaryName(CommonConstants.TERM_DICTIONARY_FILENAME);
+			termIndexDetails.setIndexName(CommonConstants.TERM_INDEX_FILENAME);
+			termIndexDetails.setFieldName(FieldNames.CONTENT);
+		}else if(termType.equals(CommonConstants.TYPE_CATEGORY)){
+			termIndexDetails.setIndexType(IndexType.CATEGORY);
+			termIndexDetails.setDictionaryName(CommonConstants.CATEGORY_DICTIONARY_FILENAME);
+			termIndexDetails.setIndexName(CommonConstants.CATEGORY_INDEX_FILENAME);
+			termIndexDetails.setFieldName(FieldNames.CATEGORY);
+		}else if(termType.equals(CommonConstants.TYPE_AUTHOR)){
+			termIndexDetails.setIndexType(IndexType.AUTHOR);
+			termIndexDetails.setDictionaryName(CommonConstants.AUTHOR_DICTIONARY_FILENAME);
+			termIndexDetails.setIndexName(CommonConstants.AUTHOR_INDEX_FILENAME);
+			termIndexDetails.setFieldName(FieldNames.AUTHOR);
+		}else if(termType.equals(CommonConstants.TYPE_PLACE)){
+			termIndexDetails.setIndexType(IndexType.PLACE);
+			termIndexDetails.setDictionaryName(CommonConstants.PLACE_DICTIONARY_FILENAME);
+			termIndexDetails.setIndexName(CommonConstants.PLACE_INDEX_FILENAME);
+			termIndexDetails.setFieldName(FieldNames.PLACE);
+		}
+		return termIndexDetails;
+   }
 }
+
+

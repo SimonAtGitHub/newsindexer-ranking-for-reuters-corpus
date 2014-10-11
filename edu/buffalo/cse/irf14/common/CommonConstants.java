@@ -40,5 +40,17 @@ public class CommonConstants {
 
 	public static final Pattern PATTERN_FOR_DATE = Pattern
 			.compile(RegExp.REGEX_DATE + RegExp.REGEX_EXT_PUNCTUATION);
+	
+	public static final String TYPE_TERM = "Term";
+	
+	public static final String TYPE_CATEGORY = "Category";
+	
+	public static final String TYPE_AUTHOR = "Author";
+	
+	public static final String TYPE_PLACE = "Place";
+	
+	public static final String COLON = ":";
+	
+	public static final String DOUBLE_QUOTES = "\"";
 
 }

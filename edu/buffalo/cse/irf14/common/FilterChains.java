@@ -32,15 +32,9 @@ public class FilterChains {
 			TokenFilterType.NUMERIC, TokenFilterType.CAPITALIZATION,
 			TokenFilterType.STOPWORD, TokenFilterType.STEMMER };
 
-	/**
-	 * Use only symbol rule to remove Symbols like ' and accent rule to have
-	 * proper english names. Capitalization is not used since the tokenization
-	 * is done based on 'and' and it is assumed that name is formatted fine.
-	 */
 	public static final TokenFilterType[] FILTERS_FOR_AUTHOR = {
 			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,
-			TokenFilterType.SPECIALCHARS, TokenFilterType.CAPITALIZATION,
-			TokenFilterType.STOPWORD };
+			TokenFilterType.SPECIALCHARS, TokenFilterType.CAPITALIZATION};
 
 	public static final TokenFilterType[] FILTERS_FOR_AUTHORORG = {
 			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,

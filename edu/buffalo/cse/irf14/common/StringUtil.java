@@ -44,28 +44,25 @@ public class StringUtil {
 		return null;
 	}
 
-	private String convertTokenStreamToString(TokenStream tstream) {
+	/**
+	 * Method to convert TokenStream to a String
+	 * @param tstream
+	 * @return
+	 */
+	public static String convertTokenStreamToString(TokenStream tstream) {
 
-		ArrayList<String> list = new ArrayList<String>();
-		String s;
+		String outputStr="";
 		Token t;
 
 		while (tstream.hasNext()) {
 			t = tstream.next();
-
-			if (t != null) {
-				s = t.toString();
-
-				if (s != null && !s.isEmpty())
-					list.add(s);
-			}
+			outputStr = outputStr+t.toString();
+			outputStr = outputStr + CommonConstants.WHITESPACE;
 		}
-
-		String[] rv = new String[list.size()];
-		rv = list.toArray(rv);
-		tstream = null;
-		list = null;
-		return rv.toString();
+		if(outputStr!=null){
+			outputStr =outputStr.trim();
+		}
+		return outputStr;
 	}
 
 	/**
@@ -86,4 +83,21 @@ public class StringUtil {
 		return builder.toString();
 	}
 
+	/**
+	 * Method that checks for an empty or blank string
+	 */
+	public static Boolean isEmpty(String str){
+		Boolean flag = false;
+		if(str==null || str.length()==0){
+			flag = true;
+		}
+		return flag;
+	}
+	
+	/**
+	 * Method that checks if a string is not empty
+	 */
+	public static Boolean isNotEmpty(String str){
+		return !isEmpty(str);
+	}
 }
