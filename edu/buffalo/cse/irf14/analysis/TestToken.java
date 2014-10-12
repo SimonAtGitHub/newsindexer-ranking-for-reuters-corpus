@@ -1,7 +1,5 @@
 package edu.buffalo.cse.irf14.analysis;
 
-import edu.buffalo.cse.irf14.common.Month;
-import edu.buffalo.cse.irf14.common.QueryRegExp;
 import edu.buffalo.cse.irf14.query.Query;
 import edu.buffalo.cse.irf14.query.QueryParser;
 
@@ -49,13 +47,37 @@ public class TestToken {
 		// QueryParser parser = new QueryParser();
 		// Query query = parser.parse("hello", null);
 		// System.out.println(query.toString());
+
+		// Query Regex
+		// String[] stringArr = new String[] { "hello", "hello world",
+		// " Hello!! World", "Hello!! World", "Hello Animesh Kumar",
+		// "Hello Animesh Kumar!! Welcome", "Hello Animesh Kumar ",
+		// "Hello Animesh Kumar!! Welcome ", "(hello)", "(hello world)",
+		// "( Hello!! World)", "(Hello!! World)", "(Hello Animesh Kumar)",
+		// "(Hello Animesh Kumar!! Welcome)", "(Hello Animesh Kumar )",
+		// "(Hello Animesh Kumar!! Welcome )", "\"hello\"",
+		// "\"hello world\"", "\" Hello!! World\"", "\"Hello!! World\"",
+		// "\"Hello Animesh Kumar\"", "\"Hello Animesh Kumar!! Welcome\"",
+		// "\"Hello Animesh Kumar \"",
+		// "\"Hello Animesh Kumar!! Welcome \"" };
+		// for (String string : stringArr) {
+		// System.out.println(string
+		// + " :"
+		// + (string.matches(QueryRegExp.TERM) || string
+		// .matches(QueryRegExp.COMPLEX_TERM)));
+		// }
+
+		// Query Formulation
 		String[] stringArr = new String[] { "hello", "hello world",
 				" Hello!! World", "Hello!! World", "Hello Animesh Kumar",
-				"Hello Animesh Kumar!! Welcome", "Hello Animesh Kumar ",
-				"Hello Animesh Kumar!! Welcome " };
+				"Hello Animesh Kumar!! Welcome", "\"hello world\"" };
 		for (String string : stringArr) {
-			System.out
-					.println(string + " :" + string.matches(QueryRegExp.TERM));
+			Query query = QueryParser.parse(string, "OR");
+			System.out.println("Original - " + string);
+			System.out.println("Query -" + query.getQuery());
+			System.out.println("toString -" + query.toString());
+			System.out.println();
 		}
+
 	}
 }

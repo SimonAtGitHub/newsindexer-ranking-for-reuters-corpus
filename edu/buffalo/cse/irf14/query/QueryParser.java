@@ -21,10 +21,13 @@ public class QueryParser {
 	 */
 	public static Query parse(String userQuery, String defaultOperator) {
 		// TODO: YOU MUST IMPLEMENT THIS METHOD
+
+		
 		// Hardcoding for now
 		List<String> terms = new ArrayList<String>();
 		terms.add("hello");
-		Query query = new Query(terms, defaultOperator);
+		Query query = new Query(userQuery, defaultOperator);
 		return query;
 	}
+
 }
