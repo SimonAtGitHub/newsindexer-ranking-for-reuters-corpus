@@ -13,7 +13,7 @@ import edu.buffalo.cse.irf14.common.CommonQueryPatterns;
  */
 public class Query {
 
-	private String queryString = "";
+	private String query = "";
 
 	/**
 	 * List of terms
@@ -44,17 +44,27 @@ public class Query {
 			// Split the terms based on whitespace
 			String[] queryTerms = userQuery.split("\\s");
 			for (int i = 0; i < queryTerms.length; i++) {
-				queryString = queryString + "Term:" + queryTerms[i];
+				query = query + "Term:" + queryTerms[i];
 				// Add operator in all terms except the last
 				if (i < queryTerms.length - 1) {
-					queryString = queryString + " " + defaultOperator + " ";
+					query = query + " " + defaultOperator + " ";
 				}
 			}
 		} else if (quotedTermMatcher.matches()) {
-			queryString = queryString + "Term:" + userQuery;
+			query = query + "Term:" + userQuery;
 		}
 		// Enclose the queryString in brackets
-		queryString = "( " + queryString + " )";
+		query = "( " + query + " )";
+	}
+
+	/**
+	 * Returns a representation of query which is required to execute the query. <br>
+	 * <b>NOT SAME AS toString() representation.</b>
+	 * 
+	 * @return
+	 */
+	public String getQuery() {
+		return query;
 	}
 
 	/**
@@ -62,9 +72,19 @@ public class Query {
 	 */
 	public String toString() {
 		// TODO: YOU MUST IMPLEMENT THIS
-		// if (terms.size() == 1) {
-		// queryString = "Term:" + terms.get(0);
-		// }
+		String queryString = query;
+		// Replace the first and last bracket by flower brackets if the string
+		// is not empty
+		if (!queryString.isEmpty() && queryString.length() > 1) {
+			// Replaces only first occurence
+			queryString = queryString.replace("(", "{");
+			// Replace last occurence by }
+			if (queryString.charAt(queryString.length() - 1) == ')') {
+				queryString = queryString
+						.substring(0, queryString.length() - 1) + "}";
+			}
+
+		}
 		return queryString;
 	}
 }

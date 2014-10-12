@@ -1,5 +1,6 @@
 package edu.buffalo.cse.irf14.analysis;
 
+import edu.buffalo.cse.irf14.query.Query;
 import edu.buffalo.cse.irf14.query.QueryParser;
 
 public class TestToken {
@@ -71,7 +72,11 @@ public class TestToken {
 				" Hello!! World", "Hello!! World", "Hello Animesh Kumar",
 				"Hello Animesh Kumar!! Welcome", "\"hello world\"" };
 		for (String string : stringArr) {
-			System.out.println(QueryParser.parse(string, "OR"));
+			Query query = QueryParser.parse(string, "OR");
+			System.out.println("Original - " + string);
+			System.out.println("Query -" + query.getQuery());
+			System.out.println("toString -" + query.toString());
+			System.out.println();
 		}
 
 	}
