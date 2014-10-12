@@ -56,6 +56,49 @@ public class IndexReader {
 	Map<Integer, String> docDictionary = null;
 
 	/**
+	 * @return the dictionaryForIndexType
+	 */
+	public Map<String, Integer> getDictionaryForIndexType() {
+		return dictionaryForIndexType;
+	}
+
+	/**
+	 * @param dictionaryForIndexType the dictionaryForIndexType to set
+	 */
+	public void setDictionaryForIndexType(
+			Map<String, Integer> dictionaryForIndexType) {
+		this.dictionaryForIndexType = dictionaryForIndexType;
+	}
+
+	/**
+	 * @return the indexMap
+	 */
+	public Map<Integer, PostingWrapper> getIndexMap() {
+		return indexMap;
+	}
+
+	/**
+	 * @param indexMap the indexMap to set
+	 */
+	public void setIndexMap(Map<Integer, PostingWrapper> indexMap) {
+		this.indexMap = indexMap;
+	}
+
+	/**
+	 * @return the docDictionary
+	 */
+	public Map<Integer, String> getDocDictionary() {
+		return docDictionary;
+	}
+
+	/**
+	 * @param docDictionary the docDictionary to set
+	 */
+	public void setDocDictionary(Map<Integer, String> docDictionary) {
+		this.docDictionary = docDictionary;
+	}
+
+	/**
 	 * Default constructor
 	 * 
 	 * @param indexDir
