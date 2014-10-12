@@ -1,7 +1,9 @@
 package edu.buffalo.cse.irf14.analysis;
 
 import edu.buffalo.cse.irf14.common.Month;
-
+import edu.buffalo.cse.irf14.common.QueryRegExp;
+import edu.buffalo.cse.irf14.query.Query;
+import edu.buffalo.cse.irf14.query.QueryParser;
 
 public class TestToken {
 	public static void main(String[] args) throws TokenizerException {
@@ -32,10 +34,28 @@ public class TestToken {
 		// String name = "Animesh";
 		// String[] split = name.split("and");
 		// System.out.println(Arrays.deepToString(split));
-		
-		//Enums
-		Month.valueOfDesc("December");
-		Month.valueOfDesc("Something but not month");
 
+		// Enums
+		// Month.valueOfDesc("December");
+		// Month.valueOfDesc("Something but not month");
+
+		// String index = "\\bTerm\\b|\\bCategory\\b|\\bAuthor\\b|\\bPlace\\b";
+		// String operator = "\\bAND\\b|\\bOR\\b|\\bNOT\\b";
+		// String queryTerm = "(\\S+)";
+		// String queryPhrase ="[\"]("+queryTerm+"(\\s))*(\\S)+[\"]";
+		// String input = "\"abc def\"";
+
+		// Querying
+		// QueryParser parser = new QueryParser();
+		// Query query = parser.parse("hello", null);
+		// System.out.println(query.toString());
+		String[] stringArr = new String[] { "hello", "hello world",
+				" Hello!! World", "Hello!! World", "Hello Animesh Kumar",
+				"Hello Animesh Kumar!! Welcome", "Hello Animesh Kumar ",
+				"Hello Animesh Kumar!! Welcome " };
+		for (String string : stringArr) {
+			System.out
+					.println(string + " :" + string.matches(QueryRegExp.TERM));
+		}
 	}
 }
