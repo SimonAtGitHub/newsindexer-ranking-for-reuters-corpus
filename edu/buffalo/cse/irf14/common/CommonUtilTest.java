@@ -11,12 +11,12 @@ import static org.junit.Assert.*;
 
 public class CommonUtilTest {
 
-	@Test
+	/*@Test
 	public void testGetAnalyzedTerm() {
 		assertEquals("comput",CommonUtil.getAnalyzedTerm("Term:Computer") );
 		assertEquals("san Francisco",CommonUtil.getAnalyzedTerm("Term:\"San Francisco\"") );
-		/*System.out.println(CommonUtil.getAnalyzedTerm("Term:priyankar"));
-		System.out.println(CommonUtil.getAnalyzedTerm("Term:nandi"));*/
+		System.out.println(CommonUtil.getAnalyzedTerm("Term:priyankar"));
+		System.out.println(CommonUtil.getAnalyzedTerm("Term:nandi"));
 	}
 	
 	@Test
@@ -31,10 +31,10 @@ public class CommonUtilTest {
 		String indexDir = "H:\\projects\\IR\\newsindexer\\index";
 		PostingWrapper postingWrapperFirst=CommonUtil.getPostings(indexDir, "priyankar","Term");
 		PostingWrapper postingWrapperSecond=CommonUtil.getPostings(indexDir, "nandi","Term");
-/*		List<Posting> lstAnd=CommonUtil.mergePostingsAnd(postingWrapperFirst.getPostings(), postingWrapperSecond.getPostings());
-		assertEquals(2, lstAnd.size());*/
-/*		List<Posting> lstOr=CommonUtil.mergePostingsOr(postingWrapperFirst.getPostings(), postingWrapperSecond.getPostings());
-		assertEquals(4, lstOr.size());*/
+		List<Posting> lstAnd=CommonUtil.mergePostingsAnd(postingWrapperFirst.getPostings(), postingWrapperSecond.getPostings());
+		assertEquals(2, lstAnd.size());
+		List<Posting> lstOr=CommonUtil.mergePostingsOr(postingWrapperFirst.getPostings(), postingWrapperSecond.getPostings());
+		assertEquals(4, lstOr.size());
         List<Posting> lstNot=CommonUtil.mergePostingsNot(postingWrapperFirst.getPostings(), postingWrapperSecond.getPostings());
 		assertEquals(1, lstNot.size());
         System.out.println("\nPostings retrieved");
@@ -49,6 +49,6 @@ public class CommonUtilTest {
 		CommonUtil.executeQuery("( ( Term:priyankar AND Term:nandi ) OR Term:lubricating )"); //1,4,5
 		//CommonUtil.executeQuery("( Term:animesh OR ( Term:priyankar AND Term:nandi ) )");
         System.out.println("\nPostings retrieved");
-	}
+	}*/
 
 }

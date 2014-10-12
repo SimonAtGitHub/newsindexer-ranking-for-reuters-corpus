@@ -252,63 +252,6 @@ public class CommonUtil {
 	
 	
 	
-	/**
-	 * Method to get the analyzed term based on the index type
-	 * Input should be of the type Term:hello or Term:”hello world”
-	 * @param string
-	 * @return
-	 */
-	public static String getAnalyzedTerm(String string) {
-		
-		TermIndexDetails termIndexDetails = null;
-		String rawIndexType = null;
-		String rawQueryString = null;
-		String analyzedStr = null;
-		
-		//parse the input string to get the raw index type and the raw string
-		
-		if(StringUtil.isNotEmpty(string)){
-			String [] strArr = string.split(CommonConstants.COLON);
-			/*after splitting length of the string array should be 2.
-			 * First Index contain the raw index type and the second index contains the raw string
-			 */
-			if(strArr.length!=2){
-				System.out.println("\nQuery not supported");
-				return null;
-			}
-			else{
-				rawIndexType = strArr[0];
-				rawQueryString = strArr[1];
-				//in case of phrase queries remove the double quotes
-				rawQueryString=rawQueryString.replaceAll(CommonConstants.DOUBLE_QUOTES,"");
-				termIndexDetails = getTermIndexDetails(rawIndexType);
-			}
-		}
-		
-		//Analyze the query term
-		if(StringUtil.isNotEmpty(rawQueryString) && termIndexDetails!=null){
-			Tokenizer tknizer = new Tokenizer();
-			AnalyzerFactory fact = AnalyzerFactory.getInstance();
-			
-			try {
-				TokenStream stream = tknizer.consume(rawQueryString);
-				Analyzer analyzer = fact.getAnalyzerForField(termIndexDetails.getFieldName(),
-						stream);
-
-				while (analyzer.increment()) {
-
-				}
-
-				stream.reset();
-				analyzedStr=StringUtil.convertTokenStreamToString(stream);
-			} catch (TokenizerException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return analyzedStr;
-	}
-	
 	
 	/**
 	 * Finds the indexType based on the raw String
@@ -330,6 +273,32 @@ public class CommonUtil {
 		
 		return indexType;
    }
+	
+	
+	
+	/**
+	 * Reads a object given by the path
+	 * 
+	 * @param filePath
+	 * @return
+	 */
+	public static Object readObject(String filePath) {
+		Object retObject = null;
+		try {
+			FileInputStream fileIn = new FileInputStream(filePath);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			retObject = in.readObject();
+			in.close();
+			fileIn.close();
+		} catch (IOException i) {
+			i.printStackTrace();
+			retObject = null;
+		} catch (ClassNotFoundException c) {
+			c.printStackTrace();
+			retObject = null;
+		}
+		return retObject;
+	}
 	
 	
 	/**
@@ -362,337 +331,10 @@ public class CommonUtil {
 		}
 		return termIndexDetails;
    }
-	
-	/**
-	 * Reads a object given by the path
-	 * 
-	 * @param filePath
-	 * @return
-	 */
-	public static Object readObject(String filePath) {
-		Object retObject = null;
-		try {
-			FileInputStream fileIn = new FileInputStream(filePath);
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			retObject = in.readObject();
-			in.close();
-			fileIn.close();
-		} catch (IOException i) {
-			i.printStackTrace();
-			retObject = null;
-		} catch (ClassNotFoundException c) {
-			c.printStackTrace();
-			retObject = null;
-		}
-		return retObject;
-	}
-	
-	/**
-	 * Method to find the postings list of a term
-	 * @param term - analyzed term
-	 * @param indexType - index type where the term is to be searched
-	 * @return
-	 */
-	public static PostingWrapper getPostings(String indexDir,String term,String termType) {
-		
-		PostingWrapper postingWrapper = null;
-		//get the index type based on the raw string index type. Term: gets coverted to IndexTypeTerm
-		IndexType indexType = getTermIndexType(termType);
-		//load the document and the index
-		IndexReader indexReader = new IndexReader(indexDir, indexType);
-		Map<String, Integer> dictionaryForIndexType=indexReader.getDictionaryForIndexType();
-		Map<Integer, PostingWrapper> indexMap=indexReader.getIndexMap();
-        // get the term id from the dictionary
-		Integer termId = (Integer) dictionaryForIndexType.get(term);
-		if (termId != null) {
-			// get the postings list from the index
-			postingWrapper = (PostingWrapper) indexMap
-					.get(termId);
-		}
-		return postingWrapper;
-   }
 
-    /**
-     * Method to merge the two postings list based on operators 
-     * @param firstPostings - List of first postings
-     * @param secondPostings - List of second postings
-     * @param operator - AND
-     * @return
-     */
-	public static List<Posting> mergePostingsAnd(List<Posting> firstPostings,List<Posting> secondPostings) {
-		
-		List<Posting> outputPostings = new LinkedList<Posting>();
-		//declare the variables to be used for merging
-		Posting firstPosting;
-		Posting secondPosting;
-		Integer firstDocId;
-		Integer secondDocId;
-		//define the iterators over the two lists
-		Iterator<Posting> firstIterator=firstPostings.iterator();
-		Iterator<Posting> secondIterator=secondPostings.iterator();
-		firstPosting = firstIterator.next();
-		secondPosting = secondIterator.next();
-		//merge the postings
-		while(firstPosting!=null && secondPosting!=null){
-			firstDocId = firstPosting.getDocId();
-			secondDocId = secondPosting.getDocId();
-			//if the docIds are equal ADD
-			if(firstDocId.equals(secondDocId)){
-				outputPostings.add(firstPosting);
-				if(firstIterator.hasNext()){
-					firstPosting=firstIterator.next();
-				}else{
-					firstPosting=null;
-				}
-				if(secondIterator.hasNext()){
-					secondPosting=secondIterator.next();
-				}
-				else{
-					secondPosting=null;
-				}
-			}
-			//if the first docId is greater than the second
-			else if(firstDocId<secondDocId){
-					firstPosting=firstIterator.next();
-			}
-			//if the second docId is greater than the first
-			else if(firstDocId>secondDocId){
-					secondPosting=secondIterator.next();
-			}
-		}
-		return outputPostings;
-   }
+ 
 
-    /**
-     * Method to merge the two postings list based on operators 
-     * @param firstPostings - List of first postings
-     * @param secondPostings - List of second postings
-     * @param operator - OR
-     * @return
-     */
-	public static List<Posting> mergePostingsOr(List<Posting> firstPostings,List<Posting> secondPostings) {
-		
-		List<Posting> outputPostings = new LinkedList<Posting>();
-		//declare the variables to be used for merging
-		Posting firstPosting;
-		Posting secondPosting;
-		Integer firstDocId;
-		Integer secondDocId;
-		//define the iterators over the two lists
-		Iterator<Posting> firstIterator=firstPostings.iterator();
-		Iterator<Posting> secondIterator=secondPostings.iterator();
-		firstPosting = firstIterator.next();
-		secondPosting = secondIterator.next();
-		//merge the postings
-		while(firstPosting!=null && secondPosting!=null){
-			firstDocId = firstPosting.getDocId();
-			secondDocId = secondPosting.getDocId();
-			//if the docIds are equal ADD
-			if(firstDocId.equals(secondDocId)){
-				outputPostings.add(firstPosting);
-				if(firstIterator.hasNext()){
-					firstPosting=firstIterator.next();
-				}else{
-					firstPosting=null;
-				}
-				if(secondIterator.hasNext()){
-					secondPosting=secondIterator.next();
-				}
-				else{
-					secondPosting=null;
-				}
-			}
-			//if the first docId is greater than the second ADD
-			else if(firstDocId<secondDocId){
-				    outputPostings.add(firstPosting);
-				    if(firstIterator.hasNext()){
-						firstPosting=firstIterator.next();
-					}else{
-						firstPosting=null;
-					}
-			}
-			//if the second docId is greater than the first ADD
-			else if(firstDocId>secondDocId){
-				outputPostings.add(secondPosting);
-				if(secondIterator.hasNext()){
-					secondPosting=secondIterator.next();
-				}
-				else{
-					secondPosting=null;
-				}
-			}
-		}
-		
-		//add the remaining elements of the first list(if any)
-		while(firstPosting!=null){
-			outputPostings.add(firstPosting);
-			if(firstIterator.hasNext()){
-				firstPosting=firstIterator.next();
-			}
-			else{
-				firstPosting=null;
-			}
-		}
-		
-		//add the remaining elements of the second list(if any)
-	    while(secondPosting!=null){
-					outputPostings.add(secondPosting);
-					if(secondIterator.hasNext()){
-						secondPosting=secondIterator.next();
-					}
-					else{
-						secondPosting=null;
-					}
-		}
-		return outputPostings;
-   }
-	
-    /**
-     * Method to merge the two postings list based on operators 
-     * @param firstPostings - List of first postings
-     * @param secondPostings - List of second postings
-     * @param operator - NOT
-     * @return
-     */
-	public static List<Posting> mergePostingsNot(List<Posting> firstPostings,List<Posting> secondPostings) {
-		
-		List<Posting> outputPostings = new LinkedList<Posting>();
-		//declare the variables to be used for merging
-		Posting firstPosting;
-		Posting secondPosting;
-		Integer firstDocId;
-		Integer secondDocId;
-		//define the iterators over the two lists
-		Iterator<Posting> firstIterator=firstPostings.iterator();
-		Iterator<Posting> secondIterator=secondPostings.iterator();
-		firstPosting = firstIterator.next();
-		secondPosting = secondIterator.next();
-		//merge the postings
-		while(firstPosting!=null && secondPosting!=null){
-			firstDocId = firstPosting.getDocId();
-			secondDocId = secondPosting.getDocId();
-			//if the docIds are equal
-			if(firstDocId.equals(secondDocId)){
-				if(firstIterator.hasNext()){
-					firstPosting=firstIterator.next();
-				}else{
-					firstPosting=null;
-				}
-				if(secondIterator.hasNext()){
-					secondPosting=secondIterator.next();
-				}
-				else{
-					secondPosting=null;
-				}
-			}
-			//if the first docId is greater than the second ADD
-			else if(firstDocId<secondDocId){
-				    outputPostings.add(firstPosting);
-				    if(firstIterator.hasNext()){
-						firstPosting=firstIterator.next();
-					}else{
-						firstPosting=null;
-					}
-			}
-			//if the second docId is greater than the first
-			else if(firstDocId>secondDocId){
-				if(secondIterator.hasNext()){
-					secondPosting=secondIterator.next();
-				}
-				else{
-					secondPosting=null;
-				}
-			}
-		}
-		//add the remaining elements of the first list(if any)
-		while(firstPosting!=null){
-			outputPostings.add(firstPosting);
-			if(firstIterator.hasNext()){
-				firstPosting=firstIterator.next();
-			}else{
-				firstPosting=null;
-			}
-		}
-		return outputPostings;
-   }
 
-   /**
-    * Function that executes the parsed query
-    * @param query
-    */
-   public static void executeQuery(String query){
-	   Stack queryStack = new Stack();
-	   String [] queryStrArr=query.split(CommonConstants.WHITESPACE);
-	   if(null!=queryStrArr && queryStrArr.length>0){
-		   for(String str:queryStrArr){
-			   str = str.trim();
-			   if(str.equals(CommonConstants.FIRST_BRACKET_OPEN)
-					   || str.equals(CommonConstants.OPERATOR_AND)
-					   || str.equals(CommonConstants.OPERATOR_OR)
-					   || str.equals(CommonConstants.OPERATOR_NOT)){
-				   queryStack.push(str);
-			   }
-			   //pop from the stack until a first bracket is encountered
-			   else if (str.equals(CommonConstants.FIRST_BRACKET_CLOSE)){
-				   List<Posting> firstPosting = null;
-				   List<Posting> secondPosting = null;
-				   List<Posting> mergedPostings = null;
-				   String operator = null;
-				   while(!CommonConstants.FIRST_BRACKET_OPEN.equals(queryStack.peek())){
-					   Object stackObj=queryStack.pop();
-					   //populate the second posting if it is not populated already
-					   if(secondPosting==null && stackObj instanceof List){
-						   secondPosting =  (List<Posting>)stackObj;
-					   }
-					   else if(stackObj instanceof List){
-						   firstPosting =  (List<Posting>)stackObj;
-					   }
-					   //store the operator
-					   else if(CommonConstants.OPERATOR_AND.equals(stackObj)
-							   || CommonConstants.OPERATOR_OR.equals(stackObj)
-							   || CommonConstants.OPERATOR_NOT.equals(stackObj)){
-						   operator = (String)stackObj;
-					   }
-					   
-					   //if the first postings , second postings and the operator has been populated
-					   //merge the two postings on the basis of the operator
-					   if(firstPosting!=null && secondPosting!=null && operator!=null){
-						   if(operator.equals(CommonConstants.OPERATOR_AND)){
-							   mergedPostings=mergePostingsAnd(firstPosting,secondPosting);
-						   }
-						   else if(operator.equals(CommonConstants.OPERATOR_OR)){
-							   mergedPostings=mergePostingsOr(firstPosting,secondPosting);
-						   }
-						   else if(operator.equals(CommonConstants.OPERATOR_NOT)){
-							   mergedPostings=mergePostingsNot(firstPosting,secondPosting);
-						   }
-						   //make the second postings NULL. This serves as the identifier that there was a merge rather than
-						   //a single term
-						   secondPosting =null;
-					   }
-				   }
-				   //pop one more time to remove the first bracket
-				   queryStack.pop();
-				   //push the merged postings lists into the stack
-				   if(mergedPostings!=null){
-					   queryStack.push(mergedPostings);
-				   }else{
-					   queryStack.push(secondPosting);
-				   }
-				   
-			   }
-			   // the string is a term e.g. Author:Rushdie Term:Hello,push the postings list to the stack
-			   else{
-				   String analyzedTerm=CommonUtil.getAnalyzedTerm(str);
-				   //TODO- Hardcodings to be removed
-				   PostingWrapper postingWrapper=getPostings("H:\\projects\\IR\\newsindexer\\index",analyzedTerm,"Term");
-				   queryStack.push(postingWrapper.getPostings());
-			   }
-		   }
-	   }
-	   System.out.println(queryStack.peek());
-	   System.out.println("Query Parsed");
-   }
 }
 
 
