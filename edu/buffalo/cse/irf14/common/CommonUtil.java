@@ -1,9 +1,14 @@
 package edu.buffalo.cse.irf14.common;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,11 +26,13 @@ import edu.buffalo.cse.irf14.index.AuthorIndex;
 import edu.buffalo.cse.irf14.index.CategoryDictionary;
 import edu.buffalo.cse.irf14.index.CategoryIndex;
 import edu.buffalo.cse.irf14.index.DocumentDictionary;
+import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
 import edu.buffalo.cse.irf14.index.NewsDictionary;
 import edu.buffalo.cse.irf14.index.NewsIndex;
 import edu.buffalo.cse.irf14.index.PlaceDictionary;
 import edu.buffalo.cse.irf14.index.PlaceIndex;
+import edu.buffalo.cse.irf14.index.Posting;
 import edu.buffalo.cse.irf14.index.PostingWrapper;
 import edu.buffalo.cse.irf14.index.TermDictionary;
 import edu.buffalo.cse.irf14.index.TermIndex;
@@ -353,6 +360,228 @@ public class CommonUtil {
 			termIndexDetails.setFieldName(FieldNames.PLACE);
 		}
 		return termIndexDetails;
+   }
+	
+	/**
+	 * Reads a object given by the path
+	 * 
+	 * @param filePath
+	 * @return
+	 */
+	public static Object readObject(String filePath) {
+		Object retObject = null;
+		try {
+			FileInputStream fileIn = new FileInputStream(filePath);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			retObject = in.readObject();
+			in.close();
+			fileIn.close();
+		} catch (IOException i) {
+			i.printStackTrace();
+			retObject = null;
+		} catch (ClassNotFoundException c) {
+			c.printStackTrace();
+			retObject = null;
+		}
+		return retObject;
+	}
+	
+	/**
+	 * Method to find the postings list of a term
+	 * @param term - analyzed term
+	 * @param indexType - index type where the term is to be searched
+	 * @return
+	 */
+	public static PostingWrapper getPostings(String indexDir,String term,String termType) {
+		
+		PostingWrapper postingWrapper = null;
+		//get the index type based on the raw string index type. Term: gets coverted to IndexTypeTerm
+		IndexType indexType = getTermIndexType(termType);
+		//load the document and the index
+		IndexReader indexReader = new IndexReader(indexDir, indexType);
+		Map<String, Integer> dictionaryForIndexType=indexReader.getDictionaryForIndexType();
+		Map<Integer, PostingWrapper> indexMap=indexReader.getIndexMap();
+        // get the term id from the dictionary
+		Integer termId = (Integer) dictionaryForIndexType.get(term);
+		if (termId != null) {
+			// get the postings list from the index
+			postingWrapper = (PostingWrapper) indexMap
+					.get(termId);
+		}
+		return postingWrapper;
+   }
+
+    /**
+     * Method to merge the two postings list based on operators 
+     * @param firstPostings - List of first postings
+     * @param secondPostings - List of second postings
+     * @param operator - AND
+     * @return
+     */
+	public static List<Posting> mergePostingsAnd(List<Posting> firstPostings,List<Posting> secondPostings) {
+		
+		List<Posting> outputPostings = new LinkedList<Posting>();
+		//declare the variables to be used for merging
+		Posting firstPosting;
+		Posting secondPosting;
+		Integer firstDocId;
+		Integer secondDocId;
+		//define the iterators over the two lists
+		Iterator<Posting> firstIterator=firstPostings.iterator();
+		Iterator<Posting> secondIterator=secondPostings.iterator();
+		firstPosting = firstIterator.next();
+		secondPosting = secondIterator.next();
+		//merge the postings
+		while(firstPosting!=null && secondPosting!=null){
+			firstDocId = firstPosting.getDocId();
+			secondDocId = secondPosting.getDocId();
+			//if the docIds are equal ADD
+			if(firstDocId.equals(secondDocId)){
+				outputPostings.add(firstPosting);
+				if(firstIterator.hasNext()){
+					firstPosting=firstIterator.next();
+				}else{
+					firstPosting=null;
+				}
+				if(secondIterator.hasNext()){
+					secondPosting=secondIterator.next();
+				}
+				else{
+					secondPosting=null;
+				}
+			}
+			//if the first docId is greater than the second
+			else if(firstDocId<secondDocId){
+					firstPosting=firstIterator.next();
+			}
+			//if the second docId is greater than the first
+			else if(firstDocId>secondDocId){
+					secondPosting=secondIterator.next();
+			}
+		}
+		return outputPostings;
+   }
+
+    /**
+     * Method to merge the two postings list based on operators 
+     * @param firstPostings - List of first postings
+     * @param secondPostings - List of second postings
+     * @param operator - OR
+     * @return
+     */
+	public static List<Posting> mergePostingsOr(List<Posting> firstPostings,List<Posting> secondPostings) {
+		
+		List<Posting> outputPostings = new LinkedList<Posting>();
+		//declare the variables to be used for merging
+		Posting firstPosting;
+		Posting secondPosting;
+		Integer firstDocId;
+		Integer secondDocId;
+		//define the iterators over the two lists
+		Iterator<Posting> firstIterator=firstPostings.iterator();
+		Iterator<Posting> secondIterator=secondPostings.iterator();
+		firstPosting = firstIterator.next();
+		secondPosting = secondIterator.next();
+		//merge the postings
+		while(firstPosting!=null || secondPosting!=null){
+			firstDocId = firstPosting.getDocId();
+			secondDocId = secondPosting.getDocId();
+			//if the docIds are equal
+			if(firstDocId.equals(secondDocId)){
+				outputPostings.add(firstPosting);
+				if(firstIterator.hasNext()){
+					firstPosting=firstIterator.next();
+				}else{
+					firstPosting=null;
+				}
+				if(secondIterator.hasNext()){
+					secondPosting=secondIterator.next();
+				}
+				else{
+					secondPosting=null;
+				}
+			}
+			//if the first docId is greater than the second ADD
+			else if(firstDocId<secondDocId){
+				    outputPostings.add(firstPosting);
+				    if(firstIterator.hasNext()){
+						firstPosting=firstIterator.next();
+					}else{
+						firstPosting=null;
+					}
+			}
+			//if the second docId is greater than the first ADD
+			else if(firstDocId>secondDocId){
+				outputPostings.add(secondPosting);
+				if(secondIterator.hasNext()){
+					secondPosting=secondIterator.next();
+				}
+				else{
+					secondPosting=null;
+				}
+			}
+		}
+		return outputPostings;
+   }
+	
+    /**
+     * Method to merge the two postings list based on operators 
+     * @param firstPostings - List of first postings
+     * @param secondPostings - List of second postings
+     * @param operator - NOT
+     * @return
+     */
+	public static List<Posting> mergePostingsNot(List<Posting> firstPostings,List<Posting> secondPostings) {
+		
+		List<Posting> outputPostings = new LinkedList<Posting>();
+		//declare the variables to be used for merging
+		Posting firstPosting;
+		Posting secondPosting;
+		Integer firstDocId;
+		Integer secondDocId;
+		//define the iterators over the two lists
+		Iterator<Posting> firstIterator=firstPostings.iterator();
+		Iterator<Posting> secondIterator=secondPostings.iterator();
+		firstPosting = firstIterator.next();
+		secondPosting = secondIterator.next();
+		//merge the postings
+		while(firstPosting!=null || secondPosting!=null){
+			firstDocId = firstPosting.getDocId();
+			secondDocId = secondPosting.getDocId();
+			//if the docIds are equal
+			if(firstDocId.equals(secondDocId)){
+				if(firstIterator.hasNext()){
+					firstPosting=firstIterator.next();
+				}else{
+					firstPosting=null;
+				}
+				if(secondIterator.hasNext()){
+					secondPosting=secondIterator.next();
+				}
+				else{
+					secondPosting=null;
+				}
+			}
+			//if the first docId is greater than the second ADD
+			else if(firstDocId<secondDocId){
+				    outputPostings.add(firstPosting);
+				    if(firstIterator.hasNext()){
+						firstPosting=firstIterator.next();
+					}else{
+						firstPosting=null;
+					}
+			}
+			//if the second docId is greater than the first
+			else if(firstDocId>secondDocId){
+				if(secondIterator.hasNext()){
+					secondPosting=secondIterator.next();
+				}
+				else{
+					secondPosting=null;
+				}
+			}
+		}
+		return outputPostings;
    }
 }
 
