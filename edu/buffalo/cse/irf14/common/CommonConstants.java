@@ -52,5 +52,15 @@ public class CommonConstants {
 	public static final String COLON = ":";
 	
 	public static final String DOUBLE_QUOTES = "\"";
+	
+	public static final String FIRST_BRACKET_OPEN = "(";
+	
+	public static final String FIRST_BRACKET_CLOSE= ")";
+	
+	public static final String OPERATOR_AND= "AND";
+	
+	public static final String OPERATOR_OR= "OR";
+	
+	public static final String OPERATOR_NOT= "NOT";
 
 }

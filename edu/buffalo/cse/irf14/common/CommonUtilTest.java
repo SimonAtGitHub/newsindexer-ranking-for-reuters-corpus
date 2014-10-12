@@ -39,5 +39,16 @@ public class CommonUtilTest {
 		assertEquals(1, lstNot.size());
         System.out.println("\nPostings retrieved");
 	}
+	
+	@Test
+	public void testExecuteQuery() {
+		//CommonUtil.executeQuery("( Term:priyankar )");
+        //CommonUtil.executeQuery("( Term:priyankar AND Term:nandi )");
+		//CommonUtil.executeQuery("( Term:priyankar OR Term:nandi )");
+		//CommonUtil.executeQuery("( Term:priyankar NOT Term:nandi )");
+		CommonUtil.executeQuery("( ( Term:priyankar AND Term:nandi ) OR Term:lubricating )"); //1,4,5
+		//CommonUtil.executeQuery("( Term:animesh OR ( Term:priyankar AND Term:nandi ) )");
+        System.out.println("\nPostings retrieved");
+	}
 
 }

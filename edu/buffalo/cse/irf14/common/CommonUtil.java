@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Stack;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
 import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
@@ -483,10 +484,10 @@ public class CommonUtil {
 		firstPosting = firstIterator.next();
 		secondPosting = secondIterator.next();
 		//merge the postings
-		while(firstPosting!=null || secondPosting!=null){
+		while(firstPosting!=null && secondPosting!=null){
 			firstDocId = firstPosting.getDocId();
 			secondDocId = secondPosting.getDocId();
-			//if the docIds are equal
+			//if the docIds are equal ADD
 			if(firstDocId.equals(secondDocId)){
 				outputPostings.add(firstPosting);
 				if(firstIterator.hasNext()){
@@ -521,6 +522,28 @@ public class CommonUtil {
 				}
 			}
 		}
+		
+		//add the remaining elements of the first list(if any)
+		while(firstPosting!=null){
+			outputPostings.add(firstPosting);
+			if(firstIterator.hasNext()){
+				firstPosting=firstIterator.next();
+			}
+			else{
+				firstPosting=null;
+			}
+		}
+		
+		//add the remaining elements of the second list(if any)
+	    while(secondPosting!=null){
+					outputPostings.add(secondPosting);
+					if(secondIterator.hasNext()){
+						secondPosting=secondIterator.next();
+					}
+					else{
+						secondPosting=null;
+					}
+		}
 		return outputPostings;
    }
 	
@@ -545,7 +568,7 @@ public class CommonUtil {
 		firstPosting = firstIterator.next();
 		secondPosting = secondIterator.next();
 		//merge the postings
-		while(firstPosting!=null || secondPosting!=null){
+		while(firstPosting!=null && secondPosting!=null){
 			firstDocId = firstPosting.getDocId();
 			secondDocId = secondPosting.getDocId();
 			//if the docIds are equal
@@ -581,7 +604,94 @@ public class CommonUtil {
 				}
 			}
 		}
+		//add the remaining elements of the first list(if any)
+		while(firstPosting!=null){
+			outputPostings.add(firstPosting);
+			if(firstIterator.hasNext()){
+				firstPosting=firstIterator.next();
+			}else{
+				firstPosting=null;
+			}
+		}
 		return outputPostings;
+   }
+
+   /**
+    * Function that executes the parsed query
+    * @param query
+    */
+   public static void executeQuery(String query){
+	   Stack queryStack = new Stack();
+	   String [] queryStrArr=query.split(CommonConstants.WHITESPACE);
+	   if(null!=queryStrArr && queryStrArr.length>0){
+		   for(String str:queryStrArr){
+			   str = str.trim();
+			   if(str.equals(CommonConstants.FIRST_BRACKET_OPEN)
+					   || str.equals(CommonConstants.OPERATOR_AND)
+					   || str.equals(CommonConstants.OPERATOR_OR)
+					   || str.equals(CommonConstants.OPERATOR_NOT)){
+				   queryStack.push(str);
+			   }
+			   //pop from the stack until a first bracket is encountered
+			   else if (str.equals(CommonConstants.FIRST_BRACKET_CLOSE)){
+				   List<Posting> firstPosting = null;
+				   List<Posting> secondPosting = null;
+				   List<Posting> mergedPostings = null;
+				   String operator = null;
+				   while(!CommonConstants.FIRST_BRACKET_OPEN.equals(queryStack.peek())){
+					   Object stackObj=queryStack.pop();
+					   //populate the second posting if it is not populated already
+					   if(secondPosting==null && stackObj instanceof List){
+						   secondPosting =  (List<Posting>)stackObj;
+					   }
+					   else if(stackObj instanceof List){
+						   firstPosting =  (List<Posting>)stackObj;
+					   }
+					   //store the operator
+					   else if(CommonConstants.OPERATOR_AND.equals(stackObj)
+							   || CommonConstants.OPERATOR_OR.equals(stackObj)
+							   || CommonConstants.OPERATOR_NOT.equals(stackObj)){
+						   operator = (String)stackObj;
+					   }
+					   
+					   //if the first postings , second postings and the operator has been populated
+					   //merge the two postings on the basis of the operator
+					   if(firstPosting!=null && secondPosting!=null && operator!=null){
+						   if(operator.equals(CommonConstants.OPERATOR_AND)){
+							   mergedPostings=mergePostingsAnd(firstPosting,secondPosting);
+						   }
+						   else if(operator.equals(CommonConstants.OPERATOR_OR)){
+							   mergedPostings=mergePostingsOr(firstPosting,secondPosting);
+						   }
+						   else if(operator.equals(CommonConstants.OPERATOR_NOT)){
+							   mergedPostings=mergePostingsNot(firstPosting,secondPosting);
+						   }
+						   //make the second postings NULL. This serves as the identifier that there was a merge rather than
+						   //a single term
+						   secondPosting =null;
+					   }
+				   }
+				   //pop one more time to remove the first bracket
+				   queryStack.pop();
+				   //push the merged postings lists into the stack
+				   if(mergedPostings!=null){
+					   queryStack.push(mergedPostings);
+				   }else{
+					   queryStack.push(secondPosting);
+				   }
+				   
+			   }
+			   // the string is a term e.g. Author:Rushdie Term:Hello,push the postings list to the stack
+			   else{
+				   String analyzedTerm=CommonUtil.getAnalyzedTerm(str);
+				   //TODO- Hardcodings to be removed
+				   PostingWrapper postingWrapper=getPostings("H:\\projects\\IR\\newsindexer\\index",analyzedTerm,"Term");
+				   queryStack.push(postingWrapper.getPostings());
+			   }
+		   }
+	   }
+	   System.out.println(queryStack.peek());
+	   System.out.println("Query Parsed");
    }
 }
 
