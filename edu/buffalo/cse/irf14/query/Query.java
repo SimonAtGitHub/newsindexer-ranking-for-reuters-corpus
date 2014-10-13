@@ -3,7 +3,7 @@ package edu.buffalo.cse.irf14.query;
 import java.util.List;
 import java.util.Stack;
 
-import edu.buffalo.cse.irf14.common.CommonConstants;
+import edu.buffalo.cse.irf14.common.QueryRegExp;
 
 /**
  * Class that represents a parsed query
@@ -33,33 +33,33 @@ public class Query {
 		// For our convenience in handling the brackets
 		userQuery = userQuery.replaceAll("[(]", "( ");
 		userQuery = userQuery.replaceAll("[)]", " )");
-		String[] queryStrArr = userQuery.split(CommonConstants.WHITESPACE);
+		String[] queryStrArr = userQuery
+				.split(QueryRegExp.WHITESPACE_NOT_IN_QUOTES);
 		// Stack for numbers: "values"
 		Stack<String> queryTermStack = new Stack<String>();
 		Stack<String> operatorStack = new Stack<String>();
+		boolean useDefault = false;
 		for (int i = 0; i < queryStrArr.length; i++) {
-			// // Current token is a number, push it to stack for numbers
-			// if (tokens[i] >= "0" && tokens[i] <= "9") {
-			// StringBuffer sbuf = new StringBuffer();
-			// // There may be more than one digits in number
-			// while (i < tokens.length && tokens[i] >= "0"
-			// && tokens[i] <= "9")
-			// sbuf.append(tokens[i++]);
-			// queryTerms.push(sbuf.toString());
-			// }
 
 			// Current token is an opening brace, push it to "ops"
-			String term = queryStrArr[i];
+			String term = queryStrArr[i].trim();
+			if (term.isEmpty()) {
+				continue;
+			}
 			if (term.equals("(")) {
 				operatorStack.push(String.valueOf(term));
+				useDefault = false;
 			}
 			// Closing brace encountered, solve entire brace
 			else if (term.equals(")")) {
-				while (!operatorStack.peek().equals("(")){
+				while (!operatorStack.peek().equals("(")) {
 					queryTermStack.push(applyOp(operatorStack.pop(),
 							queryTermStack.pop(), queryTermStack.pop()));
 				}
+				// Apply the brackets
+				queryTermStack.push("(" + queryTermStack.pop() + ")");
 				operatorStack.pop();
+				useDefault = false;
 			}
 
 			// Current token is an operator.
@@ -75,9 +75,19 @@ public class Query {
 
 				// Push current token to "ops".
 				operatorStack.push(String.valueOf(term));
-
+				useDefault = false;
 			} else {
-				queryTermStack.push(term);
+				// For a term substiture it with Term:term
+				term = "Term:" + term;
+				// If last term was also a normal term
+				if (useDefault) {
+					queryTermStack.push(applyOp(defaultOperator, term,
+							queryTermStack.pop()));
+				} else {
+					queryTermStack.push(term);
+					// Flag too use the default operator between two terms
+					useDefault = true;
+				}
 			}
 		}
 
@@ -117,7 +127,6 @@ public class Query {
 	 */
 	public String getQuery() {
 		// Enclose the queryString in brackets
-		query = "( " + query + " )";
 		return query;
 	}
 

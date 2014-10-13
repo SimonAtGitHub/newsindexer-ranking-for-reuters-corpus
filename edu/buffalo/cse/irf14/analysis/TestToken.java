@@ -68,10 +68,10 @@ public class TestToken {
 		// }
 
 		// Query Formulation
-		String[] stringArr = new String[] { "(black OR blue) AND bruises",
-				"hello", "hello world", " Hello!! World", "Hello!! World",
-				"Hello Animesh Kumar", "Hello Animesh Kumar!! Welcome",
-				"\"hello world\"" };
+		String[] stringArr = new String[] { "A B C D E F (G NOT H)",
+				"(black OR blue) AND bruises", "hello", "hello world",
+				" Hello!! World", "Hello!! World", "Hello Animesh Kumar",
+				"Hello Animesh Kumar!! Welcome", "\"hello world\"" };
 		for (String string : stringArr) {
 			Query query = QueryParser.parse(string, "OR");
 			System.out.println("Original - " + string);
