@@ -93,7 +93,7 @@ public class SearchRunner {
 		placeIndex = (Map<Integer, PostingWrapper>) CommonUtil.readObject(indexDir + File.separatorChar+ CommonConstants.PLACE_INDEX_FILENAME);
 		
 	}
-	
+
 	/**
 	 * Method to execute given query in the Q mode
 	 * @param userQuery : Query to be parsed and executed
@@ -184,7 +184,8 @@ public class SearchRunner {
     * @param query
     */
    public List<Posting> executeQuery(String query){
-	   Stack queryStack = new Stack();
+	   Stack<List<Posting>> valueStack = new Stack<List<Posting>>();
+	   Stack<String> operatorStack = new Stack<String>();
 	   termSet = new HashSet<String>();
 	   String [] queryStrArr=query.split(CommonConstants.WHITESPACE);
 	   if(null!=queryStrArr && queryStrArr.length>0){
@@ -194,7 +195,7 @@ public class SearchRunner {
 					   || str.equals(CommonConstants.OPERATOR_AND)
 					   || str.equals(CommonConstants.OPERATOR_OR)
 					   || str.equals(CommonConstants.OPERATOR_NOT)){
-				   queryStack.push(str);
+				   operatorStack.push(str);
 			   }
 			   //pop from the stack until a first bracket is encountered
 			   else if (str.equals(CommonConstants.FIRST_BRACKET_CLOSE)){
@@ -202,70 +203,63 @@ public class SearchRunner {
 				   List<Posting> secondPosting = null;
 				   List<Posting> mergedPostings = null;
 				   String operator = null;
-				   while(!CommonConstants.FIRST_BRACKET_OPEN.equals(queryStack.peek())){
-					   Object stackObj=queryStack.pop();
-					   //populate the second posting if it is not populated already
-					   if(secondPosting==null && stackObj instanceof List){
-						   secondPosting =  (List<Posting>)stackObj;
+				   //until and unless a closing bracket is encountered on operator stack
+				   //pop two elements from value stack and one element from operator stack
+				   //after combining the values with the operator, push the result into the value stack
+				   while(!CommonConstants.FIRST_BRACKET_OPEN.equals(operatorStack.peek())){
+					   firstPosting = valueStack.pop();
+					   secondPosting = valueStack.pop();
+					   operator = operatorStack.pop();
+
+					   if(operator.equals(CommonConstants.OPERATOR_AND)){
+						   mergedPostings=mergePostingsAnd(firstPosting,secondPosting);
 					   }
-					   else if(stackObj instanceof List){
-						   firstPosting =  (List<Posting>)stackObj;
+					   else if(operator.equals(CommonConstants.OPERATOR_OR)){
+						   mergedPostings=mergePostingsOr(firstPosting,secondPosting);
 					   }
-					   //store the operator
-					   else if(CommonConstants.OPERATOR_AND.equals(stackObj)
-							   || CommonConstants.OPERATOR_OR.equals(stackObj)
-							   || CommonConstants.OPERATOR_NOT.equals(stackObj)){
-						   operator = (String)stackObj;
+					   else if(operator.equals(CommonConstants.OPERATOR_NOT)){
+						   mergedPostings=mergePostingsNot(firstPosting,secondPosting);
 					   }
-					   
-					   //if the first postings , second postings and the operator has been populated
-					   //merge the two postings on the basis of the operator
-					   if(firstPosting!=null && secondPosting!=null && operator!=null){
-						   if(operator.equals(CommonConstants.OPERATOR_AND)){
-							   mergedPostings=mergePostingsAnd(firstPosting,secondPosting);
-						   }
-						   else if(operator.equals(CommonConstants.OPERATOR_OR)){
-							   mergedPostings=mergePostingsOr(firstPosting,secondPosting);
-						   }
-						   else if(operator.equals(CommonConstants.OPERATOR_NOT)){
-							   mergedPostings=mergePostingsNot(firstPosting,secondPosting);
-						   }
-						   //make the second postings NULL. This serves as the identifier that there was a merge rather than
-						   //a single term
-						   secondPosting =null;
-					   }
+					
+					   valueStack.push(mergedPostings);
 				   }
-				   //pop one more time to remove the first bracket
-				   queryStack.pop();
-				   //push the merged postings lists into the stack
-				   if(mergedPostings!=null){
-					   queryStack.push(mergedPostings);
-				   }else{
-					   queryStack.push(secondPosting);
-				   }
+				   //pop one more time to remove the closing first bracket
+				   operatorStack.pop();
 				   
 			   }
 			   // the string is a term e.g. Author:Rushdie Term:Hello,push the postings list to the stack
 			   else{
 				   
-				   //add the term to the termset if it is not preceeded by a 'NOT' operator.This 
-				   //is used in computing the score
-				   if(!CommonConstants.OPERATOR_NOT.equals(queryStack.peek())){
-					   termSet.add(str);
-				   }
+				   //TODO exclude the term preceeded by NOT
+				   termSet.add(str);
 				   String analyzedTerm=getAnalyzedTerm(str);
-				   //TODO- Hardcodings to be removed
 				   PostingWrapper postingWrapper=getPostings(indexDir,analyzedTerm,getRawIndexOfTheTerm(str));
-				   queryStack.push(postingWrapper.getPostings());
+				   valueStack.push(postingWrapper.getPostings());
 			   }
 		   }
+		   
+		   //while the operator stack is not empty, pop two elements from value stack and one element from operator stack
+		   //after combining the values with the operator, push the result into the value stack 
+		   while(!operatorStack.isEmpty()){
+			   List<Posting> firstPosting = valueStack.pop();
+			   List<Posting> secondPosting = valueStack.pop();
+			   List<Posting> mergedPostings = null;
+			   String operator = operatorStack.pop();
+
+			   if(operator.equals(CommonConstants.OPERATOR_AND)){
+				   mergedPostings=mergePostingsAnd(firstPosting,secondPosting);
+			   }
+			   else if(operator.equals(CommonConstants.OPERATOR_OR)){
+				   mergedPostings=mergePostingsOr(firstPosting,secondPosting);
+			   }
+			   else if(operator.equals(CommonConstants.OPERATOR_NOT)){
+				   mergedPostings=mergePostingsNot(firstPosting,secondPosting);
+			   }
+			
+			   valueStack.push(mergedPostings);
+		   }
 	   }
-	   if(queryStack.peek() instanceof List){
-		   return (List<Posting>)queryStack.peek();
-	   }
-	   else{
-		   return null;
-	   }
+	   return valueStack.pop();
    }
    
    /**
