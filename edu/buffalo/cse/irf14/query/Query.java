@@ -2,6 +2,8 @@ package edu.buffalo.cse.irf14.query;
 
 import java.util.List;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import edu.buffalo.cse.irf14.common.QueryRegExp;
 
@@ -29,9 +31,19 @@ public class Query {
 		query = formulateQuery(userQuery, defaultOperator);
 	}
 
+	/**
+	 * This method works on the similar structure as given in :-
+	 * http://www.geeksforgeeks.org/expression-evaluation/ <br>
+	 * http://ideone.com/NEYfnD
+	 * 
+	 * @param userQuery
+	 * @param defaultOperator
+	 * @return
+	 */
 	private String formulateQuery(String userQuery, String defaultOperator) {
 		// For our convenience in handling the brackets
 		userQuery = userQuery.replaceAll("[(]", "( ");
+		// userQuery = userQuery.replaceAll("[:(]", " (");
 		userQuery = userQuery.replaceAll("[)]", " )");
 		String[] queryStrArr = userQuery
 				.split(QueryRegExp.WHITESPACE_NOT_IN_QUOTES);
@@ -77,8 +89,13 @@ public class Query {
 				operatorStack.push(String.valueOf(term));
 				useDefault = false;
 			} else {
-				// For a term substiture it with Term:term
-				term = "Term:" + term;
+				// For a term prepend it with the index. If no index is
+				// specified, default it to Term Index.Eg.Term:term
+				Pattern indexedTerm = Pattern.compile(QueryRegExp.INDEX);
+				Matcher indexedTermMatcher = indexedTerm.matcher(term);
+				if (!indexedTermMatcher.matches()) {
+					term = "Term:" + term;
+				}
 				// If last term was also a normal term
 				if (useDefault) {
 					queryTermStack.push(applyOp(defaultOperator, term,

@@ -7,7 +7,7 @@ public class QueryRegExp {
 	// Don't even know what this regex means.
 	public static final String WHITESPACE_NOT_IN_QUOTES = "\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)";
 	// regular expression for various types of indices in a query
-	public static final String INDEX = "Term|Category|Author|Place";
+	public static final String INDEX = "(Term:|Category:|Author:|Place:)(\\S+)";
 	// regular expression for various operators in a query
 	public static final String OPERATOR = "AND|OR|NOT";
 

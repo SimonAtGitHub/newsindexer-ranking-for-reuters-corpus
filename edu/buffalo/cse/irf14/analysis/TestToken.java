@@ -68,15 +68,20 @@ public class TestToken {
 		// }
 
 		// Query Formulation
-		String[] stringArr = new String[] { "A B C D E F (G NOT H)",
-				"(black OR blue) AND bruises", "hello", "hello world",
-				" Hello!! World", "Hello!! World", "Hello Animesh Kumar",
-				"Hello Animesh Kumar!! Welcome", "\"hello world\"" };
+		String[] stringArr = new String[] {
+				"Author:rushdie NOT jihad",
+				"Category:War AND Author:Dutt AND Place:Baghdad AND prisoners detainees rebels",
+				/* "(Love NOT War) AND Category:(movies NOT crime)", */
+				"(A OR B OR C OR D) AND ((E AND F) OR (G AND H)) AND ((I OR J OR K) AND (L OR M OR N OR O)) AND (P OR (Q OR (R OR (S AND T))))",
+				"A B C D E F (G NOT H)", "(black OR blue) AND bruises",
+				"hello", "hello world", " Hello!! World", "Hello!! World",
+				"Hello Animesh Kumar", "Hello Animesh Kumar!! Welcome",
+				"\"hello world\"" };
 		for (String string : stringArr) {
 			Query query = QueryParser.parse(string, "OR");
 			System.out.println("Original - " + string);
 			System.out.println("Query -" + query.getQuery());
-			System.out.println("toString -" + query.toString());
+			// System.out.println("toString -" + query.toString());
 			System.out.println();
 		}
 
