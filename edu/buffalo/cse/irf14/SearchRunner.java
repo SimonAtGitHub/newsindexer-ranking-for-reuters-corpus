@@ -2,11 +2,15 @@ package edu.buffalo.cse.irf14;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.sql.DatabaseMetaData;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
@@ -22,6 +26,7 @@ import edu.buffalo.cse.irf14.document.FieldNames;
 import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
 import edu.buffalo.cse.irf14.index.Posting;
+import edu.buffalo.cse.irf14.index.PostingScoreComparator;
 import edu.buffalo.cse.irf14.index.PostingWrapper;
 
 /**
@@ -55,6 +60,11 @@ public class SearchRunner {
 	private Map<Integer, PostingWrapper> categoryIndex;
 	
 	private Map<Integer, PostingWrapper> placeIndex;
+	
+	/*
+	 * Set consisting of all the terms in the query
+	 */
+	Set<String> termSet ;
 	
 	/**
 	 * Default (and only public) constuctor
@@ -93,8 +103,27 @@ public class SearchRunner {
 		   //TODO: IMPLEMENT THIS METHOD
 		   //TODO- call queryParser to parse the query
 		   //execute the query
+		   long startime = System.currentTimeMillis(); 
 		   List<Posting> postings=executeQuery(userQuery);
-		   System.out.println(postings);
+		   //calculate the score based on the Scoring model of each document
+		   //with respect to the query terms
+		   calculateScore(postings,model);
+		   termSet = new HashSet<String>();
+		   
+		   //print the execution details
+		   System.out.println("===============================================================");
+		   long endtime = System.currentTimeMillis();
+		   System.out.println("Query: " + userQuery);
+		   System.out.println("Query time: " + ((endtime - startime)));
+		   int rank=1;
+		   Collections.sort(postings, new PostingScoreComparator());
+		   for(Posting posting:postings){
+			   System.out.println("Result Title: "+docDictionary.get(posting.getDocId())+
+					               "   Result Rank: "+  rank+
+					               "   Result Relevancy: "+  posting.getScore());
+			   rank++;
+		   }
+		   System.out.println("===============================================================");
 	}
 	
 	/**
@@ -156,6 +185,7 @@ public class SearchRunner {
     */
    public List<Posting> executeQuery(String query){
 	   Stack queryStack = new Stack();
+	   termSet = new HashSet<String>();
 	   String [] queryStrArr=query.split(CommonConstants.WHITESPACE);
 	   if(null!=queryStrArr && queryStrArr.length>0){
 		   for(String str:queryStrArr){
@@ -217,6 +247,12 @@ public class SearchRunner {
 			   }
 			   // the string is a term e.g. Author:Rushdie Term:Hello,push the postings list to the stack
 			   else{
+				   
+				   //add the term to the termset if it is not preceeded by a 'NOT' operator.This 
+				   //is used in computing the score
+				   if(!CommonConstants.OPERATOR_NOT.equals(queryStack.peek())){
+					   termSet.add(str);
+				   }
 				   String analyzedTerm=getAnalyzedTerm(str);
 				   //TODO- Hardcodings to be removed
 				   PostingWrapper postingWrapper=getPostings(indexDir,analyzedTerm,getRawIndexOfTheTerm(str));
@@ -582,5 +618,65 @@ public class SearchRunner {
 				break;
 		}
 		return index;
+	}
+	
+	/**
+	 * Calculate the score of the document with respect to the query and the
+	 * relevance model passed. Score is calculated in term-at-a-time fashion
+	 * @param postings - List of final postings
+	 * @param model - Scoring Model used
+	 */
+	private void calculateScore(List<Posting> mergedPostings, ScoringModel model){
+		
+		//e.g. Term:Computer
+		for(String term:termSet){
+			
+			String analyzedTerm=getAnalyzedTerm(term); //analyzedTerm - comput
+			String termType=getRawIndexOfTheTerm(term); //termType - Term
+			
+			//get the index type based on the raw string index type. Term: gets converted to IndexType TERM
+			IndexType indexType= CommonUtil.getTermIndexType(termType);
+			
+			Map<String, Integer> dictionaryForIndexType=getDictionaryForIndexType(indexType); // Term dictionary
+			Map<Integer, PostingWrapper> indexMap=getInvIndexForIndexType(indexType); //Term Index
+			
+			//get the postings list
+			PostingWrapper postingWrapper=getPostings(indexDir,analyzedTerm,termType);
+			
+			// get the term id from the dictionary
+			Integer termId = (Integer) dictionaryForIndexType.get(analyzedTerm);
+			if (termId != null) {
+				// get the postings list from the index
+				postingWrapper = (PostingWrapper) indexMap
+						.get(termId);
+				List<Posting> termPostings = postingWrapper.getPostings();
+				
+				//Should have avoided O(n2). But doing this in the interest of time.
+				for(Posting mergedPosting:mergedPostings){
+					for(Posting termPosting:termPostings){
+						if(mergedPosting.equals(termPosting)){
+							//compute the tf
+							int termfrequency = termPosting.getFrequency();
+							double tf = 1+ Math.log10(termfrequency);
+							//compute the idf
+							int N = docDictionary.size();
+							int docFrequency = postingWrapper.getTotalFrequency();
+							double idf = Math.log10(N/docFrequency);
+							//compute the tf-idf score
+							double tf_idf = tf*idf;
+							//TODO - change the below line
+							if(null==mergedPosting.getScore()){
+								mergedPosting.setScore(0.0);
+							}
+							double score = mergedPosting.getScore() + tf_idf;
+							mergedPosting.setScore(score);
+							break;
+						}
+					}
+				}
+				
+			}
+		}
+		//System.out.println("\nScore calculated");
 	}
 }
