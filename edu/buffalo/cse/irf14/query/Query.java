@@ -53,7 +53,9 @@ public class Query {
 		Stack<String> operatorStack = new Stack<String>();
 		// Stack for Chained query terms
 		Stack<String> lookaheadStack = new Stack<String>();
+		boolean useDefault = true;
 		String defaultIndex = "Term:";
+		String index = defaultIndex;
 		// A boolean flag to lookahead for consecutive terms to be merged with
 		// default operator
 		boolean lookahead = false;
@@ -64,6 +66,11 @@ public class Query {
 				continue;
 			}
 			if (term.matches(QueryRegExp.INDEX)) {
+				index = getIndex(term);
+				useDefault = false;
+				continue;
+				// Change this flag when the first closing bracket is
+				// encountered
 			}
 			// Current token is an opening brace, push it to "ops"
 			else if (term.equals("(")) {
@@ -75,6 +82,9 @@ public class Query {
 			}
 			// Closing brace encountered, solve entire brace
 			else if (term.equals(")")) {
+				if (!useDefault) {
+					useDefault = true;
+				}
 				lookahead = false;
 				if (!lookaheadStack.isEmpty())
 					transferChainedTermsToMainStack(defaultOperator,
@@ -110,10 +120,14 @@ public class Query {
 				// // specified, default it to Term Index.Eg.Term:term
 				Pattern indexedTerm = Pattern
 						.compile(QueryRegExp.TERMS_WITH_INDEX);
+				if (!useDefault) {
+					term = index + term;
+				}
 				Matcher indexedTermMatcher = indexedTerm.matcher(term);
 				if (!indexedTermMatcher.matches()) {
 					term = defaultIndex + term;
 				}
+
 				// Check if lookahead is true. If yes, pop the item from
 				// queryItemStack and merge with default operator
 				if (lookahead) {
@@ -154,6 +168,19 @@ public class Query {
 		// Top of "values" contains result, return it
 		return queryTermStack.pop();
 
+	}
+
+	private String getIndex(String term) {
+		if (term.equalsIgnoreCase("term:")) {
+			return "Term:";
+		} else if (term.equalsIgnoreCase("category:")) {
+			return "Category:";
+		} else if (term.equalsIgnoreCase("place:")) {
+			return "Place:";
+		} else if (term.equalsIgnoreCase("author:")) {
+			return "Author:";
+		}
+		return "Term:";
 	}
 
 	private void transferChainedTermsToMainStack(String defaultOperator,

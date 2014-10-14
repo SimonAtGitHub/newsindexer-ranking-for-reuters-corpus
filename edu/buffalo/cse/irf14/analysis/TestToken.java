@@ -83,8 +83,69 @@ public class TestToken {
 				"A B C D E F (G NOT H)",
 				"(A OR B OR C OR D) AND ("
 						+ "(E AND F) OR (G AND H)) AND ((I OR J OR K) AND (L OR M OR N OR O)) AND (P OR (Q OR (R OR (S AND T))))",
-				" Hello!! World", "Hello!! World", "Hello Animesh Kumar",
-				"Hello Animesh Kumar!! Welcome", };
+				"NATO",
+				"adobe",
+				"author:\"Patti Domm\" AND american express",
+
+				"author:(brian OR richard) AND place:(paris OR washington)",
+
+				"author:miller OR miller",
+
+				"author:minkwoski OR disney",
+
+				"author:torday AND (debt OR currency)",
+
+				"balance sheet",
+
+				"blah blah blah",
+
+				"casino",
+
+				"category:coffee beans",
+
+				"chase manhattan",
+
+				"consumer price index consumer index cpi index consumer surplus",
+
+				"controlling interest",
+
+				"current financial quarter",
+
+				"debt leverage",
+
+				"debt securities",
+
+				"factory workers lay-offs lockouts strikes",
+
+				"french economy employment government policies",
+
+				"fully convertible non convertible optionally convertible pct convertible debentures",
+
+				"hostile bids mergers takeovers acquisitions",
+
+				"laser",
+
+				"mitsubishi",
+
+				"place:chicago AND administration",
+
+				"place:paris AND government",
+
+				"place:tokyo NOT bank",
+
+				"place:washington AND federal treasury",
+
+				"query",
+
+				"takeovers",
+
+				"tapioca",
+
+				"trade deficit foreign exchange trade surplus balance of trade",
+
+				"weather",
+
+				"zenith" };
 		for (String string : stringArr) {
 			Query query = QueryParser.parse(string, "OR");
 			System.out.println("Original - " + string);
