@@ -2,7 +2,6 @@ package edu.buffalo.cse.irf14;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.sql.DatabaseMetaData;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,8 +21,6 @@ import edu.buffalo.cse.irf14.common.CommonConstants;
 import edu.buffalo.cse.irf14.common.CommonUtil;
 import edu.buffalo.cse.irf14.common.StringUtil;
 import edu.buffalo.cse.irf14.common.TermIndexDetails;
-import edu.buffalo.cse.irf14.document.FieldNames;
-import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
 import edu.buffalo.cse.irf14.index.Posting;
 import edu.buffalo.cse.irf14.index.PostingScoreComparator;

@@ -51,6 +51,8 @@ public class Query {
 		Stack<String> queryTermStack = new Stack<String>();
 		// Stack for Operators and brackets
 		Stack<String> operatorStack = new Stack<String>();
+		// Stack for Chained query terms
+		Stack<String> lookaheadStack = new Stack<String>();
 		String defaultIndex = "Term:";
 		// A boolean flag to lookahead for consecutive terms to be merged with
 		// default operator
@@ -105,23 +107,63 @@ public class Query {
 				}
 				// Check if lookahead is true. If yes, pop the item from
 				// queryItemStack and merge with default operator
-				if (lookahead && !queryTermStack.isEmpty()) {
-					queryTermStack.push(applyOp(defaultOperator, term,
-							queryTermStack.pop()));
+				if (lookahead) {
+					// queryTermStack.push(applyOp(defaultOperator, term,
+					// queryTermStack.pop()));
+					if (lookaheadStack.isEmpty()) {
+						lookaheadStack.push(queryTermStack.pop());
+					}
+					lookaheadStack.push(term);
 					// Keep looking ahead for more terms to merge
 					lookahead = true;
+				} else if (!lookahead && !lookaheadStack.isEmpty()) {
+					while (lookaheadStack.size() > 1) {
+						lookaheadStack.push(applyOp(defaultOperator,
+								lookaheadStack.pop(), lookaheadStack.pop()));
+					}
+					// If operator stack is not empty. Enclose the chain in a
+					// bracket
+					if (!operatorStack.isEmpty()
+							&& operatorStack.peek().matches(
+									QueryRegExp.OPERATOR)) {
+						lookaheadStack.push("(" + lookaheadStack.pop() + ")");
+					}
+					// Push this onto the main stack
+					queryTermStack.push(lookaheadStack.pop());
+					// Since the lookahead is already over, the term has to be
+					// pushed on to the stack
+					queryTermStack.push(term);
 				} else {
 					queryTermStack.push(term);
 					lookahead = true;
 				}
 			}
 		}
-
+		// First finalize the lookahead stack, shift everything to main stack
+		if (!lookaheadStack.isEmpty()
+				|| (operatorStack.isEmpty() && !lookaheadStack.isEmpty())) {
+			while (lookaheadStack.size() > 1) {
+				lookaheadStack.push(applyOp(defaultOperator,
+						lookaheadStack.pop(), lookaheadStack.pop()));
+			}
+			// Push the combination to main stack.
+			// If operator stack is not empty. Enclose the chain in a
+			// bracket
+			if (!operatorStack.isEmpty()
+					&& operatorStack.peek().matches(QueryRegExp.OPERATOR)) {
+				queryTermStack.push("(" + lookaheadStack.pop() + ")");
+			} else {
+				queryTermStack.push(lookaheadStack.pop());
+			}
+		}
 		// Entire expression has been parsed at this point, apply remaining
 		// ops to remaining values
-		while (!operatorStack.empty())
+		while (!operatorStack.empty() && queryTermStack.size() > 1)
 			queryTermStack.push(applyOp(operatorStack.pop(),
 					queryTermStack.pop(), queryTermStack.pop()));
+
+		// If there are still some elements left on the main stack, concatenate
+		// with default operator
 		if (operatorStack.isEmpty() && queryTermStack.size() > 1) {
 			while (queryTermStack.size() > 1) {
 				queryTermStack.push(applyOp(defaultOperator,
