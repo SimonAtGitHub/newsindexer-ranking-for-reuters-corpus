@@ -77,6 +77,7 @@ public class TestToken {
 				"Author:rushdie NOT jihad",
 				"Category:War AND Author:Dutt AND Place:Baghdad AND prisoners detainees rebels",
 				"(Love NOT War) AND Category:(movies NOT crime)",
+				"(A B C D E F) G NOT H",
 				"A B C D E F (G NOT H)",
 				"(A OR B OR C OR D) AND ("
 						+ "(E AND F) OR (G AND H)) AND ((I OR J OR K) AND (L OR M OR N OR O)) AND (P OR (Q OR (R OR (S AND T))))",

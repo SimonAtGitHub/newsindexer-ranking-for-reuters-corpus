@@ -69,6 +69,9 @@ public class Query {
 			else if (term.equals("(")) {
 				operatorStack.push(String.valueOf(term));
 				lookahead = false;
+				if (!lookaheadStack.isEmpty())
+					transferChainedTermsToMainStack(defaultOperator,
+							queryTermStack, operatorStack, lookaheadStack);
 			}
 			// Closing brace encountered, solve entire brace
 			else if (term.equals(")")) {
@@ -76,10 +79,13 @@ public class Query {
 					queryTermStack.push(applyOp(operatorStack.pop(),
 							queryTermStack.pop(), queryTermStack.pop()));
 				}
+				lookahead = false;
+				if (!lookaheadStack.isEmpty())
+					transferChainedTermsToMainStack(defaultOperator,
+							queryTermStack, operatorStack, lookaheadStack);
 				// Apply the brackets
 				queryTermStack.push("(" + queryTermStack.pop() + ")");
 				operatorStack.pop();
-				lookahead = false;
 			}
 
 			// Current token is an operator.
@@ -96,6 +102,9 @@ public class Query {
 				// Push current token to "ops".
 				operatorStack.push(String.valueOf(term));
 				lookahead = false;
+				if (!lookaheadStack.isEmpty())
+					transferChainedTermsToMainStack(defaultOperator,
+							queryTermStack, operatorStack, lookaheadStack);
 			} else {
 				// // For a term prepend it with the index. If no index is
 				// // specified, default it to Term Index.Eg.Term:term
@@ -116,23 +125,6 @@ public class Query {
 					lookaheadStack.push(term);
 					// Keep looking ahead for more terms to merge
 					lookahead = true;
-				} else if (!lookahead && !lookaheadStack.isEmpty()) {
-					while (lookaheadStack.size() > 1) {
-						lookaheadStack.push(applyOp(defaultOperator,
-								lookaheadStack.pop(), lookaheadStack.pop()));
-					}
-					// If operator stack is not empty. Enclose the chain in a
-					// bracket
-					if (!operatorStack.isEmpty()
-							&& operatorStack.peek().matches(
-									QueryRegExp.OPERATOR)) {
-						lookaheadStack.push("(" + lookaheadStack.pop() + ")");
-					}
-					// Push this onto the main stack
-					queryTermStack.push(lookaheadStack.pop());
-					// Since the lookahead is already over, the term has to be
-					// pushed on to the stack
-					queryTermStack.push(term);
 				} else {
 					queryTermStack.push(term);
 					lookahead = true;
@@ -142,19 +134,8 @@ public class Query {
 		// First finalize the lookahead stack, shift everything to main stack
 		if (!lookaheadStack.isEmpty()
 				|| (operatorStack.isEmpty() && !lookaheadStack.isEmpty())) {
-			while (lookaheadStack.size() > 1) {
-				lookaheadStack.push(applyOp(defaultOperator,
-						lookaheadStack.pop(), lookaheadStack.pop()));
-			}
-			// Push the combination to main stack.
-			// If operator stack is not empty. Enclose the chain in a
-			// bracket
-			if (!operatorStack.isEmpty()
-					&& operatorStack.peek().matches(QueryRegExp.OPERATOR)) {
-				queryTermStack.push("(" + lookaheadStack.pop() + ")");
-			} else {
-				queryTermStack.push(lookaheadStack.pop());
-			}
+			transferChainedTermsToMainStack(defaultOperator, queryTermStack,
+					operatorStack, lookaheadStack);
 		}
 		// Entire expression has been parsed at this point, apply remaining
 		// ops to remaining values
@@ -173,6 +154,23 @@ public class Query {
 		// Top of "values" contains result, return it
 		return queryTermStack.pop();
 
+	}
+
+	private void transferChainedTermsToMainStack(String defaultOperator,
+			Stack<String> queryTermStack, Stack<String> operatorStack,
+			Stack<String> lookaheadStack) {
+		while (lookaheadStack.size() > 1) {
+			lookaheadStack.push(applyOp(defaultOperator, lookaheadStack.pop(),
+					lookaheadStack.pop()));
+		}
+		// If operator stack is not empty. Enclose the chain in a
+		// bracket
+		if (!operatorStack.isEmpty()
+				&& operatorStack.peek().matches(QueryRegExp.OPERATOR)) {
+			lookaheadStack.push("(" + lookaheadStack.pop() + ")");
+		}
+		// Push this onto the main stack
+		queryTermStack.push(lookaheadStack.pop());
 	}
 
 	// Returns true if "op2" has higher or same precedence as "op1",
