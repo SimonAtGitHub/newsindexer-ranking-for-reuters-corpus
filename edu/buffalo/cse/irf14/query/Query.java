@@ -43,24 +43,30 @@ public class Query {
 	private String formulateQuery(String userQuery, String defaultOperator) {
 		// For our convenience in handling the brackets
 		userQuery = userQuery.replaceAll("[(]", "( ");
-		// userQuery = userQuery.replaceAll("[:(]", " (");
+		userQuery = userQuery.replaceAll("[:][(]", ": (");
 		userQuery = userQuery.replaceAll("[)]", " )");
 		String[] queryStrArr = userQuery
 				.split(QueryRegExp.WHITESPACE_NOT_IN_QUOTES);
-		// Stack for numbers: "values"
+		// Stack for queryTerms
 		Stack<String> queryTermStack = new Stack<String>();
+		// Stack for Operators and brackets
 		Stack<String> operatorStack = new Stack<String>();
-		boolean useDefault = false;
+		String defaultIndex = "Term:";
+		// A boolean flag to lookahead for consecutive terms to be merged with
+		// default operator
+		boolean lookahead = false;
 		for (int i = 0; i < queryStrArr.length; i++) {
 
-			// Current token is an opening brace, push it to "ops"
 			String term = queryStrArr[i].trim();
 			if (term.isEmpty()) {
 				continue;
 			}
-			if (term.equals("(")) {
+			if (term.matches(QueryRegExp.INDEX)) {
+			}
+			// Current token is an opening brace, push it to "ops"
+			else if (term.equals("(")) {
 				operatorStack.push(String.valueOf(term));
-				useDefault = false;
+				lookahead = false;
 			}
 			// Closing brace encountered, solve entire brace
 			else if (term.equals(")")) {
@@ -71,7 +77,7 @@ public class Query {
 				// Apply the brackets
 				queryTermStack.push("(" + queryTermStack.pop() + ")");
 				operatorStack.pop();
-				useDefault = false;
+				lookahead = false;
 			}
 
 			// Current token is an operator.
@@ -87,23 +93,26 @@ public class Query {
 
 				// Push current token to "ops".
 				operatorStack.push(String.valueOf(term));
-				useDefault = false;
+				lookahead = false;
 			} else {
-				// For a term prepend it with the index. If no index is
-				// specified, default it to Term Index.Eg.Term:term
-				Pattern indexedTerm = Pattern.compile(QueryRegExp.INDEX);
+				// // For a term prepend it with the index. If no index is
+				// // specified, default it to Term Index.Eg.Term:term
+				Pattern indexedTerm = Pattern
+						.compile(QueryRegExp.TERMS_WITH_INDEX);
 				Matcher indexedTermMatcher = indexedTerm.matcher(term);
 				if (!indexedTermMatcher.matches()) {
-					term = "Term:" + term;
+					term = defaultIndex + term;
 				}
-				// If last term was also a normal term
-				if (useDefault) {
+				// Check if lookahead is true. If yes, pop the item from
+				// queryItemStack and merge with default operator
+				if (lookahead && !queryTermStack.isEmpty()) {
 					queryTermStack.push(applyOp(defaultOperator, term,
 							queryTermStack.pop()));
+					// Keep looking ahead for more terms to merge
+					lookahead = true;
 				} else {
 					queryTermStack.push(term);
-					// Flag too use the default operator between two terms
-					useDefault = true;
+					lookahead = true;
 				}
 			}
 		}
@@ -113,7 +122,12 @@ public class Query {
 		while (!operatorStack.empty())
 			queryTermStack.push(applyOp(operatorStack.pop(),
 					queryTermStack.pop(), queryTermStack.pop()));
-
+		if (operatorStack.isEmpty() && queryTermStack.size() > 1) {
+			while (queryTermStack.size() > 1) {
+				queryTermStack.push(applyOp(defaultOperator,
+						queryTermStack.pop(), queryTermStack.pop()));
+			}
+		}
 		// Top of "values" contains result, return it
 		return queryTermStack.pop();
 

@@ -6,8 +6,10 @@ public class QueryRegExp {
 	// http://stackoverflow.com/questions/9577930/regular-expression-to-select-all-whitespace-that-isnt-in-quotes
 	// Don't even know what this regex means.
 	public static final String WHITESPACE_NOT_IN_QUOTES = "\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)";
+	// regular expression for various types of indices
+	public static final String INDEX = "(Term:|Category:|Author:|Place:)";
 	// regular expression for various types of indices in a query
-	public static final String INDEX = "(Term:|Category:|Author:|Place:)(\\S+)";
+	public static final String TERMS_WITH_INDEX = "(Term:|Category:|Author:|Place:)(\\S+)";
 	// regular expression for various operators in a query
 	public static final String OPERATOR = "AND|OR|NOT";
 
