@@ -75,14 +75,14 @@ public class Query {
 			}
 			// Closing brace encountered, solve entire brace
 			else if (term.equals(")")) {
-				while (!operatorStack.peek().equals("(")) {
-					queryTermStack.push(applyOp(operatorStack.pop(),
-							queryTermStack.pop(), queryTermStack.pop()));
-				}
 				lookahead = false;
 				if (!lookaheadStack.isEmpty())
 					transferChainedTermsToMainStack(defaultOperator,
 							queryTermStack, operatorStack, lookaheadStack);
+				while (!operatorStack.peek().equals("(")) {
+					queryTermStack.push(applyOp(operatorStack.pop(),
+							queryTermStack.pop(), queryTermStack.pop()));
+				}
 				// Apply the brackets
 				queryTermStack.push("(" + queryTermStack.pop() + ")");
 				operatorStack.pop();
@@ -91,6 +91,9 @@ public class Query {
 			// Current token is an operator.
 			else if (term.equals("AND") || term.equals("OR")
 					|| term.equals("NOT")) {
+				if (!lookaheadStack.isEmpty())
+					transferChainedTermsToMainStack(defaultOperator,
+							queryTermStack, operatorStack, lookaheadStack);
 				// While top of "ops" has same or greater precedence to current
 				// token, which is an operator. Apply operator on top of "ops"
 				// to top two elements in values stack
@@ -102,9 +105,6 @@ public class Query {
 				// Push current token to "ops".
 				operatorStack.push(String.valueOf(term));
 				lookahead = false;
-				if (!lookaheadStack.isEmpty())
-					transferChainedTermsToMainStack(defaultOperator,
-							queryTermStack, operatorStack, lookaheadStack);
 			} else {
 				// // For a term prepend it with the index. If no index is
 				// // specified, default it to Term Index.Eg.Term:term
