@@ -62,5 +62,12 @@ public class CommonConstants {
 	public static final String OPERATOR_OR= "OR";
 	
 	public static final String OPERATOR_NOT= "NOT";
+	
+	public static final String SECOND_BRACKET_OPEN= "{";
+	
+	public static final String SECOND_BRACKET_CLOSE= "}";
+	
+	public static final String COMMA= ",";
+	
 
 }

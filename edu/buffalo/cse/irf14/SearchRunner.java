@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.common.CommonConstants;
 import edu.buffalo.cse.irf14.common.CommonUtil;
 import edu.buffalo.cse.irf14.common.DocMetaData;
+import edu.buffalo.cse.irf14.common.QueryResult;
 import edu.buffalo.cse.irf14.common.StringUtil;
 import edu.buffalo.cse.irf14.common.TermIndexDetails;
 import edu.buffalo.cse.irf14.index.IndexType;
@@ -145,11 +147,14 @@ public class SearchRunner {
 			// Read the file contents into a buffer
 			BufferedReader reader;
 			reader = new BufferedReader(new FileReader(queryFile));
+			//final list that contains all the result outputs of the queries of the input file
+			List<QueryResult> queryResults = new ArrayList<QueryResult>();
 			// line buffer to read a line once at a time
 			String line;
 			String queryId;
 			String query="";
-			List<Posting> finalPostings;
+			List<Posting> finalPostings = new ArrayList<Posting>();
+			int numResults = 0;
 			while ((line = reader.readLine()) != null) {
 				String strArr [] = line.split(CommonConstants.COLON);
 				queryId = strArr[0];
@@ -161,8 +166,29 @@ public class SearchRunner {
 					query = query.substring(0,query.length()-1);
 				}
 				finalPostings = executeQuery(query);
+				if(finalPostings.size()>0){
+					numResults++;
+					QueryResult queryResult = new QueryResult();
+					queryResult.setQueryId(queryId);
+					queryResult.setResultPostings(finalPostings);
+					queryResults.add(queryResult);
+				}
 				System.out.println(finalPostings);
 			}
+			//Print the result to a file
+			stream.println("numResults="+numResults);
+			for(QueryResult queryResult:queryResults){
+				stream.print(queryResult.getQueryId()+CommonConstants.COLON+CommonConstants.WHITESPACE);
+				stream.print(CommonConstants.SECOND_BRACKET_OPEN);
+				List<Posting> resultPostings = queryResult.getResultPostings();
+				for(Posting posting:resultPostings){
+					DocMetaData docMetaData = docDictionary.get(posting.getDocId());
+					String fileId=docMetaData.getFileName();
+					stream.print(fileId+CommonConstants.COMMA);
+				}
+				stream.println(CommonConstants.SECOND_BRACKET_CLOSE);
+			}
+			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
