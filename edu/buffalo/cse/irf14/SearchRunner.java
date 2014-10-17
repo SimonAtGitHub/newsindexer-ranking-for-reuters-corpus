@@ -235,6 +235,9 @@ public class SearchRunner {
 				   termSet.add(str);
 				   String analyzedTerm=getAnalyzedTerm(str);
 				   PostingWrapper postingWrapper=getPostings(indexDir,analyzedTerm,getRawIndexOfTheTerm(str));
+				   if(postingWrapper == null){
+					   postingWrapper = new PostingWrapper();
+				   }
 				   valueStack.push(postingWrapper.getPostings());
 			   }
 		   }
