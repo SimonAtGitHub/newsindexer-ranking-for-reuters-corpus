@@ -35,7 +35,7 @@ import edu.buffalo.cse.irf14.index.PostingWrapper;
 /**
  * Main class to run the searcher.
  * As before implement all TODO methods unless marked for bonus
- * @author nikhillo
+ * @author nikhillo d
  *
  */
 public class SearchRunner {
