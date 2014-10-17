@@ -19,6 +19,7 @@ import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.common.CommonConstants;
 import edu.buffalo.cse.irf14.common.CommonUtil;
+import edu.buffalo.cse.irf14.common.DocMetaData;
 import edu.buffalo.cse.irf14.common.StringUtil;
 import edu.buffalo.cse.irf14.document.Document;
 import edu.buffalo.cse.irf14.document.FieldNames;
@@ -66,7 +67,10 @@ public class IndexWriter {
 			Integer docId = DocumentDictionary.getInstance().nextVal();
 			// create document dictionary
 			DocumentDictionary docDictionary = DocumentDictionary.getInstance();
-			docDictionary.getMap().put(docId, fileId);
+			DocMetaData docMetaData = new DocMetaData();
+			docMetaData.setLength(d.getLength());
+			docMetaData.setFileName(fileId);
+			docDictionary.getMap().put(docId, docMetaData);
 
 			for (FieldNames fieldName : FieldNames.values()) {
 				// analyze the tokenstream and apply filter chaining except for

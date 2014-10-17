@@ -7,6 +7,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.buffalo.cse.irf14.common.DocMetaData;
+
 public class DocumentDictionary implements Serializable{
  
 	/**
@@ -18,7 +20,7 @@ public class DocumentDictionary implements Serializable{
 	 * Doc id has been kept as the key as it would be used to seach for the file id 
 	 * during retrieval
 	 */
-	private Map<Integer,String> map=new HashMap<Integer,String>();
+	private Map<Integer,DocMetaData> map=new HashMap<Integer,DocMetaData>();
 	
 	transient private static int sequence=0;
 	
@@ -43,14 +45,14 @@ public class DocumentDictionary implements Serializable{
 	/**
 	 * @return the map
 	 */
-	public Map<Integer, String> getMap() {
+	public Map<Integer, DocMetaData> getMap() {
 		return map;
 	}
 
 	/**
 	 * @param map the map to set
 	 */
-	public void setMap(Map<Integer, String> map) {
+	public void setMap(Map<Integer, DocMetaData> map) {
 		this.map = map;
 	}
 

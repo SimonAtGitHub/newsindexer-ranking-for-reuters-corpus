@@ -21,6 +21,11 @@ public class Document {
 	}
 	
 	/**
+	 * store the length of the file
+	 */
+	private Long length;
+	
+	/**
 	 * Method to set the field value for the given {@link FieldNames} field
 	 * @param fn : The {@link FieldNames} to be set
 	 * @param o : The value to be set to
@@ -38,6 +43,20 @@ public class Document {
 		return map.get(fn);
 	}
 	
+	/**
+	 * @return the length
+	 */
+	public Long getLength() {
+		return length;
+	}
+
+	/**
+	 * @param length the length to set
+	 */
+	public void setLength(Long length) {
+		this.length = length;
+	}
+
 	public String toString(){
 		return new StringBuilder().append("FILEID ::").append(map.get(FieldNames.FILEID))
 				.append("CATEGORY ::").append(map.get(FieldNames.CATEGORY))

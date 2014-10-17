@@ -50,6 +50,9 @@ public class Parser {
 
 			// Read the file contents into a buffer
 			reader = new BufferedReader(new FileReader(filename));
+			
+			//Find the length of the file
+			document.setLength(new File(filename).length());
 
 			// line buffer to read a line once at a time
 			String line;

@@ -2,6 +2,7 @@ package edu.buffalo.cse.irf14;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.common.CommonConstants;
 import edu.buffalo.cse.irf14.common.CommonUtil;
+import edu.buffalo.cse.irf14.common.DocMetaData;
 import edu.buffalo.cse.irf14.common.StringUtil;
 import edu.buffalo.cse.irf14.common.TermIndexDetails;
 import edu.buffalo.cse.irf14.index.IndexType;
@@ -40,7 +42,9 @@ public class SearchRunner {
 	private char mode;
 	private PrintStream stream;
 	
-	private Map<Integer, String> docDictionary;
+	DecimalFormat decimalFormat = new DecimalFormat("00.00000");
+	
+	private Map<Integer, DocMetaData> docDictionary;
 	
 	private Map<String, Integer> termDictionary;
 	
@@ -78,7 +82,7 @@ public class SearchRunner {
 		this.mode=mode;
 		this.stream=stream;
 		//load the dictionaries
-		docDictionary = (Map<Integer, String>) CommonUtil.readObject(indexDir + File.separatorChar+ CommonConstants.DOCUMENT_DICTIONARY_FILENAME);
+		docDictionary = (Map<Integer, DocMetaData>) CommonUtil.readObject(indexDir + File.separatorChar+ CommonConstants.DOCUMENT_DICTIONARY_FILENAME);
 		termDictionary = (Map<String, Integer>) CommonUtil.readObject(indexDir + File.separatorChar+ CommonConstants.TERM_DICTIONARY_FILENAME);
 		authorDictionary = (Map<String, Integer>) CommonUtil.readObject(indexDir + File.separatorChar+ CommonConstants.AUTHOR_DICTIONARY_FILENAME);
 		categoryDictionary = (Map<String, Integer>) CommonUtil.readObject(indexDir + File.separatorChar+ CommonConstants.CATEGORY_DICTIONARY_FILENAME);
@@ -115,7 +119,7 @@ public class SearchRunner {
 		   int rank=1;
 		   Collections.sort(postings, new PostingScoreComparator());
 		   for(Posting posting:postings){
-			   System.out.println("Result Title: "+docDictionary.get(posting.getDocId())+
+			   System.out.println("Result Title: "+docDictionary.get(posting.getDocId()).getFileName()+
 					               "   Result Rank: "+  rank+
 					               "   Result Relevancy: "+  posting.getScore());
 			   rank++;
@@ -666,6 +670,17 @@ public class SearchRunner {
 					}
 				}
 				
+				//apply the formatting of score and normalization
+				
+				for(Posting posting:mergedPostings){
+					DocMetaData docMetaData = docDictionary.get(posting.getDocId());
+					double score = posting.getScore();
+					score = score / docMetaData.getLength();
+					//format the score
+					score=Double.parseDouble(decimalFormat.format(score));
+					posting.setScore(score);
+					docDictionary.get(posting.getDocId());
+				}
 			}
 		}
 		//System.out.println("\nScore calculated");

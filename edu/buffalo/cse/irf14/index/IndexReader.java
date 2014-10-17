@@ -16,6 +16,7 @@ import java.util.TreeMap;
 
 import edu.buffalo.cse.irf14.common.CommonConstants;
 import edu.buffalo.cse.irf14.common.CommonUtil;
+import edu.buffalo.cse.irf14.common.DocMetaData;
 
 /**
  * @author nikhillo Class that emulates reading data back from a written index
@@ -53,7 +54,7 @@ public class IndexReader {
 	 * Document dictionary
 	 *
 	 */
-	Map<Integer, String> docDictionary = null;
+	Map<Integer, DocMetaData> docDictionary = null;
 
 	/**
 	 * @return the dictionaryForIndexType
@@ -87,14 +88,14 @@ public class IndexReader {
 	/**
 	 * @return the docDictionary
 	 */
-	public Map<Integer, String> getDocDictionary() {
+	public Map<Integer, DocMetaData> getDocDictionary() {
 		return docDictionary;
 	}
 
 	/**
 	 * @param docDictionary the docDictionary to set
 	 */
-	public void setDocDictionary(Map<Integer, String> docDictionary) {
+	public void setDocDictionary(Map<Integer, DocMetaData> docDictionary) {
 		this.docDictionary = docDictionary;
 	}
 
@@ -126,7 +127,7 @@ public class IndexReader {
 
 		indexMap = (Map<Integer, PostingWrapper>) readObject(indexFilePath);
 
-		docDictionary = (Map<Integer, String>) readObject(docDictionaryFilePath);
+		docDictionary = (Map<Integer, DocMetaData>) readObject(docDictionaryFilePath);
 
 	}
 
@@ -180,7 +181,8 @@ public class IndexReader {
 			if (postings != null && postings.size() > 0) {
 				postingsMap = new HashMap<String, Integer>();
 				for (Posting posting : postings) {
-					String fileId = docDictionary.get(posting.getDocId());
+					DocMetaData docMetaData = docDictionary.get(posting.getDocId());
+					String fileId = docMetaData.getFileName();
 					postingsMap.put(fileId, posting.getFrequency());
 				}
 			}
