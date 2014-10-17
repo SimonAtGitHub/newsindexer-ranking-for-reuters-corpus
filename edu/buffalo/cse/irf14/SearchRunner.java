@@ -1,6 +1,10 @@
 package edu.buffalo.cse.irf14;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.util.Collections;
@@ -133,6 +137,39 @@ public class SearchRunner {
 	 */
 	public void query(File queryFile) {
 		//TODO: IMPLEMENT THIS METHOD
+		if(queryFile==null || !queryFile.exists()){
+			System.out.println("\nFile does not exits");
+			return;
+		}
+		try {
+			// Read the file contents into a buffer
+			BufferedReader reader;
+			reader = new BufferedReader(new FileReader(queryFile));
+			// line buffer to read a line once at a time
+			String line;
+			String queryId;
+			String query="";
+			List<Posting> finalPostings;
+			while ((line = reader.readLine()) != null) {
+				String strArr [] = line.split(CommonConstants.COLON);
+				queryId = strArr[0];
+				//merge the query parts that got splitted
+				for(int i=1;i<strArr.length;i++){
+					query = query + strArr[i] + CommonConstants.COLON;
+				}
+				if(query.length()>0){
+					query = query.substring(0,query.length()-1);
+				}
+				finalPostings = executeQuery(query);
+				System.out.println(finalPostings);
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**

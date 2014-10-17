@@ -1,6 +1,7 @@
 package edu.buffalo.cse.irf14.test;
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.List;
@@ -39,7 +40,22 @@ public class SearchRunnerTest {
        	List<Posting> postings=null;
    		try {
    			searchRunner = new SearchRunner("H:\\projects\\IR\\newsindexer\\index", "H:\\projects\\IR\\newsindexer\\training", 'Q', new PrintStream("H:\\projects\\IR\\newsindexer\\index\\queryOutput.txt"));
-   			searchRunner.query("( Term:priyankar AND Term:nandi )", ScoringModel.TFIDF);
+   			searchRunner.query("Term:priyankar AND Term:nandi", ScoringModel.TFIDF);
+   			//searchRunner.query("( Term:abcd )", ScoringModel.TFIDF);
+   	        System.out.println("\nPostings retrieved");
+   		} catch (FileNotFoundException e) {
+   			// TODO Auto-generated catch block
+   			e.printStackTrace();
+   		}
+   	}
+    
+    @Test
+   	public void testQueryEvaluation() {
+       	SearchRunner searchRunner;
+       	List<Posting> postings=null;
+   		try {
+   			searchRunner = new SearchRunner("H:\\projects\\IR\\newsindexer\\index", "H:\\projects\\IR\\newsindexer\\training", 'Q', new PrintStream("H:\\projects\\IR\\newsindexer\\index\\queryOutput.txt"));
+   			searchRunner.query(new File("H:\\projects\\IR\\newsindexer\\index\\queryInput.txt"));
    			//searchRunner.query("( Term:abcd )", ScoringModel.TFIDF);
    	        System.out.println("\nPostings retrieved");
    		} catch (FileNotFoundException e) {
