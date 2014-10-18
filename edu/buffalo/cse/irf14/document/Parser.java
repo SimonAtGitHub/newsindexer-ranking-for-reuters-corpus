@@ -39,8 +39,9 @@ public class Parser {
 		// create the Document object
 		Document document = new Document();
 		try {
+			int snippetLineCnt = 0;
 			// variables to hold the "Document" attributes
-			String title, place = "", newsDate, content = "";
+			String title, place = "", newsDate, content = "",snippet="";
 
 			// flags to hold if the fields have been populated or not
 			boolean hasAuthor = false;
@@ -86,11 +87,16 @@ public class Parser {
 						// so that last word and first word of next line don't
 						// combine.
 						content = content + " " + line;
+						if(snippetLineCnt<3){
+							snippet = snippet +" "+line;
+							snippetLineCnt++;
+						}
 					}
 
 				}
 				content = content.trim();
 				document.setField(FieldNames.CONTENT, content);
+				document.setResultSnippet(snippet);
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {

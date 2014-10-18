@@ -18,6 +18,11 @@ public class DocMetaData implements Serializable{
 	 * stores the length of the file
 	 */
 	private Long length;
+	
+	/**
+	 * stores the result snippet for the document
+	 */
+	private String resultSnippet;
 
 	/**
 	 * @return the fileName
@@ -45,6 +50,20 @@ public class DocMetaData implements Serializable{
 	 */
 	public void setLength(Long length) {
 		this.length = length;
+	}
+
+	/**
+	 * @return the resultSnippet
+	 */
+	public String getResultSnippet() {
+		return resultSnippet;
+	}
+
+	/**
+	 * @param resultSnippet the resultSnippet to set
+	 */
+	public void setResultSnippet(String resultSnippet) {
+		this.resultSnippet = resultSnippet;
 	}
 	
 	

@@ -70,6 +70,9 @@ public class IndexWriter {
 			DocMetaData docMetaData = new DocMetaData();
 			docMetaData.setLength(d.getLength());
 			docMetaData.setFileName(fileId);
+			//set the result snippet
+			docMetaData.setResultSnippet(d.getResultSnippet());
+			
 			docDictionary.getMap().put(docId, docMetaData);
 
 			for (FieldNames fieldName : FieldNames.values()) {

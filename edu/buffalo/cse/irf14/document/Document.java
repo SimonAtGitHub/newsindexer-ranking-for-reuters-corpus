@@ -24,6 +24,10 @@ public class Document {
 	 * store the length of the file
 	 */
 	private Long length;
+	/**
+	 * stores the result snippet for the document
+	 */
+	private String resultSnippet;
 	
 	/**
 	 * Method to set the field value for the given {@link FieldNames} field
@@ -55,6 +59,14 @@ public class Document {
 	 */
 	public void setLength(Long length) {
 		this.length = length;
+	}
+
+	public String getResultSnippet() {
+		return resultSnippet;
+	}
+
+	public void setResultSnippet(String resultSnippet) {
+		this.resultSnippet = resultSnippet;
 	}
 
 	public String toString(){

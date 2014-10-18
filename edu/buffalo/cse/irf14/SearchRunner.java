@@ -131,12 +131,13 @@ public class SearchRunner {
 		   int rank=1;
 		   Collections.sort(postings, new PostingScoreComparator());
 		   for(Posting posting:postings){
-			   stream.println("Result Title: "+docDictionary.get(posting.getDocId()).getFileName()+
-					               "   Result Rank: "+  rank+
-					               "   Result Relevancy: "+  posting.getScore());
+			   stream.println("Result Rank: "+  rank);
+			   stream.println("Result Title: "+docDictionary.get(posting.getDocId()).getFileName());
+			   stream.println("Result Snippet: " +docDictionary.get(posting.getDocId()).getResultSnippet()+ "...");
+			   stream.println("Result Relevancy: " +posting.getScore());
 			   rank++;
+			   stream.println("===============================================================");
 		   }
-		   stream.println("===============================================================");
 	}
 	
 	/**
@@ -401,7 +402,7 @@ public class SearchRunner {
 	
 	/**
 	 * Method to get the analyzed term based on the index type
-	 * Input should be of the type Term:hello or Term:”hello world”
+	 * Input should be of the type Term:hello or Term:â€�hello worldâ€�
 	 * @param string
 	 * @return
 	 */
@@ -458,7 +459,7 @@ public class SearchRunner {
 	
 	/**
 	 * Method to get the index type e.g. TERM , AUTHOR
-	 * Input should be of the type Term:hello or Term:”hello world”
+	 * Input should be of the type Term:hello or Term:â€�hello worldâ€�
 	 * @param string
 	 * @return
 	 */
@@ -610,7 +611,7 @@ public class SearchRunner {
 						posting.setScore(0.0);
 					}
 					double score = posting.getScore();
-					score = score / docMetaData.getLength();
+					score = (score*100) / docMetaData.getLength();
 					//format the score
 					score=Double.parseDouble(decimalFormat.format(score));
 					posting.setScore(score);
@@ -676,12 +677,26 @@ public class SearchRunner {
 								mergedPosting.setScore(0.0);
 							}
 							double score = mergedPosting.getScore() + (idf*var);
-							score=Double.parseDouble(decimalFormat.format(score));
 							mergedPosting.setScore(score);
 							break;
 						}
 					}
 				}
+				
+                //apply the formatting of score and normalization
+				
+				for(Posting posting:mergedPostings){
+					if(posting.getScore()==null){
+						posting.setScore(0.0);
+					}
+					double score = posting.getScore();
+					score = score / 10;
+					//format the score
+					score=Double.parseDouble(decimalFormat.format(score));
+					posting.setScore(score);
+				}
+				
+				
 			}
 		}
 		//System.out.println("\nScore calculated");
@@ -702,6 +717,17 @@ public class SearchRunner {
 		}
 		lavg = totalLen/numDocs;
 		return lavg;
+	}
+	
+	/**
+	 * Method that gets snippets on the basis of the filename
+	 * @param fileName
+	 * @return
+	 */
+	private String getResultSnippet(String fileName){
+		String snippet="";
+		String filePath = corpusDir + File.separatorChar + fileName;
+		return snippet;
 	}
 }
 
