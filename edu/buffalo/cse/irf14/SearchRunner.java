@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -160,10 +161,22 @@ public class SearchRunner {
 			String line;
 			String queryId;
 			String query="";
+			String strArr [] = null;
 			List<Posting> finalPostings = new ArrayList<Posting>();
 			int numResults = 0;
+			int numQueries = 0;
+			//find the number of queries
+			line = reader.readLine();
+			if(line!=null){
+				strArr=line.split(CommonConstants.EQUAL_SIGN);
+				try{
+				   numQueries = Integer.parseInt(strArr[1]);
+				}catch(Exception e){
+					System.out.println("Invalid query format");
+				}
+			}
 			while ((line = reader.readLine()) != null) {
-				String strArr [] = line.split(CommonConstants.COLON);
+				strArr = line.split(CommonConstants.COLON);
 				queryId = strArr[0];
 				//merge the query parts that got splitted
 				for(int i=1;i<strArr.length;i++){
@@ -172,6 +185,9 @@ public class SearchRunner {
 				if(query.length()>0){
 					query = query.substring(0,query.length()-1);
 				}
+				//remove the second brackets from beginning and end
+				query=query.replaceAll("\\{", "");
+				query=query.replaceAll("\\}", "");
 				finalPostings = executeQuery(query);
 				if(finalPostings.size()>0){
 				    //calculate the score based on the Scoring model of each document
@@ -193,11 +209,20 @@ public class SearchRunner {
 				stream.print(CommonConstants.SECOND_BRACKET_OPEN);
 				List<Posting> resultPostings = queryResult.getResultPostings();
 				Collections.sort(resultPostings, new PostingScoreComparator());
+				int counter=1;
 				for(Posting posting:resultPostings){
+					//print only the first 10 ordered results
+					if(counter>10){
+						break;
+					}
 					DocMetaData docMetaData = docDictionary.get(posting.getDocId());
 					String fileId=docMetaData.getFileName();
 					Double score= posting.getScore();
-					stream.print(fileId+CommonConstants.HASH+score+CommonConstants.COMMA);
+					stream.print(fileId+CommonConstants.HASH+score);
+					if(counter<resultPostings.size() && counter<10){
+						stream.print(CommonConstants.COMMA);
+					}
+					counter++;
 				}
 				stream.println(CommonConstants.SECOND_BRACKET_CLOSE);
 			}
@@ -615,7 +640,7 @@ public class SearchRunner {
 					//format the score
 					score=Double.parseDouble(decimalFormat.format(score));
 					posting.setScore(score);
-					docDictionary.get(posting.getDocId());
+					//docDictionary.get(posting.getDocId());
 				}
 			}
 		}

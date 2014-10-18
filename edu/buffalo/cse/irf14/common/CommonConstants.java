@@ -71,5 +71,7 @@ public class CommonConstants {
 	
 	public static final String HASH= "#";
 	
+	public static final String EQUAL_SIGN = "=";
+	
 
 }
