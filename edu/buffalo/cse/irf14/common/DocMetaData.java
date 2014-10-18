@@ -2,6 +2,8 @@ package edu.buffalo.cse.irf14.common;
 
 import java.io.Serializable;
 
+import edu.buffalo.cse.irf14.document.FieldNames;
+
 /**
  * Stores the metadata for a document
  * @author Priyankar
@@ -64,6 +66,11 @@ public class DocMetaData implements Serializable{
 	 */
 	public void setResultSnippet(String resultSnippet) {
 		this.resultSnippet = resultSnippet;
+	}
+	
+	public String toString(){
+		return new StringBuilder().append(fileName).toString();
+		
 	}
 	
 	

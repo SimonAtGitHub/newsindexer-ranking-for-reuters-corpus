@@ -35,6 +35,8 @@ import edu.buffalo.cse.irf14.index.IndexType;
 import edu.buffalo.cse.irf14.index.Posting;
 import edu.buffalo.cse.irf14.index.PostingScoreComparator;
 import edu.buffalo.cse.irf14.index.PostingWrapper;
+import edu.buffalo.cse.irf14.query.Query;
+import edu.buffalo.cse.irf14.query.QueryParser;
 
 /**
  * Main class to run the searcher.
@@ -110,10 +112,12 @@ public class SearchRunner {
 	 */
 	public void query(String userQuery, ScoringModel model) {
 		   //TODO: IMPLEMENT THIS METHOD
-		   //TODO- call queryParser to parse the query
+		   //call queryParser to parse the query
+		   Query query=QueryParser.parse(userQuery, CommonConstants.OPERATOR_OR);
+		   String parsedQuery=query.getQuery();
 		   //execute the query
 		   long startime = System.currentTimeMillis(); 
-		   List<Posting> postings=executeQuery(userQuery);
+		   List<Posting> postings=executeQuery(parsedQuery);
 		   //calculate the score based on the Scoring model of each document
 		   //with respect to the query terms
 		   if(ScoringModel.TFIDF.equals(model)){
@@ -188,11 +192,14 @@ public class SearchRunner {
 				//remove the second brackets from beginning and end
 				query=query.replaceAll("\\{", "");
 				query=query.replaceAll("\\}", "");
-				finalPostings = executeQuery(query);
+				//call queryParser to parse the query
+				Query queryObj=QueryParser.parse(query, CommonConstants.OPERATOR_OR);
+				String parsedQuery=queryObj.getQuery();
+				finalPostings = executeQuery(parsedQuery);
 				if(finalPostings.size()>0){
 				    //calculate the score based on the Scoring model of each document
 					//with respect to the query terms
-					calculateTfIdfScore(finalPostings,ScoringModel.TFIDF);
+					calculateOkapiScore(finalPostings,ScoringModel.OKAPI);
 					termSet = new HashSet<String>();
 					numResults++;
 					QueryResult queryResult = new QueryResult();
@@ -656,7 +663,7 @@ public class SearchRunner {
 	 */
 	private void calculateOkapiScore(List<Posting> mergedPostings,ScoringModel model){
 		
-		double k1=1.5;//tuning parameter for document term frequency
+		double k1=1.2;//tuning parameter for document term frequency
 		double b= .75; //tuning parameter for document length
 		//compute the average document length
         double lavg = calcAvgDocLength();

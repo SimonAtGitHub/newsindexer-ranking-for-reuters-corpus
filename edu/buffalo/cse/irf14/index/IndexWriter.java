@@ -197,7 +197,7 @@ public class IndexWriter {
 					+ fileName);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
 			out.writeObject(object);
-			// out.writeObject(object.toString());
+			//out.writeObject(object.toString());
 			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
