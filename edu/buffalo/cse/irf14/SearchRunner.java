@@ -135,9 +135,18 @@ public class SearchRunner {
 		   stream.println("Query time: " + ((endtime - startime)));
 		   int rank=1;
 		   Collections.sort(postings, new PostingScoreComparator());
+		   Map<String,Integer> fileNameMap = new HashMap<String,Integer>();
 		   for(Posting posting:postings){
+			    //handle duplicate files
+			    String fileName = docDictionary.get(posting.getDocId()).getFileName();
+				if(fileNameMap.containsKey(fileName)){
+					continue;
+				}
+				else{
+					fileNameMap.put(fileName, posting.getDocId());
+				}
 			   stream.println("Result Rank: "+  rank);
-			   stream.println("Result Title: "+docDictionary.get(posting.getDocId()).getFileName());
+			   stream.println("Result Title: "+ fileName);
 			   stream.println("Result Snippet: " +docDictionary.get(posting.getDocId()).getResultSnippet()+ "...");
 			   stream.println("Result Relevancy: " +posting.getScore());
 			   rank++;
@@ -212,6 +221,11 @@ public class SearchRunner {
 			//Print the result to a file
 			stream.println("numResults="+numResults);
 			for(QueryResult queryResult:queryResults){
+				
+				/**
+				 * map of fileIds to detect duplicates
+				 */
+				Map<String,Integer> fileIdMap = new HashMap<String,Integer>();
 				stream.print(queryResult.getQueryId()+CommonConstants.COLON+CommonConstants.WHITESPACE);
 				stream.print(CommonConstants.SECOND_BRACKET_OPEN);
 				List<Posting> resultPostings = queryResult.getResultPostings();
@@ -224,6 +238,12 @@ public class SearchRunner {
 					}
 					DocMetaData docMetaData = docDictionary.get(posting.getDocId());
 					String fileId=docMetaData.getFileName();
+					if(fileIdMap.containsKey(fileId)){
+						continue;
+					}
+					else{
+						fileIdMap.put(fileId, posting.getDocId());
+					}
 					Double score= posting.getScore();
 					stream.print(fileId+CommonConstants.HASH+score);
 					if(counter<resultPostings.size() && counter<10){

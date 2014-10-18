@@ -40,7 +40,7 @@ public class SearchRunnerTest {
        	List<Posting> postings=null;
    		try {
    			searchRunner = new SearchRunner("H:\\projects\\newsindexer\\index", "H:\\projects\\newsindexer\\training", 'Q', new PrintStream("H:\\projects\\newsindexer\\index\\queryOutput.txt"));
-   			searchRunner.query("NATO", ScoringModel.TFIDF);
+   			searchRunner.query("NATO", ScoringModel.OKAPI);
    			//searchRunner.query("( Term:abcd )", ScoringModel.TFIDF);
    	        System.out.println("\nPostings retrieved");
    		} catch (FileNotFoundException e) {
