@@ -29,6 +29,7 @@ import edu.buffalo.cse.irf14.common.DocMetaData;
 import edu.buffalo.cse.irf14.common.QueryResult;
 import edu.buffalo.cse.irf14.common.StringUtil;
 import edu.buffalo.cse.irf14.common.TermIndexDetails;
+import edu.buffalo.cse.irf14.index.DocumentIdComparator;
 import edu.buffalo.cse.irf14.index.IndexType;
 import edu.buffalo.cse.irf14.index.Posting;
 import edu.buffalo.cse.irf14.index.PostingScoreComparator;
@@ -114,23 +115,28 @@ public class SearchRunner {
 		   List<Posting> postings=executeQuery(userQuery);
 		   //calculate the score based on the Scoring model of each document
 		   //with respect to the query terms
-		   calculateScore(postings,model);
+		   if(ScoringModel.TFIDF.equals(model)){
+		      calculateTfIdfScore(postings,model);
+		   }
+		   else if(ScoringModel.OKAPI.equals(model)){
+			   calculateOkapiScore(postings,model); 
+		   }
 		   termSet = new HashSet<String>();
 		   
 		   //print the execution details
-		   System.out.println("===============================================================");
+		   stream.println("===============================================================");
 		   long endtime = System.currentTimeMillis();
-		   System.out.println("Query: " + userQuery);
-		   System.out.println("Query time: " + ((endtime - startime)));
+		   stream.println("Query: " + userQuery);
+		   stream.println("Query time: " + ((endtime - startime)));
 		   int rank=1;
 		   Collections.sort(postings, new PostingScoreComparator());
 		   for(Posting posting:postings){
-			   System.out.println("Result Title: "+docDictionary.get(posting.getDocId()).getFileName()+
+			   stream.println("Result Title: "+docDictionary.get(posting.getDocId()).getFileName()+
 					               "   Result Rank: "+  rank+
 					               "   Result Relevancy: "+  posting.getScore());
 			   rank++;
 		   }
-		   System.out.println("===============================================================");
+		   stream.println("===============================================================");
 	}
 	
 	/**
@@ -167,6 +173,10 @@ public class SearchRunner {
 				}
 				finalPostings = executeQuery(query);
 				if(finalPostings.size()>0){
+				    //calculate the score based on the Scoring model of each document
+					//with respect to the query terms
+					calculateTfIdfScore(finalPostings,ScoringModel.TFIDF);
+					termSet = new HashSet<String>();
 					numResults++;
 					QueryResult queryResult = new QueryResult();
 					queryResult.setQueryId(queryId);
@@ -181,10 +191,12 @@ public class SearchRunner {
 				stream.print(queryResult.getQueryId()+CommonConstants.COLON+CommonConstants.WHITESPACE);
 				stream.print(CommonConstants.SECOND_BRACKET_OPEN);
 				List<Posting> resultPostings = queryResult.getResultPostings();
+				Collections.sort(resultPostings, new PostingScoreComparator());
 				for(Posting posting:resultPostings){
 					DocMetaData docMetaData = docDictionary.get(posting.getDocId());
 					String fileId=docMetaData.getFileName();
-					stream.print(fileId+CommonConstants.COMMA);
+					Double score= posting.getScore();
+					stream.print(fileId+CommonConstants.HASH+score+CommonConstants.COMMA);
 				}
 				stream.println(CommonConstants.SECOND_BRACKET_CLOSE);
 			}
@@ -338,45 +350,13 @@ public class SearchRunner {
     */
 	private List<Posting> mergePostingsAnd(List<Posting> firstPostings,List<Posting> secondPostings) {
 		
-		List<Posting> outputPostings = new LinkedList<Posting>();
-		//declare the variables to be used for merging
-		Posting firstPosting;
-		Posting secondPosting;
-		Integer firstDocId;
-		Integer secondDocId;
-		//define the iterators over the two lists
-		Iterator<Posting> firstIterator=firstPostings.iterator();
-		Iterator<Posting> secondIterator=secondPostings.iterator();
-		firstPosting = firstIterator.next();
-		secondPosting = secondIterator.next();
-		//merge the postings
-		while(firstPosting!=null && secondPosting!=null){
-			firstDocId = firstPosting.getDocId();
-			secondDocId = secondPosting.getDocId();
-			//if the docIds are equal ADD
-			if(firstDocId.equals(secondDocId)){
-				outputPostings.add(firstPosting);
-				if(firstIterator.hasNext()){
-					firstPosting=firstIterator.next();
-				}else{
-					firstPosting=null;
-				}
-				if(secondIterator.hasNext()){
-					secondPosting=secondIterator.next();
-				}
-				else{
-					secondPosting=null;
-				}
-			}
-			//if the first docId is greater than the second
-			else if(firstDocId<secondDocId){
-					firstPosting=firstIterator.next();
-			}
-			//if the second docId is greater than the first
-			else if(firstDocId>secondDocId){
-					secondPosting=secondIterator.next();
+		List<Posting> outputPostings = new ArrayList<Posting>();
+		for(Posting posting:firstPostings){
+			if(secondPostings.contains(posting)){
+				outputPostings.add(posting);
 			}
 		}
+		Collections.sort(outputPostings, new DocumentIdComparator());
 		return outputPostings;
   }
 
@@ -389,80 +369,16 @@ public class SearchRunner {
     */
 	private List<Posting> mergePostingsOr(List<Posting> firstPostings,List<Posting> secondPostings) {
 		
-		List<Posting> outputPostings = new LinkedList<Posting>();
-		//declare the variables to be used for merging
-		Posting firstPosting;
-		Posting secondPosting;
-		Integer firstDocId;
-		Integer secondDocId;
-		//define the iterators over the two lists
-		Iterator<Posting> firstIterator=firstPostings.iterator();
-		Iterator<Posting> secondIterator=secondPostings.iterator();
-		firstPosting = firstIterator.next();
-		secondPosting = secondIterator.next();
-		//merge the postings
-		while(firstPosting!=null && secondPosting!=null){
-			firstDocId = firstPosting.getDocId();
-			secondDocId = secondPosting.getDocId();
-			//if the docIds are equal ADD
-			if(firstDocId.equals(secondDocId)){
-				outputPostings.add(firstPosting);
-				if(firstIterator.hasNext()){
-					firstPosting=firstIterator.next();
-				}else{
-					firstPosting=null;
-				}
-				if(secondIterator.hasNext()){
-					secondPosting=secondIterator.next();
-				}
-				else{
-					secondPosting=null;
-				}
-			}
-			//if the first docId is greater than the second ADD
-			else if(firstDocId<secondDocId){
-				    outputPostings.add(firstPosting);
-				    if(firstIterator.hasNext()){
-						firstPosting=firstIterator.next();
-					}else{
-						firstPosting=null;
-					}
-			}
-			//if the second docId is greater than the first ADD
-			else if(firstDocId>secondDocId){
-				outputPostings.add(secondPosting);
-				if(secondIterator.hasNext()){
-					secondPosting=secondIterator.next();
-				}
-				else{
-					secondPosting=null;
-				}
+		List<Posting> outputPostings = new ArrayList<Posting>();
+		outputPostings.addAll(firstPostings);
+		for(Posting posting:secondPostings){
+			if(!outputPostings.contains(posting)){
+				outputPostings.add(posting);
 			}
 		}
-		
-		//add the remaining elements of the first list(if any)
-		while(firstPosting!=null){
-			outputPostings.add(firstPosting);
-			if(firstIterator.hasNext()){
-				firstPosting=firstIterator.next();
-			}
-			else{
-				firstPosting=null;
-			}
-		}
-		
-		//add the remaining elements of the second list(if any)
-	    while(secondPosting!=null){
-					outputPostings.add(secondPosting);
-					if(secondIterator.hasNext()){
-						secondPosting=secondIterator.next();
-					}
-					else{
-						secondPosting=null;
-					}
-		}
+		Collections.sort(outputPostings, new DocumentIdComparator());
 		return outputPostings;
-  }
+    }
 	
    /**
     * Method to merge the two postings list based on operators 
@@ -473,63 +389,13 @@ public class SearchRunner {
     */
 	private List<Posting> mergePostingsNot(List<Posting> firstPostings,List<Posting> secondPostings) {
 		
-		List<Posting> outputPostings = new LinkedList<Posting>();
-		//declare the variables to be used for merging
-		Posting firstPosting;
-		Posting secondPosting;
-		Integer firstDocId;
-		Integer secondDocId;
-		//define the iterators over the two lists
-		Iterator<Posting> firstIterator=firstPostings.iterator();
-		Iterator<Posting> secondIterator=secondPostings.iterator();
-		firstPosting = firstIterator.next();
-		secondPosting = secondIterator.next();
-		//merge the postings
-		while(firstPosting!=null && secondPosting!=null){
-			firstDocId = firstPosting.getDocId();
-			secondDocId = secondPosting.getDocId();
-			//if the docIds are equal
-			if(firstDocId.equals(secondDocId)){
-				if(firstIterator.hasNext()){
-					firstPosting=firstIterator.next();
-				}else{
-					firstPosting=null;
-				}
-				if(secondIterator.hasNext()){
-					secondPosting=secondIterator.next();
-				}
-				else{
-					secondPosting=null;
-				}
-			}
-			//if the first docId is greater than the second ADD
-			else if(firstDocId<secondDocId){
-				    outputPostings.add(firstPosting);
-				    if(firstIterator.hasNext()){
-						firstPosting=firstIterator.next();
-					}else{
-						firstPosting=null;
-					}
-			}
-			//if the second docId is greater than the first
-			else if(firstDocId>secondDocId){
-				if(secondIterator.hasNext()){
-					secondPosting=secondIterator.next();
-				}
-				else{
-					secondPosting=null;
-				}
+		List<Posting> outputPostings = new ArrayList<Posting>();
+		for(Posting posting:firstPostings){
+			if(!secondPostings.contains(posting)){
+				outputPostings.add(posting);
 			}
 		}
-		//add the remaining elements of the first list(if any)
-		while(firstPosting!=null){
-			outputPostings.add(firstPosting);
-			if(firstIterator.hasNext()){
-				firstPosting=firstIterator.next();
-			}else{
-				firstPosting=null;
-			}
-		}
+		Collections.sort(outputPostings, new DocumentIdComparator());
 		return outputPostings;
   }
 	
@@ -687,7 +553,7 @@ public class SearchRunner {
 	 * @param postings - List of final postings
 	 * @param model - Scoring Model used
 	 */
-	private void calculateScore(List<Posting> mergedPostings, ScoringModel model){
+	private void calculateTfIdfScore(List<Posting> mergedPostings,ScoringModel model){
 		
 		//e.g. Term:Computer
 		for(String term:termSet){
@@ -740,6 +606,9 @@ public class SearchRunner {
 				
 				for(Posting posting:mergedPostings){
 					DocMetaData docMetaData = docDictionary.get(posting.getDocId());
+					if(posting.getScore()==null){
+						posting.setScore(0.0);
+					}
 					double score = posting.getScore();
 					score = score / docMetaData.getLength();
 					//format the score
@@ -751,4 +620,91 @@ public class SearchRunner {
 		}
 		//System.out.println("\nScore calculated");
 	}
+	
+	
+	/**
+	 * Calculate the score of the document with respect to the query and the
+	 * relevance model passed. OKAPI model is used for computation.Score is calculated in term-at-a-time fashion
+	 * @param postings - List of final postings
+	 * @param model - Scoring Model used
+	 */
+	private void calculateOkapiScore(List<Posting> mergedPostings,ScoringModel model){
+		
+		double k1=1.5;//tuning parameter for document term frequency
+		double b= .75; //tuning parameter for document length
+		//compute the average document length
+        double lavg = calcAvgDocLength();
+		
+		//e.g. Term:Computer
+		for(String term:termSet){
+			
+			String analyzedTerm=getAnalyzedTerm(term); //analyzedTerm - comput
+			String termType=getRawIndexOfTheTerm(term); //termType - Term
+			
+			//get the index type based on the raw string index type. Term: gets converted to IndexType TERM
+			IndexType indexType= CommonUtil.getTermIndexType(termType);
+			
+			Map<String, Integer> dictionaryForIndexType=getDictionaryForIndexType(indexType); // Term dictionary
+			Map<Integer, PostingWrapper> indexMap=getInvIndexForIndexType(indexType); //Term Index
+			
+			//get the postings list
+			PostingWrapper postingWrapper=getPostings(indexDir,analyzedTerm,termType);
+			
+			// get the term id from the dictionary
+			Integer termId = (Integer) dictionaryForIndexType.get(analyzedTerm);
+			if (termId != null) {
+				// get the postings list from the index
+				postingWrapper = (PostingWrapper) indexMap
+						.get(termId);
+				List<Posting> termPostings = postingWrapper.getPostings();
+				
+				//Should have avoided O(n2). But doing this in the interest of time.
+				for(Posting mergedPosting:mergedPostings){
+					for(Posting termPosting:termPostings){
+						if(mergedPosting.equals(termPosting)){
+							//compute the tf
+							int tf = termPosting.getFrequency();
+							//compute the idf
+							int N = docDictionary.size();
+							int docFrequency = postingWrapper.getTotalFrequency();
+							double idf = Math.log10(N/docFrequency);
+							long ld = docDictionary.get(mergedPosting.getDocId()).getLength();
+							//compute the variant
+							double var = (k1+1)/tf/(k1*((1-b)+b*(ld/lavg))+tf);
+							//TODO - change the below line
+							if(null==mergedPosting.getScore()){
+								mergedPosting.setScore(0.0);
+							}
+							double score = mergedPosting.getScore() + (idf*var);
+							score=Double.parseDouble(decimalFormat.format(score));
+							mergedPosting.setScore(score);
+							break;
+						}
+					}
+				}
+			}
+		}
+		//System.out.println("\nScore calculated");
+	}
+	
+	/**
+	 * Returns the average document length in the corpus
+	 * @return
+	 */
+	private double calcAvgDocLength(){
+		int numDocs= docDictionary.size();
+		long totalLen = 0;
+		double lavg = 0;
+		Set<Integer> docIds=docDictionary.keySet();
+		for(Integer docId:docIds){
+			DocMetaData docMetadata = docDictionary.get(docId);
+			totalLen=totalLen+docMetadata.getLength();
+		}
+		lavg = totalLen/numDocs;
+		return lavg;
+	}
 }
+
+
+
+

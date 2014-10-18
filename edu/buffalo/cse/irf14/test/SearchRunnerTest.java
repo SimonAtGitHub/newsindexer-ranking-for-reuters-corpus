@@ -18,7 +18,7 @@ public class SearchRunnerTest {
     	SearchRunner searchRunner;
     	List<Posting> postings=null;
 		try {
-			searchRunner = new SearchRunner("H:\\projects\\IR\\newsindexer\\index", "H:\\projects\\IR\\newsindexer\\training", 'Q', new PrintStream("H:\\projects\\IR\\newsindexer\\index\\queryOutput.txt"));
+			searchRunner = new SearchRunner("H:\\projects\\newsindexer\\index", "H:\\projects\\newsindexer\\training", 'Q', new PrintStream("H:\\projects\\newsindexer\\index\\queryOutput.txt"));
 	    	postings=searchRunner.executeQuery("Term:priyankar");
 	    	postings=searchRunner.executeQuery("Term:priyankar AND Term:nandi");
 	    	postings=searchRunner.executeQuery("Term:priyankar OR Term:nandi");
@@ -40,7 +40,7 @@ public class SearchRunnerTest {
        	List<Posting> postings=null;
    		try {
    			searchRunner = new SearchRunner("H:\\projects\\newsindexer\\index", "H:\\projects\\newsindexer\\training", 'Q', new PrintStream("H:\\projects\\newsindexer\\index\\queryOutput.txt"));
-   			searchRunner.query("Term:priyankar AND Term:nandi", ScoringModel.TFIDF);
+   			searchRunner.query("Term:computer OR Term:lubricants", ScoringModel.TFIDF);
    			//searchRunner.query("( Term:abcd )", ScoringModel.TFIDF);
    	        System.out.println("\nPostings retrieved");
    		} catch (FileNotFoundException e) {
