@@ -13,12 +13,21 @@ import edu.buffalo.cse.irf14.SearchRunner.ScoringModel;
 import edu.buffalo.cse.irf14.index.Posting;
 public class SearchRunnerTest {
 	
+	public static final String INDEX_DIR = "H:\\projects\\newsindexer\\index";
+	
+	public static final String CORPUS_DIR = "H:\\projects\\newsindexer\\training";
+	
+	public static final String OUTPUT_FILE = "H:\\projects\\newsindexer\\index\\queryOutput.txt";
+	
+	public static final String INPUT_FILE = "H:\\projects\\newsindexer\\index\\queryInput.txt";
+	
+	public static final char MODE = 'Q';
     @Test
 	public void testExecuteQuery() {
     	SearchRunner searchRunner;
     	List<Posting> postings=null;
 		try {
-			searchRunner = new SearchRunner("H:\\projects\\newsindexer\\index", "H:\\projects\\newsindexer\\training", 'Q', new PrintStream("H:\\projects\\newsindexer\\index\\queryOutput.txt"));
+			searchRunner = new SearchRunner(INDEX_DIR, CORPUS_DIR, MODE, new PrintStream(OUTPUT_FILE));
 	    	postings=searchRunner.executeQuery("Term:priyankar");
 	    	postings=searchRunner.executeQuery("Term:priyankar AND Term:nandi");
 	    	postings=searchRunner.executeQuery("Term:priyankar OR Term:nandi");
@@ -39,7 +48,7 @@ public class SearchRunnerTest {
        	SearchRunner searchRunner;
        	List<Posting> postings=null;
    		try {
-   			searchRunner = new SearchRunner("H:\\projects\\newsindexer\\index", "H:\\projects\\newsindexer\\training", 'Q', new PrintStream("H:\\projects\\newsindexer\\index\\queryOutput.txt"));
+   			searchRunner = new SearchRunner(INDEX_DIR, CORPUS_DIR, MODE, new PrintStream(OUTPUT_FILE));
    			searchRunner.query("NATO", ScoringModel.OKAPI);
    			//searchRunner.query("( Term:abcd )", ScoringModel.TFIDF);
    	        System.out.println("\nPostings retrieved");
@@ -54,8 +63,8 @@ public class SearchRunnerTest {
        	SearchRunner searchRunner;
        	List<Posting> postings=null;
    		try {
-   			searchRunner = new SearchRunner("H:\\projects\\newsindexer\\index", "H:\\projects\\newsindexer\\training", 'Q', new PrintStream("H:\\projects\\newsindexer\\index\\queryOutput.txt"));
-   			searchRunner.query(new File("H:\\projects\\newsindexer\\index\\queryInput.txt"));
+   			searchRunner = new SearchRunner(INDEX_DIR, CORPUS_DIR, MODE, new PrintStream(OUTPUT_FILE));
+   			searchRunner.query(new File(INPUT_FILE));
    			//searchRunner.query("( Term:abcd )", ScoringModel.TFIDF);
    	        System.out.println("\nPostings retrieved");
    		} catch (FileNotFoundException e) {
