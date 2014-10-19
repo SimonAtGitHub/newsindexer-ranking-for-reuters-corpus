@@ -236,6 +236,7 @@ public class IndexWriter {
 			while (stream.hasNext()) {
 				Token token = stream.next();
 				String term = token.toString();
+				Integer position = token.getPosition();
 				// get the dictionary
 				NewsDictionary dictionary = CommonUtil
 						.getDictionaryByType(fieldName);
@@ -259,6 +260,11 @@ public class IndexWriter {
 					posting.setDocId(docId);
 					posting.setFileId(fileId);
 					posting.setFrequency(1);
+					//positional index
+					List<Integer> positions = new ArrayList<Integer>();
+					positions.add(position);
+					posting.setPositions(positions);
+					//create the posting
 					List<Posting> postings = new ArrayList<Posting>();
 					postings.add(posting);
 					postingWrapper.setPostings(postings);
@@ -294,6 +300,9 @@ public class IndexWriter {
 								Integer frequency = postingItem.getFrequency();
 								postingItem.setFrequency(++frequency);
 								hasPosting = true;
+								//positional index
+								List<Integer> positions = postingItem.getPositions();
+								positions.add(position);
 								break;
 							}
 						}
@@ -306,6 +315,11 @@ public class IndexWriter {
 							posting1.setDocId(docId);
 							posting1.setFileId(fileId);
 							posting1.setFrequency(1);
+							
+							//positional index
+							List<Integer> positions = new ArrayList<Integer>();
+							positions.add(position);
+							posting1.setPositions(positions);
 							// add it to the same postings list
 							postings.add(posting1);
 						}

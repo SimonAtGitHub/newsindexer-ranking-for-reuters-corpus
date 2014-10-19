@@ -51,6 +51,7 @@ public class Tokenizer {
 	 *             : In case any exception occurs during tokenization
 	 */
 	public TokenStream consume(String str) throws TokenizerException {
+		Integer position = 1;
 		if (str == null) {
 			throw new TokenizerException("Null argument was passed.");
 		} else if (str.isEmpty()) {
@@ -69,6 +70,9 @@ public class Tokenizer {
 				Token token = new Token();
 				token.setTermText(arr[index]);
 				token.setTermBuffer(token.getTermText().toCharArray());
+				//set positional Index
+				token.setPosition(position);
+				position++;
 				// If previous token was marked as beginning of a sentence.
 				if (beginningOfSentence && !token.getTermText().isEmpty()) {
 					token.setBeginningOfSentence(true);

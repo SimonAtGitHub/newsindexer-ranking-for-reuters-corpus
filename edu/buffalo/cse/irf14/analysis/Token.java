@@ -18,6 +18,9 @@ public class Token {
 	private String termText;
 	// The char array backing termText
 	private char[] termBuffer;
+	
+	//position index of the token.
+	private Integer position;
 
 	// Whenever an end of sentence punctuation is removed, set it to true.
 	private boolean endOfSentence = false;
@@ -118,6 +121,14 @@ public class Token {
 
 	public void setDatetime(boolean datetime) {
 		this.datetime = datetime;
+	}
+
+	public Integer getPosition() {
+		return position;
+	}
+
+	public void setPosition(Integer position) {
+		this.position = position;
 	}
 
 	/**

@@ -28,14 +28,15 @@ public class SearchRunnerTest {
     	List<Posting> postings=null;
 		try {
 			searchRunner = new SearchRunner(INDEX_DIR, CORPUS_DIR, MODE, new PrintStream(OUTPUT_FILE));
-	    	postings=searchRunner.executeQuery("Term:priyankar");
+/*	    	postings=searchRunner.executeQuery("Term:priyankar");
 	    	postings=searchRunner.executeQuery("Term:priyankar AND Term:nandi");
 	    	postings=searchRunner.executeQuery("Term:priyankar OR Term:nandi");
 	    	postings=searchRunner.executeQuery("Term:priyankar NOT Term:nandi");
 	    	postings=searchRunner.executeQuery("( Term:priyankar AND Term:nandi ) OR Term:animesh");
 	    	postings=searchRunner.executeQuery("Term:animesh OR ( Term:priyankar AND Term:nandi )");
 	    	postings=searchRunner.executeQuery("Term:animesh OR Term:priyankar OR Term:nandi");
-	    	postings=searchRunner.executeQuery("Term:chandrakant OR ( Term:animesh OR Term:priyankar OR Term:nandi )");
+	    	postings=searchRunner.executeQuery("Term:chandrakant OR ( Term:animesh OR Term:priyankar OR Term:nandi )");*/
+	    	postings=searchRunner.executeQuery("Term:\"juhi har\"");
 	        System.out.println("\nPostings retrieved");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -49,7 +50,7 @@ public class SearchRunnerTest {
        	List<Posting> postings=null;
    		try {
    			searchRunner = new SearchRunner(INDEX_DIR, CORPUS_DIR, MODE, new PrintStream(OUTPUT_FILE));
-   			searchRunner.query("NATO", ScoringModel.OKAPI);
+   			searchRunner.query("\"Term:juhi har\"", ScoringModel.OKAPI);
    			//searchRunner.query("( Term:abcd )", ScoringModel.TFIDF);
    	        System.out.println("\nPostings retrieved");
    		} catch (FileNotFoundException e) {

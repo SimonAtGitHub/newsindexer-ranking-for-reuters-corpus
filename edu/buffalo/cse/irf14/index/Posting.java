@@ -1,6 +1,7 @@
 package edu.buffalo.cse.irf14.index;
 
 import java.io.Serializable;
+import java.util.List;
 
 import edu.buffalo.cse.irf14.SearchRunner.ScoringModel;
 
@@ -39,6 +40,11 @@ public class Posting implements Serializable {
 	 */
 	private transient ScoringModel model;
 
+	/**
+	 * List to maintain the positional indexes.
+	 * If not to implement positional index , just declare the below var transient
+	 */
+	private List<Integer> positions;
 	/**
 	 * @return the docId
 	 */
@@ -111,6 +117,14 @@ public class Posting implements Serializable {
 	 */
 	public void setModel(ScoringModel model) {
 		this.model = model;
+	}
+
+	public List<Integer> getPositions() {
+		return positions;
+	}
+
+	public void setPositions(List<Integer> positions) {
+		this.positions = positions;
 	}
 
 	/**
