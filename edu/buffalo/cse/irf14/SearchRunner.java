@@ -158,10 +158,14 @@ public class SearchRunner {
 
 		// print the execution details
 		stream.println("===============================================================");
+		System.out.println("===============================================================");
 		long endtime = System.currentTimeMillis();
 		stream.println("Query: " + userQuery);
+		System.out.println("Query: " + userQuery);
 		stream.println("Query time: " + ((endtime - startime)));
+		System.out.println("Query time: " + ((endtime - startime)));
 		stream.println("===============================================================");
+		System.out.println("===============================================================");
 		int rank = 1;
 		Collections.sort(postings, new PostingScoreComparator());
 		Map<String, Integer> fileNameMap = new HashMap<String, Integer>();
@@ -175,13 +179,20 @@ public class SearchRunner {
 				fileNameMap.put(fileName, posting.getDocId());
 			}
 			stream.println("Result Rank: " + rank);
+			System.out.println("Result Rank: " + rank);
 			stream.println("Result Title: " + fileName);
+			System.out.println("Result Title: " + fileName);
 			stream.println("Result Snippet: "
 					+ docDictionary.get(posting.getDocId()).getResultSnippet()
 					+ "...");
+			System.out.println("Result Snippet: "
+					+ docDictionary.get(posting.getDocId()).getResultSnippet()
+					+ "...");
 			stream.println("Result Relevancy: " + posting.getScore());
+			System.out.println("Result Relevancy: " + posting.getScore());
 			rank++;
 			stream.println("===============================================================");
+			System.out.println("===============================================================");
 		}
 	}
 
@@ -226,7 +237,7 @@ public class SearchRunner {
 				String query = "";
 				strArr = line.split(CommonConstants.COLON);
 				queryId = strArr[0];
-				System.out.println("\nEvaluating query for "+queryId);
+				//System.out.println("\nEvaluating query for "+queryId);
 				// merge the query parts that got splitted
 				for (int i = 1; i < strArr.length; i++) {
 					query = query + strArr[i] + CommonConstants.COLON;
@@ -481,9 +492,11 @@ public class SearchRunner {
 			List<Posting> secondPostings) {
 
 		List<Posting> outputPostings = new ArrayList<Posting>();
-		for (Posting posting : firstPostings) {
-			if (secondPostings.contains(posting)) {
-				outputPostings.add(posting);
+		if(null!=firstPostings && null!=secondPostings){
+			for (Posting posting : firstPostings) {
+				if (secondPostings.contains(posting)) {
+					outputPostings.add(posting);
+				}
 			}
 		}
 		Collections.sort(outputPostings, new DocumentIdComparator());
@@ -781,7 +794,7 @@ public class SearchRunner {
 				}
 			}
 		}
-		System.out.println("\nScore calculated");
+		//System.out.println("\nScore calculated");
 	}
 
 	/**

@@ -51,7 +51,7 @@ public class SearchRunnerTest {
    		try {
    			searchRunner = new SearchRunner(INDEX_DIR, CORPUS_DIR, MODE, new PrintStream(OUTPUT_FILE));
    			//searchRunner.query("\"Term:juhi har\"", ScoringModel.OKAPI);
-   			searchRunner.query("place:chicago AND administration", ScoringModel.TFIDF);
+   			searchRunner.query("author:torday AND (debt OR currency)", ScoringModel.TFIDF);
    	        System.out.println("\nPostings retrieved");
    		} catch (FileNotFoundException e) {
    			// TODO Auto-generated catch block
