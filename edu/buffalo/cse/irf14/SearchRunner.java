@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -263,7 +264,8 @@ public class SearchRunner {
 				if (finalPostings.size() > 0) {
 					// calculate the score based on the Scoring model of each document
 					//with respect to the query terms
-					calculateTfIdfScore(finalPostings);
+					//calculateTfIdfScore(finalPostings);
+					calculateOkapiScore(finalPostings);
 					termSet = new HashSet<String>();
 					numResults++;
 					QueryResult queryResult = new QueryResult();
@@ -291,9 +293,9 @@ public class SearchRunner {
 				int counter = 1;
 				for (Posting posting : resultPostings) {
 					// print only the first 10 ordered results
-					if (counter > 10) {
+					/*if (counter > 10) {
 						break;
-					}
+					}*/
 					DocMetaData docMetaData = docDictionary.get(posting
 							.getDocId());
 					String fileId = docMetaData.getFileName();
@@ -327,6 +329,7 @@ public class SearchRunner {
 	 */
 	public void close() {
 		// TODO : IMPLEMENT THIS METHOD
+		stream.close();
 	}
 
 	/**
@@ -816,7 +819,7 @@ public class SearchRunner {
 	 */
 	private void calculateOkapiScore(List<Posting> mergedPostings) {
 
-		double k1 = 1.2;// tuning parameter for document term frequency
+		double k1 = 2;// tuning parameter for document term frequency
 		double b = .75; // tuning parameter for document length
 		// compute the average document length
 		double lavg = calcAvgDocLength();
@@ -847,6 +850,7 @@ public class SearchRunner {
 				// get the postings list from the index
 				postingWrapper = (PostingWrapper) indexMap.get(termId);
 				List<Posting> termPostings = postingWrapper.getPostings();
+				int docFrequency = termPostings.size();
 
 				// Should have avoided O(n2). But doing this in the interest of
 				// time.
@@ -857,8 +861,8 @@ public class SearchRunner {
 							int tf = termPosting.getFrequency();
 							// compute the idf
 							int N = docDictionary.size();
-							int docFrequency = postingWrapper
-									.getTotalFrequency();
+							/*int docFrequency = postingWrapper
+									.getTotalFrequency();*/
 							double idf = Math.log10(N / docFrequency);
 							long ld = docDictionary.get(
 									mergedPosting.getDocId()).getLength();
@@ -877,23 +881,22 @@ public class SearchRunner {
 					}
 				}
 
-				// apply the formatting of score and normalization
-
-				for (Posting posting : mergedPostings) {
-					if (posting.getScore() == null) {
-						posting.setScore(0.0);
-					}
-					double score = posting.getScore();
-					score = score / 10;
-					// format the score
-					score = Double.parseDouble(decimalFormat.format(score));
-					if(score>1){
-						score = 1;
-					}
-					posting.setScore(score);
-				}
-
 			}
+		}
+		// apply the formatting of score and normalization
+
+		for (Posting posting : mergedPostings) {
+			if (posting.getScore() == null) {
+				posting.setScore(0.0);
+			}
+			double score = posting.getScore();
+			score = score / 10;
+			// format the score
+			score = Double.parseDouble(decimalFormat.format(score));
+			if(score>1){
+				score = 1;
+			}
+			posting.setScore(score);
 		}
 		// System.out.println("\nScore calculated");
 	}
