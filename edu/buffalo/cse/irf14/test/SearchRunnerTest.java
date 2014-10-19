@@ -19,7 +19,7 @@ public class SearchRunnerTest {
 	
 	public static final String OUTPUT_FILE = "H:\\projects\\newsindexer\\index\\queryOutput.txt";
 	
-	public static final String INPUT_FILE = "H:\\projects\\newsindexer\\index\\queryInputCorrect.txt";
+	public static final String INPUT_FILE = "H:\\projects\\newsindexer\\index\\queryInput.txt";
 	
 	public static final char MODE = 'Q';
     @Test
@@ -51,7 +51,7 @@ public class SearchRunnerTest {
    		try {
    			searchRunner = new SearchRunner(INDEX_DIR, CORPUS_DIR, MODE, new PrintStream(OUTPUT_FILE));
    			//searchRunner.query("\"Term:juhi har\"", ScoringModel.OKAPI);
-   			searchRunner.query("adobe", ScoringModel.OKAPI);
+   			searchRunner.query("trade deficit foreign exchange trade surplus balance of trade", ScoringModel.OKAPI);
    	        System.out.println("\nPostings retrieved");
    		} catch (FileNotFoundException e) {
    			// TODO Auto-generated catch block

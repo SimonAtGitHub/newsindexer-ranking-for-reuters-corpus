@@ -160,14 +160,10 @@ public class SearchRunner {
 
 		// print the execution details
 		stream.println("===============================================================");
-		System.out.println("===============================================================");
 		long endtime = System.currentTimeMillis();
 		stream.println("Query: " + userQuery);
-		System.out.println("Query: " + userQuery);
-		stream.println("Query time: " + ((endtime - startime)));
-		System.out.println("Query time: " + ((endtime - startime)));
+		stream.println("Query time: " + ((endtime - startime))+" ms");
 		stream.println("===============================================================");
-		System.out.println("===============================================================");
 		int rank = 1;
 		if(postings.size()>0)
 		{
@@ -184,20 +180,13 @@ public class SearchRunner {
 				fileNameMap.put(fileName, posting.getDocId());
 			}
 			stream.println("Result Rank: " + rank);
-			System.out.println("Result Rank: " + rank);
 			stream.println("Result Title: " + fileName);
-			System.out.println("Result Title: " + fileName);
 			stream.println("Result Snippet: "
 					+ docDictionary.get(posting.getDocId()).getResultSnippet()
 					+ "...");
-			System.out.println("Result Snippet: "
-					+ docDictionary.get(posting.getDocId()).getResultSnippet()
-					+ "...");
 			stream.println("Result Relevancy: " + posting.getScore());
-			System.out.println("Result Relevancy: " + posting.getScore());
 			rank++;
 			stream.println("===============================================================");
-			System.out.println("===============================================================");
 		}
 	}
 
@@ -264,8 +253,8 @@ public class SearchRunner {
 				if (finalPostings.size() > 0) {
 					// calculate the score based on the Scoring model of each document
 					//with respect to the query terms
-					//calculateTfIdfScore(finalPostings);
-					calculateOkapiScore(finalPostings);
+					calculateTfIdfScore(finalPostings);
+					//calculateOkapiScore(finalPostings);
 					termSet = new HashSet<String>();
 					numResults++;
 					QueryResult queryResult = new QueryResult();
@@ -293,9 +282,9 @@ public class SearchRunner {
 				int counter = 1;
 				for (Posting posting : resultPostings) {
 					// print only the first 10 ordered results
-					/*if (counter > 10) {
+					if (counter > 10) {
 						break;
-					}*/
+					}
 					DocMetaData docMetaData = docDictionary.get(posting
 							.getDocId());
 					String fileId = docMetaData.getFileName();
@@ -306,8 +295,8 @@ public class SearchRunner {
 					}
 					Double score = posting.getScore();
 					stream.print(fileId + CommonConstants.HASH + score);
-					//if (counter < resultPostings.size() && counter < 10) {
-					if (counter < resultPostings.size()) {
+					if (counter < resultPostings.size() && counter < 10) {
+					//if (counter < resultPostings.size()) {
 						stream.print(CommonConstants.COMMA);
 					}
 					counter++;
@@ -821,6 +810,7 @@ public class SearchRunner {
 
 		double k1 = 2;// tuning parameter for document term frequency
 		double b = .75; // tuning parameter for document length
+		double k3 = 1.3; // tuning parameter for long queries
 		// compute the average document length
 		double lavg = calcAvgDocLength();
 
@@ -869,12 +859,18 @@ public class SearchRunner {
 							// compute the variant
 							double var = (k1 + 1) / tf
 									/ (k1 * ((1 - b) + b * (ld / lavg)) + tf);
+							
 							// TODO - change the below line
 							if (null == mergedPosting.getScore()) {
 								mergedPosting.setScore(0.0);
 							}
 							double score = mergedPosting.getScore()
 									+ (idf * var);
+							//compute the variant for long queries i.e queries with terms >=7
+							if(termSet.size()>=7){
+								double varQuery = ((k3+1)*tf)/(k3+tf);
+								score=score*varQuery;
+							}
 							mergedPosting.setScore(score);
 							break;
 						}
