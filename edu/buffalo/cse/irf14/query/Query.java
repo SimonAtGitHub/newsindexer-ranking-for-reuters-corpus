@@ -17,6 +17,10 @@ public class Query {
 
 	private String query = "";
 
+	private String userQuery;
+
+	private String defaultOperator;
+
 	/**
 	 * List of terms
 	 */
@@ -28,6 +32,8 @@ public class Query {
 	List<Query> subqueries;
 
 	public Query(String userQuery, String defaultOperator) {
+		this.userQuery = userQuery;
+		this.defaultOperator = defaultOperator;
 		query = formulateQuery(userQuery, defaultOperator);
 	}
 
@@ -53,6 +59,7 @@ public class Query {
 		Stack<String> operatorStack = new Stack<String>();
 		// Stack for Chained query terms
 		Stack<String> lookaheadStack = new Stack<String>();
+
 		boolean useDefault = true;
 		String defaultIndex = "Term:";
 		String index = defaultIndex;
@@ -78,7 +85,8 @@ public class Query {
 				lookahead = false;
 				if (!lookaheadStack.isEmpty())
 					transferChainedTermsToMainStack(defaultOperator,
-							queryTermStack, operatorStack, lookaheadStack);
+							queryTermStack, operatorStack, lookaheadStack,
+							false);
 			}
 			// Closing brace encountered, solve entire brace
 			else if (term.equals(")")) {
@@ -88,10 +96,11 @@ public class Query {
 				lookahead = false;
 				if (!lookaheadStack.isEmpty())
 					transferChainedTermsToMainStack(defaultOperator,
-							queryTermStack, operatorStack, lookaheadStack);
+							queryTermStack, operatorStack, lookaheadStack,
+							false);
 				while (!operatorStack.peek().equals("(")) {
 					queryTermStack.push(applyOp(operatorStack.pop(),
-							queryTermStack.pop(), queryTermStack.pop()));
+							queryTermStack.pop(), queryTermStack.pop(), false));
 				}
 				// Apply the brackets
 				queryTermStack.push("( " + queryTermStack.pop() + " )");
@@ -103,14 +112,15 @@ public class Query {
 					|| term.equals("NOT")) {
 				if (!lookaheadStack.isEmpty())
 					transferChainedTermsToMainStack(defaultOperator,
-							queryTermStack, operatorStack, lookaheadStack);
+							queryTermStack, operatorStack, lookaheadStack,
+							false);
 				// While top of "ops" has same or greater precedence to current
 				// token, which is an operator. Apply operator on top of "ops"
 				// to top two elements in values stack
 				while (!operatorStack.empty()
 						&& hasPrecedence(term, operatorStack.peek()))
 					queryTermStack.push(applyOp(operatorStack.pop(),
-							queryTermStack.pop(), queryTermStack.pop()));
+							queryTermStack.pop(), queryTermStack.pop(), false));
 
 				// Push current token to "ops".
 				operatorStack.push(String.valueOf(term));
@@ -149,24 +159,24 @@ public class Query {
 		if (!lookaheadStack.isEmpty()
 				|| (operatorStack.isEmpty() && !lookaheadStack.isEmpty())) {
 			transferChainedTermsToMainStack(defaultOperator, queryTermStack,
-					operatorStack, lookaheadStack);
+					operatorStack, lookaheadStack, false);
 		}
 		// Entire expression has been parsed at this point, apply remaining
 		// ops to remaining values
 		while (!operatorStack.empty() && queryTermStack.size() > 1)
 			queryTermStack.push(applyOp(operatorStack.pop(),
-					queryTermStack.pop(), queryTermStack.pop()));
+					queryTermStack.pop(), queryTermStack.pop(), false));
 
 		// If there are still some elements left on the main stack, concatenate
 		// with default operator
 		if (operatorStack.isEmpty() && queryTermStack.size() > 1) {
 			while (queryTermStack.size() > 1) {
 				queryTermStack.push(applyOp(defaultOperator,
-						queryTermStack.pop(), queryTermStack.pop()));
+						queryTermStack.pop(), queryTermStack.pop(), false));
 			}
 		}
-		if(queryTermStack.isEmpty()){
-			System.out.println("Query parsing error for "+userQuery);
+		if (queryTermStack.isEmpty()) {
+			System.out.println("Query parsing error for " + userQuery);
 		}
 		// Top of "values" contains result, return it
 		return queryTermStack.pop();
@@ -188,16 +198,19 @@ public class Query {
 
 	private void transferChainedTermsToMainStack(String defaultOperator,
 			Stack<String> queryTermStack, Stack<String> operatorStack,
-			Stack<String> lookaheadStack) {
+			Stack<String> lookaheadStack, boolean stringRepresentation) {
 		while (lookaheadStack.size() > 1) {
 			lookaheadStack.push(applyOp(defaultOperator, lookaheadStack.pop(),
-					lookaheadStack.pop()));
+					lookaheadStack.pop(), stringRepresentation));
 		}
 		// If operator stack is not empty. Enclose the chain in a
 		// bracket
 		if (!operatorStack.isEmpty()
 				&& operatorStack.peek().matches(QueryRegExp.OPERATOR)) {
-			lookaheadStack.push("( " + lookaheadStack.pop() + " )");
+			if (!stringRepresentation)
+				lookaheadStack.push("( " + lookaheadStack.pop() + " )");
+			else
+				lookaheadStack.push("[ " + lookaheadStack.pop() + " ]");
 		}
 		// Push this onto the main stack
 		queryTermStack.push(lookaheadStack.pop());
@@ -216,8 +229,13 @@ public class Query {
 
 	// A utility method to apply an operator "op" on operands "a"
 	// and "b". Return the result.
-	public static String applyOp(String operator, String right, String left) {
-		return left + " " + operator + " " + right;
+	public static String applyOp(String operator, String right, String left,
+			boolean stringRepresentation) {
+		if (stringRepresentation && operator.equalsIgnoreCase("NOT")) {
+			return left + " AND <" + right + ">";
+		} else {
+			return left + " " + operator + " " + right;
+		}
 	}
 
 	/**
@@ -236,22 +254,153 @@ public class Query {
 	 */
 	public String toString() {
 		// TODO: YOU MUST IMPLEMENT THIS
-		String queryString = query;
-		// Replace the first and last bracket by flower brackets if the string
-		// is not empty
-		if (!queryString.isEmpty() && queryString.length() > 1) {
-			// Replaces only first occurence
-			if (queryString.charAt(0) == '(') {
-				queryString = "{"
-						+ queryString.substring(1, queryString.length() - 1);
+		// For our convenience in handling the brackets
+		userQuery = userQuery.replaceAll("[(]", "( ");
+		userQuery = userQuery.replaceAll("[:][(]", ": (");
+		userQuery = userQuery.replaceAll("[)]", " )");
+		String[] queryStrArr = userQuery
+				.split(QueryRegExp.WHITESPACE_NOT_IN_QUOTES);
+		// Stack for queryTerms
+		Stack<String> queryTermStack = new Stack<String>();
+		// Stack for Operators and brackets
+		Stack<String> operatorStack = new Stack<String>();
+		// Stack for Chained query terms
+		Stack<String> lookaheadStack = new Stack<String>();
+
+		boolean useDefault = true;
+		String defaultIndex = "Term:";
+		String index = defaultIndex;
+		// A boolean flag to lookahead for consecutive terms to be merged with
+		// default operator
+		boolean lookahead = false;
+		for (int i = 0; i < queryStrArr.length; i++) {
+
+			String term = queryStrArr[i].trim();
+			if (term.isEmpty()) {
+				continue;
 			}
-			// Replace last occurence by }
-			if (queryString.charAt(queryString.length() - 1) == ')') {
-				queryString = queryString
-						.substring(0, queryString.length() - 1) + "}";
+			if (term.matches(QueryRegExp.INDEX)) {
+				index = getIndex(term);
+				useDefault = false;
+				continue;
+				// Change this flag when the first closing bracket is
+				// encountered
+			}
+			// Current token is an opening brace, push it to "ops"
+			else if (term.equals("(")) {
+				operatorStack.push(String.valueOf(term));
+				lookahead = false;
+				if (!lookaheadStack.isEmpty())
+					transferChainedTermsToMainStack(defaultOperator,
+							queryTermStack, operatorStack, lookaheadStack, true);
+			}
+			// Closing brace encountered, solve entire brace
+			else if (term.equals(")")) {
+				if (!useDefault) {
+					useDefault = true;
+				}
+				lookahead = false;
+				if (!lookaheadStack.isEmpty())
+					transferChainedTermsToMainStack(defaultOperator,
+							queryTermStack, operatorStack, lookaheadStack, true);
+				while (!operatorStack.peek().equals("(")) {
+					queryTermStack.push(applyOp(operatorStack.pop(),
+							queryTermStack.pop(), queryTermStack.pop(), true));
+				}
+				// Apply the brackets
+				queryTermStack.push("[ " + queryTermStack.pop() + " ]");
+				operatorStack.pop();
 			}
 
+			// Current token is an operator.
+			else if (term.equals("AND") || term.equals("OR")
+					|| term.equals("NOT")) {
+				if (!lookaheadStack.isEmpty())
+					transferChainedTermsToMainStack(defaultOperator,
+							queryTermStack, operatorStack, lookaheadStack, true);
+				// While top of "ops" has same or greater precedence to current
+				// token, which is an operator. Apply operator on top of "ops"
+				// to top two elements in values stack
+				while (!operatorStack.empty()
+						&& hasPrecedence(term, operatorStack.peek()))
+					queryTermStack.push(applyOp(operatorStack.pop(),
+							queryTermStack.pop(), queryTermStack.pop(), true));
+
+				// Push current token to "ops".
+				operatorStack.push(String.valueOf(term));
+				lookahead = false;
+			} else {
+				// // For a term prepend it with the index. If no index is
+				// // specified, default it to Term Index.Eg.Term:term
+				Pattern indexedTerm = Pattern
+						.compile(QueryRegExp.TERMS_WITH_INDEX);
+				if (!useDefault) {
+					term = index + term;
+				}
+				Matcher indexedTermMatcher = indexedTerm.matcher(term);
+				if (!indexedTermMatcher.matches()) {
+					term = defaultIndex + term;
+				}
+
+				// Check if lookahead is true. If yes, pop the item from
+				// queryItemStack and merge with default operator
+				if (lookahead) {
+					// queryTermStack.push(applyOp(defaultOperator, term,
+					// queryTermStack.pop()));
+					if (lookaheadStack.isEmpty()) {
+						lookaheadStack.push(queryTermStack.pop());
+					}
+					lookaheadStack.push(term);
+					// Keep looking ahead for more terms to merge
+					lookahead = true;
+				} else {
+					queryTermStack.push(term);
+					lookahead = true;
+				}
+			}
 		}
-		return queryString;
+		// First finalize the lookahead stack, shift everything to main stack
+		if (!lookaheadStack.isEmpty()
+				|| (operatorStack.isEmpty() && !lookaheadStack.isEmpty())) {
+			transferChainedTermsToMainStack(defaultOperator, queryTermStack,
+					operatorStack, lookaheadStack, true);
+		}
+		// Entire expression has been parsed at this point, apply remaining
+		// ops to remaining values
+		while (!operatorStack.empty() && queryTermStack.size() > 1)
+			queryTermStack.push(applyOp(operatorStack.pop(),
+					queryTermStack.pop(), queryTermStack.pop(), true));
+
+		// If there are still some elements left on the main stack, concatenate
+		// with default operator
+		if (operatorStack.isEmpty() && queryTermStack.size() > 1) {
+			while (queryTermStack.size() > 1) {
+				queryTermStack.push(applyOp(defaultOperator,
+						queryTermStack.pop(), queryTermStack.pop(), true));
+			}
+		}
+		if (queryTermStack.isEmpty()) {
+			System.out.println("Query parsing error for " + userQuery);
+		}
+		// Top of "values" contains result, return it
+		return "{ " + queryTermStack.pop() + " }";
+
+		// String queryString = query;
+		// if (!queryString.isEmpty() && queryString.length() > 1) {
+		// queryString = queryString.replaceAll("[(]", "[");
+		// queryString = queryString.replaceAll("[)]", "]");
+		// // Replace NOT term with AND <term> where NOT is not in the end
+		// queryString = queryString.replaceAll("(NOT)( )"
+		// + QueryRegExp.TERMS_RELUCTANT + "( ){1}(.*)", "AND " + "<"
+		// + "$3$4" + ">" + "$5");
+		// // Replace NOT term with AND <term> where NOT term is the final term
+		// queryString = queryString.replaceAll("(NOT)( )"
+		// + QueryRegExp.TERMS_NON_RELUCTANT, "AND " + "<" + "$3$4"
+		// + ">");
+		//
+		// }
+		//
+		// // Enclose the string in flower brackets
+		// queryString = "{ " + queryString + " }";
 	}
 }

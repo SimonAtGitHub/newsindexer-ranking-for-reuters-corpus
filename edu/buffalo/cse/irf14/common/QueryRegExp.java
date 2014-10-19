@@ -10,6 +10,9 @@ public class QueryRegExp {
 	public static final String INDEX = "([tT]erm:|[cC]ategory:|[aA]uthor:|[pP]lace:)";
 	// regular expression for various types of indices in a query
 	public static final String TERMS_WITH_INDEX = "([tT]erm:|[cC]ategory:|[aA]uthor:|[pP]lace:).+";
+	// regular expression for replacing NOT string terms
+	public static final String TERMS_RELUCTANT = "(Term:|Category:|Author:|Place:)(.+?)";
+	public static final String TERMS_NON_RELUCTANT = "(Term:|Category:|Author:|Place:)(.+)";
 	// regular expression for various operators in a query
 	public static final String OPERATOR = "AND|OR|NOT";
 
