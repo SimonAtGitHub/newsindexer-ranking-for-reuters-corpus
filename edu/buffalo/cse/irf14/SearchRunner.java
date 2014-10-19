@@ -712,18 +712,15 @@ public class SearchRunner {
 		// e.g. Term:Computer
 		for (String term : termSet) {
 
-			String analyzedTerm = getAnalyzedTerm(term); // analyzedTerm -
-															// comput
+			String analyzedTerm = getAnalyzedTerm(term); // analyzedTerm -comput
 			String termType = getRawIndexOfTheTerm(term); // termType - Term
 
 			// get the index type based on the raw string index type. Term: gets
 			// converted to IndexType TERM
 			IndexType indexType = CommonUtil.getTermIndexType(termType);
 
-			Map<String, Integer> dictionaryForIndexType = getDictionaryForIndexType(indexType); // Term
-																								// dictionary
-			Map<Integer, PostingWrapper> indexMap = getInvIndexForIndexType(indexType); // Term
-																						// Index
+			Map<String, Integer> dictionaryForIndexType = getDictionaryForIndexType(indexType); // Term dictionary
+			Map<Integer, PostingWrapper> indexMap = getInvIndexForIndexType(indexType); // Term Index
 
 			// get the postings list
 			PostingWrapper postingWrapper = getPostings(indexDir, analyzedTerm,
