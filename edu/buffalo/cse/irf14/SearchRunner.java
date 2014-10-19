@@ -253,8 +253,8 @@ public class SearchRunner {
 				if (finalPostings.size() > 0) {
 					// calculate the score based on the Scoring model of each document
 					//with respect to the query terms
-					calculateTfIdfScore(finalPostings);
-					//calculateOkapiScore(finalPostings);
+					//calculateTfIdfScore(finalPostings);
+					calculateOkapiScore(finalPostings);
 					termSet = new HashSet<String>();
 					numResults++;
 					QueryResult queryResult = new QueryResult();
@@ -405,8 +405,8 @@ public class SearchRunner {
 					// result into the value stack
 					while (!CommonConstants.FIRST_BRACKET_OPEN
 							.equals(operatorStack.peek())) {
-						firstPosting = valueStack.pop();
 						secondPosting = valueStack.pop();
+						firstPosting = valueStack.pop();
 						operator = operatorStack.pop();
 
 						if (operator.equals(CommonConstants.OPERATOR_AND)) {
