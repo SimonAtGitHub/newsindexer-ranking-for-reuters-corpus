@@ -253,8 +253,8 @@ public class SearchRunner {
 				if (finalPostings.size() > 0) {
 					// calculate the score based on the Scoring model of each document
 					//with respect to the query terms
-					calculateTfIdfScore(finalPostings);
-					//calculateOkapiScore(finalPostings);
+					//calculateTfIdfScore(finalPostings);
+					calculateOkapiScore(finalPostings);
 					termSet = new HashSet<String>();
 					numResults++;
 					QueryResult queryResult = new QueryResult();
@@ -282,9 +282,9 @@ public class SearchRunner {
 				int counter = 1;
 				for (Posting posting : resultPostings) {
 					// print only the first 10 ordered results
-					/*if (counter > 10) {
+					if (counter > 10) {
 						break;
-					}*/
+					}
 					DocMetaData docMetaData = docDictionary.get(posting
 							.getDocId());
 					String fileId = docMetaData.getFileName();
@@ -295,8 +295,8 @@ public class SearchRunner {
 					}
 					Double score = posting.getScore();
 					stream.print(fileId + CommonConstants.HASH + score);
-					//if (counter < resultPostings.size() && counter < 10) {
-					if (counter < resultPostings.size()) {
+					if (counter < resultPostings.size() && counter < 10) {
+					//if (counter < resultPostings.size()) {
 						stream.print(CommonConstants.COMMA);
 					}
 					counter++;
