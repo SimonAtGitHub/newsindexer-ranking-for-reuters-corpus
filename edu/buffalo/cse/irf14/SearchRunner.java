@@ -149,6 +149,8 @@ public class SearchRunner {
 		// calculate the score based on the Scoring model of each document
 		// with respect to the query terms
 		if (ScoringModel.TFIDF.equals(model)) {
+/*			List<Posting> tempList = new ArrayList<Posting>();
+			tempList.add(postings.get(0));*/
 			calculateTfIdfScore(postings);
 		} else if (ScoringModel.OKAPI.equals(model)) {
 			calculateOkapiScore(postings);
@@ -166,7 +168,10 @@ public class SearchRunner {
 		stream.println("===============================================================");
 		System.out.println("===============================================================");
 		int rank = 1;
-		Collections.sort(postings, new PostingScoreComparator());
+		if(postings.size()>0)
+		{
+		   Collections.sort(postings, new PostingScoreComparator());
+		}
 		Map<String, Integer> fileNameMap = new HashMap<String, Integer>();
 		for (Posting posting : postings) {
 			// handle duplicate files
@@ -276,11 +281,13 @@ public class SearchRunner {
 				 * map of fileIds to detect duplicates
 				 */
 				Map<String, Integer> fileIdMap = new HashMap<String, Integer>();
-				stream.print(queryResult.getQueryId() + CommonConstants.COLON
+				stream.print("\n"+queryResult.getQueryId() + CommonConstants.COLON
 						+ CommonConstants.WHITESPACE);
 				stream.print(CommonConstants.SECOND_BRACKET_OPEN);
 				List<Posting> resultPostings = queryResult.getResultPostings();
-				Collections.sort(resultPostings, new PostingScoreComparator());
+				if(resultPostings.size()>0){
+				     Collections.sort(resultPostings, new PostingScoreComparator());
+				}
 				int counter = 1;
 				for (Posting posting : resultPostings) {
 					// print only the first 10 ordered results
@@ -744,7 +751,8 @@ public class SearchRunner {
 				// get the postings list from the index
 				postingWrapper = (PostingWrapper) indexMap.get(termId);
 				List<Posting> termPostings = postingWrapper.getPostings();
-
+                int docFrequency = termPostings.size();
+				
 				// Should have avoided O(n2). But doing this in the interest of
 				// time.
 				for (Posting mergedPosting : mergedPostings) {
@@ -755,8 +763,7 @@ public class SearchRunner {
 							double tf = 1 + Math.log10(termfrequency);
 							// compute the idf
 							int N = docDictionary.size();
-							int docFrequency = postingWrapper
-									.getTotalFrequency();
+							//int docFrequency = postingWrapper.getTotalFrequency();
 							double idf = Math.log10(N / docFrequency);
 							// compute the tf-idf score
 							double tf_idf = tf * idf;
@@ -770,28 +777,29 @@ public class SearchRunner {
 						}
 					}
 				}
-
-				// apply the formatting of score and normalization
-
-				for (Posting posting : mergedPostings) {
-					DocMetaData docMetaData = docDictionary.get(posting
-							.getDocId());
-					if (posting.getScore() == null) {
-						posting.setScore(0.0);
-					}
-					double score = posting.getScore();
-					//System.out.println("Before normalizing Score is "+score);
-					score = (score * 100) / docMetaData.getLength();
-					//System.out.println("After normalizing Score is "+score);
-					// format the score
-					score = Double.parseDouble(decimalFormat.format(score));
-					if(score>1){
-						score = 1;
-					}
-					posting.setScore(score);
-					// docDictionary.get(posting.getDocId());
-				}
 			}
+		}
+		
+		
+		// apply the formatting of score and normalization
+
+		for (Posting posting : mergedPostings) {
+			DocMetaData docMetaData = docDictionary.get(posting
+					.getDocId());
+			if (posting.getScore() == null) {
+				posting.setScore(0.0);
+			}
+			double score = posting.getScore();
+			//System.out.println("Before normalizing Score is "+score);
+			score = (score * 100) / docMetaData.getLength();
+			//System.out.println("After normalizing Score is "+score);
+			// format the score
+			score = Double.parseDouble(decimalFormat.format(score));
+			if(score>1){
+				score = 1;
+			}
+			posting.setScore(score);
+			// docDictionary.get(posting.getDocId());
 		}
 		//System.out.println("\nScore calculated");
 	}
