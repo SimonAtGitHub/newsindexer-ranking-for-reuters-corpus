@@ -261,13 +261,13 @@ public class CommonUtil {
 		
 		IndexType indexType = null;
 		
-		if(termType.equals(CommonConstants.TYPE_TERM)){
+		if(termType.equalsIgnoreCase(CommonConstants.TYPE_TERM)){
 			indexType = IndexType.TERM;
-		}else if(termType.equals(CommonConstants.TYPE_CATEGORY)){
+		}else if(termType.equalsIgnoreCase(CommonConstants.TYPE_CATEGORY)){
 			indexType = IndexType.CATEGORY;
-		}else if(termType.equals(CommonConstants.TYPE_AUTHOR)){
+		}else if(termType.equalsIgnoreCase(CommonConstants.TYPE_AUTHOR)){
 			indexType = IndexType.AUTHOR;
-		}else if(termType.equals(CommonConstants.TYPE_PLACE)){
+		}else if(termType.equalsIgnoreCase(CommonConstants.TYPE_PLACE)){
 			indexType = IndexType.PLACE;
 		}
 		
@@ -308,22 +308,22 @@ public class CommonUtil {
 		
 		TermIndexDetails termIndexDetails = new TermIndexDetails();
 		
-		if(termType.equals(CommonConstants.TYPE_TERM)){
+		if(termType.equalsIgnoreCase(CommonConstants.TYPE_TERM)){
 			termIndexDetails.setIndexType(IndexType.TERM);
 			termIndexDetails.setDictionaryName(CommonConstants.TERM_DICTIONARY_FILENAME);
 			termIndexDetails.setIndexName(CommonConstants.TERM_INDEX_FILENAME);
 			termIndexDetails.setFieldName(FieldNames.CONTENT);
-		}else if(termType.equals(CommonConstants.TYPE_CATEGORY)){
+		}else if(termType.equalsIgnoreCase(CommonConstants.TYPE_CATEGORY)){
 			termIndexDetails.setIndexType(IndexType.CATEGORY);
 			termIndexDetails.setDictionaryName(CommonConstants.CATEGORY_DICTIONARY_FILENAME);
 			termIndexDetails.setIndexName(CommonConstants.CATEGORY_INDEX_FILENAME);
 			termIndexDetails.setFieldName(FieldNames.CATEGORY);
-		}else if(termType.equals(CommonConstants.TYPE_AUTHOR)){
+		}else if(termType.equalsIgnoreCase(CommonConstants.TYPE_AUTHOR)){
 			termIndexDetails.setIndexType(IndexType.AUTHOR);
 			termIndexDetails.setDictionaryName(CommonConstants.AUTHOR_DICTIONARY_FILENAME);
 			termIndexDetails.setIndexName(CommonConstants.AUTHOR_INDEX_FILENAME);
 			termIndexDetails.setFieldName(FieldNames.AUTHOR);
-		}else if(termType.equals(CommonConstants.TYPE_PLACE)){
+		}else if(termType.equalsIgnoreCase(CommonConstants.TYPE_PLACE)){
 			termIndexDetails.setIndexType(IndexType.PLACE);
 			termIndexDetails.setDictionaryName(CommonConstants.PLACE_DICTIONARY_FILENAME);
 			termIndexDetails.setIndexName(CommonConstants.PLACE_INDEX_FILENAME);

@@ -13,7 +13,12 @@ public class CapitalizationRule extends TokenFilter {
 	@Override
 	public void applyFilter() {
 		Token token = stream.getCurrent();
-		if (token != null) {
+		if(token != null){
+			String termText = token.getTermText();
+			termText = termText.toLowerCase();
+			token.setTermText(termText);
+		}
+		/*if (token != null) {
 			// get the current token
 			String termText = token.getTermText();
 			// Don't apply if starts with digit
@@ -165,6 +170,6 @@ public class CapitalizationRule extends TokenFilter {
 					token.setTermText(termText);
 				}
 			}
-		}
+		}*/
 	}
 }

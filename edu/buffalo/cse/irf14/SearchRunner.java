@@ -150,9 +150,9 @@ public class SearchRunner {
 		// calculate the score based on the Scoring model of each document
 		// with respect to the query terms
 		if (ScoringModel.TFIDF.equals(model)) {
-			calculateTfIdfScore(postings, model);
+			calculateTfIdfScore(postings);
 		} else if (ScoringModel.OKAPI.equals(model)) {
-			calculateOkapiScore(postings, model);
+			calculateOkapiScore(postings);
 		}
 		termSet = new HashSet<String>();
 
@@ -161,6 +161,7 @@ public class SearchRunner {
 		long endtime = System.currentTimeMillis();
 		stream.println("Query: " + userQuery);
 		stream.println("Query time: " + ((endtime - startime)));
+		stream.println("===============================================================");
 		int rank = 1;
 		Collections.sort(postings, new PostingScoreComparator());
 		Map<String, Integer> fileNameMap = new HashMap<String, Integer>();
@@ -205,8 +206,6 @@ public class SearchRunner {
 			List<QueryResult> queryResults = new ArrayList<QueryResult>();
 			// line buffer to read a line once at a time
 			String line;
-			String queryId;
-			String query = "";
 			String strArr[] = null;
 			List<Posting> finalPostings = new ArrayList<Posting>();
 			int numResults = 0;
@@ -219,11 +218,15 @@ public class SearchRunner {
 					numQueries = Integer.parseInt(strArr[1]);
 				} catch (Exception e) {
 					System.out.println("Invalid query format");
+					return;
 				}
 			}
 			while ((line = reader.readLine()) != null) {
+				String queryId;
+				String query = "";
 				strArr = line.split(CommonConstants.COLON);
 				queryId = strArr[0];
+				System.out.println("\nEvaluating query for "+queryId);
 				// merge the query parts that got splitted
 				for (int i = 1; i < strArr.length; i++) {
 					query = query + strArr[i] + CommonConstants.COLON;
@@ -239,11 +242,13 @@ public class SearchRunner {
 						CommonConstants.OPERATOR_OR);
 				String parsedQuery = queryObj.getQuery();
 				finalPostings = executeQuery(parsedQuery);
+				if(finalPostings==null){
+					finalPostings = new ArrayList<Posting>();
+				}
 				if (finalPostings.size() > 0) {
-					// calculate the score based on the Scoring model of each
-					// document
-					// with respect to the query terms
-					calculateOkapiScore(finalPostings, ScoringModel.OKAPI);
+					// calculate the score based on the Scoring model of each document
+					//with respect to the query terms
+					calculateTfIdfScore(finalPostings);
 					termSet = new HashSet<String>();
 					numResults++;
 					QueryResult queryResult = new QueryResult();
@@ -251,7 +256,7 @@ public class SearchRunner {
 					queryResult.setResultPostings(finalPostings);
 					queryResults.add(queryResult);
 				}
-				System.out.println(finalPostings);
+				//System.out.println(finalPostings);
 			}
 			// Print the result to a file
 			stream.println("numResults=" + numResults);
@@ -282,7 +287,8 @@ public class SearchRunner {
 					}
 					Double score = posting.getScore();
 					stream.print(fileId + CommonConstants.HASH + score);
-					if (counter < resultPostings.size() && counter < 10) {
+					//if (counter < resultPostings.size() && counter < 10) {
+					if (counter < resultPostings.size()) {
 						stream.print(CommonConstants.COMMA);
 					}
 					counter++;
@@ -499,10 +505,14 @@ public class SearchRunner {
 			List<Posting> secondPostings) {
 
 		List<Posting> outputPostings = new ArrayList<Posting>();
-		outputPostings.addAll(firstPostings);
-		for (Posting posting : secondPostings) {
-			if (!outputPostings.contains(posting)) {
-				outputPostings.add(posting);
+		if(null!=firstPostings){
+		   outputPostings.addAll(firstPostings);
+		}
+		if(secondPostings!=null){
+			for (Posting posting : secondPostings) {
+				if (!outputPostings.contains(posting)) {
+					outputPostings.add(posting);
+				}
 			}
 		}
 		Collections.sort(outputPostings, new DocumentIdComparator());
@@ -697,8 +707,7 @@ public class SearchRunner {
 	 * @param model
 	 *            - Scoring Model used
 	 */
-	private void calculateTfIdfScore(List<Posting> mergedPostings,
-			ScoringModel model) {
+	private void calculateTfIdfScore(List<Posting> mergedPostings) {
 
 		// e.g. Term:Computer
 		for (String term : termSet) {
@@ -762,15 +771,20 @@ public class SearchRunner {
 						posting.setScore(0.0);
 					}
 					double score = posting.getScore();
+					//System.out.println("Before normalizing Score is "+score);
 					score = (score * 100) / docMetaData.getLength();
+					//System.out.println("After normalizing Score is "+score);
 					// format the score
 					score = Double.parseDouble(decimalFormat.format(score));
+					if(score>1){
+						score = 1;
+					}
 					posting.setScore(score);
 					// docDictionary.get(posting.getDocId());
 				}
 			}
 		}
-		// System.out.println("\nScore calculated");
+		System.out.println("\nScore calculated");
 	}
 
 	/**
@@ -783,8 +797,7 @@ public class SearchRunner {
 	 * @param model
 	 *            - Scoring Model used
 	 */
-	private void calculateOkapiScore(List<Posting> mergedPostings,
-			ScoringModel model) {
+	private void calculateOkapiScore(List<Posting> mergedPostings) {
 
 		double k1 = 1.2;// tuning parameter for document term frequency
 		double b = .75; // tuning parameter for document length
@@ -857,6 +870,9 @@ public class SearchRunner {
 					score = score / 10;
 					// format the score
 					score = Double.parseDouble(decimalFormat.format(score));
+					if(score>1){
+						score = 1;
+					}
 					posting.setScore(score);
 				}
 

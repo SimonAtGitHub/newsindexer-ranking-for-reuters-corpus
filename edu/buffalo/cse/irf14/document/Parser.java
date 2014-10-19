@@ -88,7 +88,7 @@ public class Parser {
 						// combine.
 						content = content + " " + line;
 						if(snippetLineCnt<3){
-							snippet = snippet +" "+line;
+							snippet = snippet +"\n"+line;
 							snippetLineCnt++;
 						}
 					}

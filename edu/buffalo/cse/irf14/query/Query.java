@@ -94,7 +94,7 @@ public class Query {
 							queryTermStack.pop(), queryTermStack.pop()));
 				}
 				// Apply the brackets
-				queryTermStack.push("(" + queryTermStack.pop() + ")");
+				queryTermStack.push("( " + queryTermStack.pop() + " )");
 				operatorStack.pop();
 			}
 
@@ -165,6 +165,9 @@ public class Query {
 						queryTermStack.pop(), queryTermStack.pop()));
 			}
 		}
+		if(queryTermStack.isEmpty()){
+			System.out.println("Query parsing error for "+userQuery);
+		}
 		// Top of "values" contains result, return it
 		return queryTermStack.pop();
 
@@ -194,7 +197,7 @@ public class Query {
 		// bracket
 		if (!operatorStack.isEmpty()
 				&& operatorStack.peek().matches(QueryRegExp.OPERATOR)) {
-			lookaheadStack.push("(" + lookaheadStack.pop() + ")");
+			lookaheadStack.push("( " + lookaheadStack.pop() + " )");
 		}
 		// Push this onto the main stack
 		queryTermStack.push(lookaheadStack.pop());
