@@ -74,6 +74,8 @@ public class Parser {
 						fetchAndSetAuthorDetails(document, line.trim());
 						hasAuthor = true;
 					} else if (!hasPlaceDate) {
+						snippet = "\n"+line;
+						snippetLineCnt++;
 						String placeDateContent[] = line.split("-");
 						if (placeDateContent != null
 								&& placeDateContent.length > 1) {
