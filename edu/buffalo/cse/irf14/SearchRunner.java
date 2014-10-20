@@ -794,7 +794,7 @@ public class SearchRunner {
 			}
 		}
 
-		for (Posting posting : mergedPostings) {
+		/*for (Posting posting : mergedPostings) {
 			DocMetaData docMetaData = docDictionary.get(posting.getDocId());
 			if (posting.getScore() == null) {
 				posting.setScore(0.0);
@@ -802,7 +802,7 @@ public class SearchRunner {
 			double score = posting.getScore();
 			score = score / docMetaData.getLength();
 			posting.setScore(score);
-		}
+		}*/
 		//Find the maximum score
 		Double maxScore=CommonUtil.findMaxScore(mergedPostings);
 		//normalization on the basis of highest score
