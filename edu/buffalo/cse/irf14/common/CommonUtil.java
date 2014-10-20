@@ -332,6 +332,22 @@ public class CommonUtil {
 		return termIndexDetails;
    }
 
+   /**
+    * Find the maximum score in the postings list
+    * @param postings
+    * @return
+    */
+   public static Double findMaxScore(List<Posting> postings){
+	   Double max=0.0;
+	   if(postings!=null){
+		   for(Posting posting:postings){
+			   Double score = posting.getScore();
+			   if(score>max)
+				   max = score;
+		   }
+	   }
+	   return max;
+   }
  
 
 

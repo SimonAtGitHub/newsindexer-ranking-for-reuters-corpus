@@ -18,7 +18,7 @@ public class FilterChains {
 			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,
 			TokenFilterType.SPECIALCHARS, TokenFilterType.DATE,
 			TokenFilterType.NUMERIC, TokenFilterType.CAPITALIZATION,
-			TokenFilterType.STOPWORD, TokenFilterType.STEMMER };
+			TokenFilterType.STOPWORD };
 
 	public static final TokenFilterType[] FILTERS_FOR_NEWSDATE = { TokenFilterType.DATE };
 
@@ -30,7 +30,7 @@ public class FilterChains {
 			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,
 			TokenFilterType.SPECIALCHARS, TokenFilterType.DATE,
 			TokenFilterType.NUMERIC, TokenFilterType.CAPITALIZATION,
-			TokenFilterType.STOPWORD, TokenFilterType.STEMMER };
+			TokenFilterType.STOPWORD };
 
 	public static final TokenFilterType[] FILTERS_FOR_AUTHOR = {
 			TokenFilterType.ACCENT, TokenFilterType.SYMBOL,

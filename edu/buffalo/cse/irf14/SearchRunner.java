@@ -265,8 +265,11 @@ public class SearchRunner {
 					// calculate the score based on the Scoring model of each
 					// document
 					// with respect to the query terms
-					calculateTfIdfScore(finalPostings);
-					// calculateOkapiScore(finalPostings);
+					if(termSet.size()<=6){
+					   calculateTfIdfScore(finalPostings);
+					}else{
+						calculateOkapiScore(finalPostings);
+					}
 					termSet = new HashSet<String>();
 					numResults++;
 					QueryResult queryResult = new QueryResult();
@@ -791,26 +794,25 @@ public class SearchRunner {
 			}
 		}
 
-		// apply the formatting of score and normalization
-
 		for (Posting posting : mergedPostings) {
 			DocMetaData docMetaData = docDictionary.get(posting.getDocId());
 			if (posting.getScore() == null) {
 				posting.setScore(0.0);
 			}
 			double score = posting.getScore();
-			// System.out.println("Before normalizing Score is "+score);
-			score = (score * 100) / docMetaData.getLength();
-			// System.out.println("After normalizing Score is "+score);
-			// format the score
-			score = Double.parseDouble(decimalFormat.format(score));
-			if (score > 1) {
-				score = 1;
-			}
+			score = score / docMetaData.getLength();
 			posting.setScore(score);
-			// docDictionary.get(posting.getDocId());
 		}
-		// System.out.println("\nScore calculated");
+		//Find the maximum score
+		Double maxScore=CommonUtil.findMaxScore(mergedPostings);
+		//normalization on the basis of highest score
+		for (Posting posting : mergedPostings){
+			double score = posting.getScore();
+			score = score / maxScore;
+			// format the score
+	        score = Double.parseDouble(decimalFormat.format(score));
+			posting.setScore(score);
+		}
 	}
 
 	/**
@@ -899,6 +901,10 @@ public class SearchRunner {
 
 			}
 		}
+		
+		//Find the maximum score
+		Double maxScore=CommonUtil.findMaxScore(mergedPostings);
+
 		// apply the formatting of score and normalization
 
 		for (Posting posting : mergedPostings) {
@@ -906,12 +912,9 @@ public class SearchRunner {
 				posting.setScore(0.0);
 			}
 			double score = posting.getScore();
-			score = score / 10;
+			score = score / maxScore;
 			// format the score
 			score = Double.parseDouble(decimalFormat.format(score));
-			if (score > 1) {
-				score = 1;
-			}
 			posting.setScore(score);
 		}
 		// System.out.println("\nScore calculated");
