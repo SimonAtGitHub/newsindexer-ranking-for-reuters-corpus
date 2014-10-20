@@ -142,10 +142,16 @@ public class SearchRunner {
 	public void query(String userQuery, ScoringModel model) {
 		// TODO: IMPLEMENT THIS METHOD
 		// call queryParser to parse the query
+		String parsedQuery = null;
 		try {
 			Query query = QueryParser.parse(userQuery,
 					CommonConstants.OPERATOR_OR);
-			String parsedQuery = query.getQuery();
+			parsedQuery = query.getQuery();
+		} catch (QueryParserException e) {
+			throw new QueryParserException();
+		}
+		try {
+
 			// execute the query
 			long startime = System.currentTimeMillis();
 			List<Posting> postings = executeQuery(parsedQuery);
@@ -169,35 +175,37 @@ public class SearchRunner {
 			stream.println("Query time: " + ((endtime - startime)) + " ms");
 			stream.println("===============================================================");
 			int rank = 1;
-			if (postings.size() > 0) {
+			if (postings != null && postings.size() > 0) {
 				Collections.sort(postings, new PostingScoreComparator());
 			}
 			Map<String, Integer> fileNameMap = new HashMap<String, Integer>();
 			int counter = 1;
-			for (Posting posting : postings) {
-				if(counter>10){
-					break;
+			if (postings != null) {
+				for (Posting posting : postings) {
+					if (counter > 10) {
+						break;
+					}
+					// handle duplicate files
+					String fileName = docDictionary.get(posting.getDocId())
+							.getFileName();
+					if (fileNameMap.containsKey(fileName)) {
+						continue;
+					} else {
+						fileNameMap.put(fileName, posting.getDocId());
+					}
+					stream.println("Result Rank: " + rank);
+					stream.println("Result Title: " + fileName);
+					stream.println("Result Snippet: "
+							+ docDictionary.get(posting.getDocId())
+									.getResultSnippet() + "...");
+					stream.println("Result Relevancy: " + posting.getScore());
+					rank++;
+					counter++;
+					stream.println("===============================================================");
 				}
-				// handle duplicate files
-				String fileName = docDictionary.get(posting.getDocId())
-						.getFileName();
-				if (fileNameMap.containsKey(fileName)) {
-					continue;
-				} else {
-					fileNameMap.put(fileName, posting.getDocId());
-				}
-				stream.println("Result Rank: " + rank);
-				stream.println("Result Title: " + fileName);
-				stream.println("Result Snippet: "
-						+ docDictionary.get(posting.getDocId())
-								.getResultSnippet() + "...");
-				stream.println("Result Relevancy: " + posting.getScore());
-				rank++;
-				counter++;
-				stream.println("===============================================================");
 			}
 		} catch (Exception e) {
-			throw new QueryParserException();
+			// e.printStackTrace();
 		}
 	}
 
@@ -265,9 +273,9 @@ public class SearchRunner {
 					// calculate the score based on the Scoring model of each
 					// document
 					// with respect to the query terms
-					if(termSet.size()<=6){
-					   calculateTfIdfScore(finalPostings);
-					}else{
+					if (termSet.size() <= 6) {
+						calculateTfIdfScore(finalPostings);
+					} else {
 						calculateOkapiScore(finalPostings);
 					}
 					termSet = new HashSet<String>();
@@ -291,31 +299,33 @@ public class SearchRunner {
 						+ CommonConstants.COLON + CommonConstants.WHITESPACE);
 				stream.print(CommonConstants.SECOND_BRACKET_OPEN);
 				List<Posting> resultPostings = queryResult.getResultPostings();
-				if (resultPostings.size() > 0) {
+				if (resultPostings != null && resultPostings.size() > 0) {
 					Collections.sort(resultPostings,
 							new PostingScoreComparator());
 				}
 				int counter = 1;
-				for (Posting posting : resultPostings) {
-					// print only the first 10 ordered results
-					if (counter > 10) { 
-						break; 
+				if (resultPostings != null) {
+					for (Posting posting : resultPostings) {
+						// print only the first 10 ordered results
+						if (counter > 10) {
+							break;
+						}
+						DocMetaData docMetaData = docDictionary.get(posting
+								.getDocId());
+						String fileId = docMetaData.getFileName();
+						if (fileIdMap.containsKey(fileId)) {
+							continue;
+						} else {
+							fileIdMap.put(fileId, posting.getDocId());
+						}
+						Double score = posting.getScore();
+						stream.print(fileId + CommonConstants.HASH + score);
+						if (counter < resultPostings.size() && counter < 10) {
+							// if (counter < resultPostings.size()) {
+							stream.print(CommonConstants.COMMA);
+						}
+						counter++;
 					}
-					DocMetaData docMetaData = docDictionary.get(posting
-							.getDocId());
-					String fileId = docMetaData.getFileName();
-					if (fileIdMap.containsKey(fileId)) {
-						continue;
-					} else {
-						fileIdMap.put(fileId, posting.getDocId());
-					}
-					Double score = posting.getScore();
-					stream.print(fileId + CommonConstants.HASH + score);
-					if (counter < resultPostings.size() && counter < 10) {
-					//if (counter < resultPostings.size()) {
-						stream.print(CommonConstants.COMMA);
-					}
-					counter++;
 				}
 				stream.println(CommonConstants.SECOND_BRACKET_CLOSE);
 			}
@@ -765,53 +775,55 @@ public class SearchRunner {
 				postingWrapper = (PostingWrapper) indexMap.get(termId);
 				List<Posting> termPostings = postingWrapper.getPostings();
 				int docFrequency = termPostings.size();
-
-				// Should have avoided O(n2). But doing this in the interest of
-				// time.
-				for (Posting mergedPosting : mergedPostings) {
-					for (Posting termPosting : termPostings) {
-						if (mergedPosting.equals(termPosting)) {
-							// compute the tf
-							int termfrequency = termPosting.getFrequency();
-							double tf = 1 + Math.log10(termfrequency);
-							// compute the idf
-							int N = docDictionary.size();
-							// int docFrequency =
-							// postingWrapper.getTotalFrequency();
-							double idf = Math.log10(N / docFrequency);
-							// compute the tf-idf score
-							double tf_idf = tf * idf;
-							// TODO - change the below line
-							if (null == mergedPosting.getScore()) {
-								mergedPosting.setScore(0.0);
+				if (mergedPostings != null) {
+					// Should have avoided O(n2). But doing this in the interest
+					// of
+					// time.
+					for (Posting mergedPosting : mergedPostings) {
+						for (Posting termPosting : termPostings) {
+							if (mergedPosting.equals(termPosting)) {
+								// compute the tf
+								int termfrequency = termPosting.getFrequency();
+								double tf = 1 + Math.log10(termfrequency);
+								// compute the idf
+								int N = docDictionary.size();
+								// int docFrequency =
+								// postingWrapper.getTotalFrequency();
+								double idf = Math.log10(N / docFrequency);
+								// compute the tf-idf score
+								double tf_idf = tf * idf;
+								// TODO - change the below line
+								if (null == mergedPosting.getScore()) {
+									mergedPosting.setScore(0.0);
+								}
+								double score = mergedPosting.getScore()
+										+ tf_idf;
+								mergedPosting.setScore(score);
+								break;
 							}
-							double score = mergedPosting.getScore() + tf_idf;
-							mergedPosting.setScore(score);
-							break;
 						}
 					}
 				}
 			}
 		}
 
-		/*for (Posting posting : mergedPostings) {
-			DocMetaData docMetaData = docDictionary.get(posting.getDocId());
-			if (posting.getScore() == null) {
-				posting.setScore(0.0);
+		/*
+		 * for (Posting posting : mergedPostings) { DocMetaData docMetaData =
+		 * docDictionary.get(posting.getDocId()); if (posting.getScore() ==
+		 * null) { posting.setScore(0.0); } double score = posting.getScore();
+		 * score = score / docMetaData.getLength(); posting.setScore(score); }
+		 */
+		// Find the maximum score
+		Double maxScore = CommonUtil.findMaxScore(mergedPostings);
+		if (mergedPostings != null) {
+			// normalization on the basis of highest score
+			for (Posting posting : mergedPostings) {
+				double score = posting.getScore();
+				score = score / maxScore;
+				// format the score
+				score = Double.parseDouble(decimalFormat.format(score));
+				posting.setScore(score);
 			}
-			double score = posting.getScore();
-			score = score / docMetaData.getLength();
-			posting.setScore(score);
-		}*/
-		//Find the maximum score
-		Double maxScore=CommonUtil.findMaxScore(mergedPostings);
-		//normalization on the basis of highest score
-		for (Posting posting : mergedPostings){
-			double score = posting.getScore();
-			score = score / maxScore;
-			// format the score
-	        score = Double.parseDouble(decimalFormat.format(score));
-			posting.setScore(score);
 		}
 	}
 
@@ -860,64 +872,68 @@ public class SearchRunner {
 				postingWrapper = (PostingWrapper) indexMap.get(termId);
 				List<Posting> termPostings = postingWrapper.getPostings();
 				int docFrequency = termPostings.size();
+				if (mergedPostings != null) {
+					// Should have avoided O(n2). But doing this in the interest
+					// of
+					// time.
+					for (Posting mergedPosting : mergedPostings) {
+						for (Posting termPosting : termPostings) {
+							if (mergedPosting.equals(termPosting)) {
+								// compute the tf
+								int tf = termPosting.getFrequency();
+								// compute the idf
+								int N = docDictionary.size();
+								/*
+								 * int docFrequency = postingWrapper
+								 * .getTotalFrequency();
+								 */
+								double idf = Math.log10(N / docFrequency);
+								long ld = docDictionary.get(
+										mergedPosting.getDocId()).getLength();
+								// compute the variant
+								double var = (k1 + 1)
+										/ tf
+										/ (k1 * ((1 - b) + b * (ld / lavg)) + tf);
 
-				// Should have avoided O(n2). But doing this in the interest of
-				// time.
-				for (Posting mergedPosting : mergedPostings) {
-					for (Posting termPosting : termPostings) {
-						if (mergedPosting.equals(termPosting)) {
-							// compute the tf
-							int tf = termPosting.getFrequency();
-							// compute the idf
-							int N = docDictionary.size();
-							/*
-							 * int docFrequency = postingWrapper
-							 * .getTotalFrequency();
-							 */
-							double idf = Math.log10(N / docFrequency);
-							long ld = docDictionary.get(
-									mergedPosting.getDocId()).getLength();
-							// compute the variant
-							double var = (k1 + 1) / tf
-									/ (k1 * ((1 - b) + b * (ld / lavg)) + tf);
-
-							// TODO - change the below line
-							if (null == mergedPosting.getScore()) {
-								mergedPosting.setScore(0.0);
+								// TODO - change the below line
+								if (null == mergedPosting.getScore()) {
+									mergedPosting.setScore(0.0);
+								}
+								double score = mergedPosting.getScore()
+										+ (idf * var);
+								// compute the variant for long queries i.e
+								// queries
+								// with terms >=7
+								if (termSet.size() >= 7) {
+									double varQuery = ((k3 + 1) * tf)
+											/ (k3 + tf);
+									score = score * varQuery;
+								}
+								mergedPosting.setScore(score);
+								break;
 							}
-							double score = mergedPosting.getScore()
-									+ (idf * var);
-							// compute the variant for long queries i.e queries
-							// with terms >=7
-							if (termSet.size() >= 7) {
-								double varQuery = ((k3 + 1) * tf) / (k3 + tf);
-								score = score * varQuery;
-							}
-							mergedPosting.setScore(score);
-							break;
 						}
 					}
 				}
-
 			}
 		}
-		
-		//Find the maximum score
-		Double maxScore=CommonUtil.findMaxScore(mergedPostings);
+
+		// Find the maximum score
+		Double maxScore = CommonUtil.findMaxScore(mergedPostings);
 
 		// apply the formatting of score and normalization
-
-		for (Posting posting : mergedPostings) {
-			if (posting.getScore() == null) {
-				posting.setScore(0.0);
+		if (mergedPostings != null) {
+			for (Posting posting : mergedPostings) {
+				if (posting.getScore() == null) {
+					posting.setScore(0.0);
+				}
+				double score = posting.getScore();
+				score = score / maxScore;
+				// format the score
+				score = Double.parseDouble(decimalFormat.format(score));
+				posting.setScore(score);
 			}
-			double score = posting.getScore();
-			score = score / maxScore;
-			// format the score
-			score = Double.parseDouble(decimalFormat.format(score));
-			posting.setScore(score);
-		}
-		// System.out.println("\nScore calculated");
+		}// System.out.println("\nScore calculated");
 	}
 
 	/**
