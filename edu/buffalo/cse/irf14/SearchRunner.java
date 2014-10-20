@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,6 +36,7 @@ import edu.buffalo.cse.irf14.index.PostingScoreComparator;
 import edu.buffalo.cse.irf14.index.PostingWrapper;
 import edu.buffalo.cse.irf14.query.Query;
 import edu.buffalo.cse.irf14.query.QueryParser;
+import edu.buffalo.cse.irf14.query.QueryParserException;
 
 /**
  * Main class to run the searcher. As before implement all TODO methods unless
@@ -142,51 +142,57 @@ public class SearchRunner {
 	public void query(String userQuery, ScoringModel model) {
 		// TODO: IMPLEMENT THIS METHOD
 		// call queryParser to parse the query
-		Query query = QueryParser.parse(userQuery, CommonConstants.OPERATOR_OR);
-		String parsedQuery = query.getQuery();
-		// execute the query
-		long startime = System.currentTimeMillis();
-		List<Posting> postings = executeQuery(parsedQuery);
-		// calculate the score based on the Scoring model of each document
-		// with respect to the query terms
-		if (ScoringModel.TFIDF.equals(model)) {
-/*			List<Posting> tempList = new ArrayList<Posting>();
-			tempList.add(postings.get(0));*/
-			calculateTfIdfScore(postings);
-		} else if (ScoringModel.OKAPI.equals(model)) {
-			calculateOkapiScore(postings);
-		}
-		termSet = new HashSet<String>();
-
-		// print the execution details
-		stream.println("===============================================================");
-		long endtime = System.currentTimeMillis();
-		stream.println("Query: " + userQuery);
-		stream.println("Query time: " + ((endtime - startime))+" ms");
-		stream.println("===============================================================");
-		int rank = 1;
-		if(postings.size()>0)
-		{
-		   Collections.sort(postings, new PostingScoreComparator());
-		}
-		Map<String, Integer> fileNameMap = new HashMap<String, Integer>();
-		for (Posting posting : postings) {
-			// handle duplicate files
-			String fileName = docDictionary.get(posting.getDocId())
-					.getFileName();
-			if (fileNameMap.containsKey(fileName)) {
-				continue;
-			} else {
-				fileNameMap.put(fileName, posting.getDocId());
+		try {
+			Query query = QueryParser.parse(userQuery,
+					CommonConstants.OPERATOR_OR);
+			String parsedQuery = query.getQuery();
+			// execute the query
+			long startime = System.currentTimeMillis();
+			List<Posting> postings = executeQuery(parsedQuery);
+			// calculate the score based on the Scoring model of each document
+			// with respect to the query terms
+			if (ScoringModel.TFIDF.equals(model)) {
+				/*
+				 * List<Posting> tempList = new ArrayList<Posting>();
+				 * tempList.add(postings.get(0));
+				 */
+				calculateTfIdfScore(postings);
+			} else if (ScoringModel.OKAPI.equals(model)) {
+				calculateOkapiScore(postings);
 			}
-			stream.println("Result Rank: " + rank);
-			stream.println("Result Title: " + fileName);
-			stream.println("Result Snippet: "
-					+ docDictionary.get(posting.getDocId()).getResultSnippet()
-					+ "...");
-			stream.println("Result Relevancy: " + posting.getScore());
-			rank++;
+			termSet = new HashSet<String>();
+
+			// print the execution details
 			stream.println("===============================================================");
+			long endtime = System.currentTimeMillis();
+			stream.println("Query: " + userQuery);
+			stream.println("Query time: " + ((endtime - startime)) + " ms");
+			stream.println("===============================================================");
+			int rank = 1;
+			if (postings.size() > 0) {
+				Collections.sort(postings, new PostingScoreComparator());
+			}
+			Map<String, Integer> fileNameMap = new HashMap<String, Integer>();
+			for (Posting posting : postings) {
+				// handle duplicate files
+				String fileName = docDictionary.get(posting.getDocId())
+						.getFileName();
+				if (fileNameMap.containsKey(fileName)) {
+					continue;
+				} else {
+					fileNameMap.put(fileName, posting.getDocId());
+				}
+				stream.println("Result Rank: " + rank);
+				stream.println("Result Title: " + fileName);
+				stream.println("Result Snippet: "
+						+ docDictionary.get(posting.getDocId())
+								.getResultSnippet() + "...");
+				stream.println("Result Relevancy: " + posting.getScore());
+				rank++;
+				stream.println("===============================================================");
+			}
+		} catch (Exception e) {
+			throw new QueryParserException();
 		}
 	}
 
@@ -231,7 +237,7 @@ public class SearchRunner {
 				String query = "";
 				strArr = line.split(CommonConstants.COLON);
 				queryId = strArr[0];
-				//System.out.println("\nEvaluating query for "+queryId);
+				// System.out.println("\nEvaluating query for "+queryId);
 				// merge the query parts that got splitted
 				for (int i = 1; i < strArr.length; i++) {
 					query = query + strArr[i] + CommonConstants.COLON;
@@ -247,14 +253,15 @@ public class SearchRunner {
 						CommonConstants.OPERATOR_OR);
 				String parsedQuery = queryObj.getQuery();
 				finalPostings = executeQuery(parsedQuery);
-				if(finalPostings==null){
+				if (finalPostings == null) {
 					finalPostings = new ArrayList<Posting>();
 				}
 				if (finalPostings.size() > 0) {
-					// calculate the score based on the Scoring model of each document
-					//with respect to the query terms
+					// calculate the score based on the Scoring model of each
+					// document
+					// with respect to the query terms
 					calculateTfIdfScore(finalPostings);
-					//calculateOkapiScore(finalPostings);
+					// calculateOkapiScore(finalPostings);
 					termSet = new HashSet<String>();
 					numResults++;
 					QueryResult queryResult = new QueryResult();
@@ -262,7 +269,7 @@ public class SearchRunner {
 					queryResult.setResultPostings(finalPostings);
 					queryResults.add(queryResult);
 				}
-				//System.out.println(finalPostings);
+				// System.out.println(finalPostings);
 			}
 			// Print the result to a file
 			stream.println("numResults=" + numResults);
@@ -272,19 +279,20 @@ public class SearchRunner {
 				 * map of fileIds to detect duplicates
 				 */
 				Map<String, Integer> fileIdMap = new HashMap<String, Integer>();
-				stream.print("\n"+queryResult.getQueryId() + CommonConstants.COLON
-						+ CommonConstants.WHITESPACE);
+				stream.print("\n" + queryResult.getQueryId()
+						+ CommonConstants.COLON + CommonConstants.WHITESPACE);
 				stream.print(CommonConstants.SECOND_BRACKET_OPEN);
 				List<Posting> resultPostings = queryResult.getResultPostings();
-				if(resultPostings.size()>0){
-				     Collections.sort(resultPostings, new PostingScoreComparator());
+				if (resultPostings.size() > 0) {
+					Collections.sort(resultPostings,
+							new PostingScoreComparator());
 				}
 				int counter = 1;
 				for (Posting posting : resultPostings) {
 					// print only the first 10 ordered results
-					/*if (counter > 10) {
-						break;
-					}*/
+					/*
+					 * if (counter > 10) { break; }
+					 */
 					DocMetaData docMetaData = docDictionary.get(posting
 							.getDocId());
 					String fileId = docMetaData.getFileName();
@@ -295,7 +303,7 @@ public class SearchRunner {
 					}
 					Double score = posting.getScore();
 					stream.print(fileId + CommonConstants.HASH + score);
-					//if (counter < resultPostings.size() && counter < 10) {
+					// if (counter < resultPostings.size() && counter < 10) {
 					if (counter < resultPostings.size()) {
 						stream.print(CommonConstants.COMMA);
 					}
@@ -310,6 +318,8 @@ public class SearchRunner {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (Exception e) {
+			throw new QueryParserException();
 		}
 	}
 
@@ -381,7 +391,8 @@ public class SearchRunner {
 
 				// handling of phrase queries
 				if (str.contains(CommonConstants.DOUBLE_QUOTES)) {
-					str = queryStrArr[i] + CommonConstants.WHITESPACE+queryStrArr[i + 1];
+					str = queryStrArr[i] + CommonConstants.WHITESPACE
+							+ queryStrArr[i + 1];
 					queryStrArr[i + 1] = "";
 				}
 
@@ -490,7 +501,7 @@ public class SearchRunner {
 			List<Posting> secondPostings) {
 
 		List<Posting> outputPostings = new ArrayList<Posting>();
-		if(null!=firstPostings && null!=secondPostings){
+		if (null != firstPostings && null != secondPostings) {
 			for (Posting posting : firstPostings) {
 				if (secondPostings.contains(posting)) {
 					outputPostings.add(posting);
@@ -516,10 +527,10 @@ public class SearchRunner {
 			List<Posting> secondPostings) {
 
 		List<Posting> outputPostings = new ArrayList<Posting>();
-		if(null!=firstPostings){
-		   outputPostings.addAll(firstPostings);
+		if (null != firstPostings) {
+			outputPostings.addAll(firstPostings);
 		}
-		if(secondPostings!=null){
+		if (secondPostings != null) {
 			for (Posting posting : secondPostings) {
 				if (!outputPostings.contains(posting)) {
 					outputPostings.add(posting);
@@ -730,8 +741,10 @@ public class SearchRunner {
 			// converted to IndexType TERM
 			IndexType indexType = CommonUtil.getTermIndexType(termType);
 
-			Map<String, Integer> dictionaryForIndexType = getDictionaryForIndexType(indexType); // Term dictionary
-			Map<Integer, PostingWrapper> indexMap = getInvIndexForIndexType(indexType); // Term Index
+			Map<String, Integer> dictionaryForIndexType = getDictionaryForIndexType(indexType); // Term
+																								// dictionary
+			Map<Integer, PostingWrapper> indexMap = getInvIndexForIndexType(indexType); // Term
+																						// Index
 
 			// get the postings list
 			PostingWrapper postingWrapper = getPostings(indexDir, analyzedTerm,
@@ -743,8 +756,8 @@ public class SearchRunner {
 				// get the postings list from the index
 				postingWrapper = (PostingWrapper) indexMap.get(termId);
 				List<Posting> termPostings = postingWrapper.getPostings();
-                int docFrequency = termPostings.size();
-				
+				int docFrequency = termPostings.size();
+
 				// Should have avoided O(n2). But doing this in the interest of
 				// time.
 				for (Posting mergedPosting : mergedPostings) {
@@ -755,7 +768,8 @@ public class SearchRunner {
 							double tf = 1 + Math.log10(termfrequency);
 							// compute the idf
 							int N = docDictionary.size();
-							//int docFrequency = postingWrapper.getTotalFrequency();
+							// int docFrequency =
+							// postingWrapper.getTotalFrequency();
 							double idf = Math.log10(N / docFrequency);
 							// compute the tf-idf score
 							double tf_idf = tf * idf;
@@ -771,29 +785,27 @@ public class SearchRunner {
 				}
 			}
 		}
-		
-		
+
 		// apply the formatting of score and normalization
 
 		for (Posting posting : mergedPostings) {
-			DocMetaData docMetaData = docDictionary.get(posting
-					.getDocId());
+			DocMetaData docMetaData = docDictionary.get(posting.getDocId());
 			if (posting.getScore() == null) {
 				posting.setScore(0.0);
 			}
 			double score = posting.getScore();
-			//System.out.println("Before normalizing Score is "+score);
+			// System.out.println("Before normalizing Score is "+score);
 			score = (score * 100) / docMetaData.getLength();
-			//System.out.println("After normalizing Score is "+score);
+			// System.out.println("After normalizing Score is "+score);
 			// format the score
 			score = Double.parseDouble(decimalFormat.format(score));
-			if(score>1){
+			if (score > 1) {
 				score = 1;
 			}
 			posting.setScore(score);
 			// docDictionary.get(posting.getDocId());
 		}
-		//System.out.println("\nScore calculated");
+		// System.out.println("\nScore calculated");
 	}
 
 	/**
@@ -851,25 +863,28 @@ public class SearchRunner {
 							int tf = termPosting.getFrequency();
 							// compute the idf
 							int N = docDictionary.size();
-							/*int docFrequency = postingWrapper
-									.getTotalFrequency();*/
+							/*
+							 * int docFrequency = postingWrapper
+							 * .getTotalFrequency();
+							 */
 							double idf = Math.log10(N / docFrequency);
 							long ld = docDictionary.get(
 									mergedPosting.getDocId()).getLength();
 							// compute the variant
 							double var = (k1 + 1) / tf
 									/ (k1 * ((1 - b) + b * (ld / lavg)) + tf);
-							
+
 							// TODO - change the below line
 							if (null == mergedPosting.getScore()) {
 								mergedPosting.setScore(0.0);
 							}
 							double score = mergedPosting.getScore()
 									+ (idf * var);
-							//compute the variant for long queries i.e queries with terms >=7
-							if(termSet.size()>=7){
-								double varQuery = ((k3+1)*tf)/(k3+tf);
-								score=score*varQuery;
+							// compute the variant for long queries i.e queries
+							// with terms >=7
+							if (termSet.size() >= 7) {
+								double varQuery = ((k3 + 1) * tf) / (k3 + tf);
+								score = score * varQuery;
 							}
 							mergedPosting.setScore(score);
 							break;
@@ -889,7 +904,7 @@ public class SearchRunner {
 			score = score / 10;
 			// format the score
 			score = Double.parseDouble(decimalFormat.format(score));
-			if(score>1){
+			if (score > 1) {
 				score = 1;
 			}
 			posting.setScore(score);
@@ -924,7 +939,8 @@ public class SearchRunner {
 	List<Posting> findPostingsPhraseQueries(String str) {
 		List<Posting> finalPostings = new ArrayList<Posting>();
 		try {
-			str = str.replaceAll(CommonConstants.DOUBLE_QUOTES, "");// Term:"Hello World"->Term:Hello World
+			str = str.replaceAll(CommonConstants.DOUBLE_QUOTES, "");// Term:"Hello World"->Term:Hello
+																	// World
 			String[] strArr = str.split(CommonConstants.WHITESPACE);
 			String secondTermRaw = strArr[1];// World
 			String[] strArr2 = strArr[0].split(CommonConstants.COLON);
@@ -932,8 +948,9 @@ public class SearchRunner {
 			String indexRaw = strArr2[0];// Term
 
 			// For Hello
-			termSet.add(indexRaw+CommonConstants.COLON+secondTermRaw);
-			String analyzedTerm = getAnalyzedTerm(indexRaw+CommonConstants.COLON+firstTermRaw);
+			termSet.add(indexRaw + CommonConstants.COLON + secondTermRaw);
+			String analyzedTerm = getAnalyzedTerm(indexRaw
+					+ CommonConstants.COLON + firstTermRaw);
 			PostingWrapper postingWrapper = getPostings(indexDir, analyzedTerm,
 					indexRaw);
 			if (postingWrapper == null) {
@@ -943,81 +960,88 @@ public class SearchRunner {
 			firstPostings = postingWrapper.getPostings();
 
 			// For World
-			termSet.add(indexRaw+CommonConstants.COLON+secondTermRaw);
-			analyzedTerm = getAnalyzedTerm(indexRaw+CommonConstants.COLON+secondTermRaw);
+			termSet.add(indexRaw + CommonConstants.COLON + secondTermRaw);
+			analyzedTerm = getAnalyzedTerm(indexRaw + CommonConstants.COLON
+					+ secondTermRaw);
 			postingWrapper = getPostings(indexDir, analyzedTerm, indexRaw);
 			List<Posting> secondPostings = new ArrayList<Posting>();
 			secondPostings = postingWrapper.getPostings();
-			
-			//merge the postings of hello and world based on their positions
+
+			// merge the postings of hello and world based on their positions
 			if (firstPostings != null && secondPostings != null
 					&& firstPostings.size() > 0 && secondPostings.size() > 0) {
-				finalPostings = mergePostingsPhraseQueries(firstPostings,secondPostings);
+				finalPostings = mergePostingsPhraseQueries(firstPostings,
+						secondPostings);
 			}
 		} catch (StackOverflowError e) {
 			System.out.println("\nException in parsing phrase query ");
 		}
 		return finalPostings;
 	}
-	
-   /**
-    * Method to merge the two postings list based on operators 
-    * @param firstPostings - List of first postings
-    * @param secondPostings - List of second postings
-    * @param operator - AND
-    * @return
-    */
-	private List<Posting> mergePostingsPhraseQueries(List<Posting> firstPostings,List<Posting> secondPostings) {
-		
+
+	/**
+	 * Method to merge the two postings list based on operators
+	 * 
+	 * @param firstPostings
+	 *            - List of first postings
+	 * @param secondPostings
+	 *            - List of second postings
+	 * @param operator
+	 *            - AND
+	 * @return
+	 */
+	private List<Posting> mergePostingsPhraseQueries(
+			List<Posting> firstPostings, List<Posting> secondPostings) {
+
 		List<Posting> outputPostings = new LinkedList<Posting>();
-		//declare the variables to be used for merging
+		// declare the variables to be used for merging
 		Posting firstPosting;
 		Posting secondPosting;
 		Integer firstDocId;
 		Integer secondDocId;
-		//define the iterators over the two lists
-		Iterator<Posting> firstIterator=firstPostings.iterator();
-		Iterator<Posting> secondIterator=secondPostings.iterator();
+		// define the iterators over the two lists
+		Iterator<Posting> firstIterator = firstPostings.iterator();
+		Iterator<Posting> secondIterator = secondPostings.iterator();
 		firstPosting = firstIterator.next();
 		secondPosting = secondIterator.next();
-		//merge the postings
-		while(firstPosting!=null && secondPosting!=null){
+		// merge the postings
+		while (firstPosting != null && secondPosting != null) {
 			firstDocId = firstPosting.getDocId();
 			secondDocId = secondPosting.getDocId();
-			//if the docIds are equal ADD
-			if(firstDocId.equals(secondDocId)){
-				
+			// if the docIds are equal ADD
+			if (firstDocId.equals(secondDocId)) {
+
 				List<Integer> firstPositions = firstPosting.getPositions();
 				List<Integer> secondPositions = secondPosting.getPositions();
-				//add the doc in the outputlist if the postion of the second term 
-				//is greater than 1 than the first term in the doc
-				for(Integer position:secondPositions){
-					if(firstPositions.contains(position-1)){
+				// add the doc in the outputlist if the postion of the second
+				// term
+				// is greater than 1 than the first term in the doc
+				for (Integer position : secondPositions) {
+					if (firstPositions.contains(position - 1)) {
 						outputPostings.add(firstPosting);
 						break;
 					}
 				}
-				if(firstIterator.hasNext()){
-					firstPosting=firstIterator.next();
-				}else{
-					firstPosting=null;
+				if (firstIterator.hasNext()) {
+					firstPosting = firstIterator.next();
+				} else {
+					firstPosting = null;
 				}
-				if(secondIterator.hasNext()){
-					secondPosting=secondIterator.next();
-				}
-				else{
-					secondPosting=null;
+				if (secondIterator.hasNext()) {
+					secondPosting = secondIterator.next();
+				} else {
+					secondPosting = null;
 				}
 			}
-			//if the first docId is greater than the second
-			else if(firstDocId<secondDocId){
-					firstPosting=firstIterator.next();
+			// if the first docId is greater than the second
+			else if (firstDocId < secondDocId) {
+				firstPosting = firstIterator.next();
 			}
-			//if the second docId is greater than the first
-			else if(firstDocId>secondDocId){
-					secondPosting=secondIterator.next();
+			// if the second docId is greater than the first
+			else if (firstDocId > secondDocId) {
+				secondPosting = secondIterator.next();
 			}
 		}
 		return outputPostings;
-  }
+	}
 }

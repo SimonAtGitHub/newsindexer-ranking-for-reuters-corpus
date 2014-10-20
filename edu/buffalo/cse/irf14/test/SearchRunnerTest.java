@@ -1,6 +1,4 @@
 package edu.buffalo.cse.irf14.test;
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
