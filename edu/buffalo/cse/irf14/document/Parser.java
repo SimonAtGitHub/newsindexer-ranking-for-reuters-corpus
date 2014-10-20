@@ -197,7 +197,7 @@ public class Parser {
 			String[] split = authorDetails.split(",");
 			// For Author Name BY/By/by may or may not exist.
 			// Regex to match 0 or more occurrences of BY/By/by
-			String regExBy = "[Bb][Yy]*";
+			String regExBy = "By|by|BY";
 			String unfilteredAuthorName = split[0];
 			String[] authorNameSplit = unfilteredAuthorName.split(regExBy);
 			// To avoid ArrayIndexOutofBoundException, access the arrays using
