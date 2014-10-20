@@ -49,7 +49,7 @@ public class SearchRunnerTest {
    		try {
    			searchRunner = new SearchRunner(INDEX_DIR, CORPUS_DIR, MODE, new PrintStream(OUTPUT_FILE));
    			//searchRunner.query("\"Term:juhi har\"", ScoringModel.OKAPI);
-   			searchRunner.query("blah blah blah", ScoringModel.OKAPI);
+   			searchRunner.query("author:miller OR miller", ScoringModel.TFIDF);
    	        System.out.println("\nPostings retrieved");
    		} catch (FileNotFoundException e) {
    			// TODO Auto-generated catch block

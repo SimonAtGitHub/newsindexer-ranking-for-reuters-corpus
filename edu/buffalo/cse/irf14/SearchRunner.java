@@ -173,7 +173,11 @@ public class SearchRunner {
 				Collections.sort(postings, new PostingScoreComparator());
 			}
 			Map<String, Integer> fileNameMap = new HashMap<String, Integer>();
+			int counter = 1;
 			for (Posting posting : postings) {
+				if(counter>10){
+					break;
+				}
 				// handle duplicate files
 				String fileName = docDictionary.get(posting.getDocId())
 						.getFileName();
@@ -189,6 +193,7 @@ public class SearchRunner {
 								.getResultSnippet() + "...");
 				stream.println("Result Relevancy: " + posting.getScore());
 				rank++;
+				counter++;
 				stream.println("===============================================================");
 			}
 		} catch (Exception e) {
@@ -290,9 +295,9 @@ public class SearchRunner {
 				int counter = 1;
 				for (Posting posting : resultPostings) {
 					// print only the first 10 ordered results
-					/*
-					 * if (counter > 10) { break; }
-					 */
+					if (counter > 10) { 
+						break; 
+					}
 					DocMetaData docMetaData = docDictionary.get(posting
 							.getDocId());
 					String fileId = docMetaData.getFileName();
@@ -303,8 +308,8 @@ public class SearchRunner {
 					}
 					Double score = posting.getScore();
 					stream.print(fileId + CommonConstants.HASH + score);
-					// if (counter < resultPostings.size() && counter < 10) {
-					if (counter < resultPostings.size()) {
+					if (counter < resultPostings.size() && counter < 10) {
+					//if (counter < resultPostings.size()) {
 						stream.print(CommonConstants.COMMA);
 					}
 					counter++;
