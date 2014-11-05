@@ -75,7 +75,7 @@ public class SearchRunnerTest {
 					new PrintStream(OUTPUT_FILE));
 			// searchRunner.query("\"Term:juhi har\"", ScoringModel.OKAPI);
 			searchRunner.query("animesh", ScoringModel.TFIDF);
-			searchRunner.query("tytytytytytytyttyytytytyytytty",
+			searchRunner.query("tytytytytytytyttyytytytyytytty OR computer",
 					ScoringModel.TFIDF);
 			System.out.println("\nPostings retrieved");
 		} catch (FileNotFoundException e) {
