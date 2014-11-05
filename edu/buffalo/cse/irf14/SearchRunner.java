@@ -247,7 +247,7 @@ public class SearchRunner {
 					return;
 				}
 			}
-			while ((line = reader.readLine()) != null) {
+			while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
 				String queryId;
 				String query = "";
 				strArr = line.split(CommonConstants.COLON);
@@ -319,14 +319,20 @@ public class SearchRunner {
 							continue;
 						} else {
 							fileIdMap.put(fileId, posting.getDocId());
+
+							Double score = posting.getScore();
+							// stream.print(fileId + CommonConstants.HASH +
+							// score);
+							// if (counter < resultPostings.size() && counter <
+							// 10) {
+							// stream.print(CommonConstants.COMMA);
+							// }
+							if (counter > 1) {
+								stream.print(CommonConstants.COMMA);
+							}
+							stream.print(fileId + CommonConstants.HASH + score);
+							counter++;
 						}
-						Double score = posting.getScore();
-						stream.print(fileId + CommonConstants.HASH + score);
-						if (counter < resultPostings.size() && counter < 10) {
-							// if (counter < resultPostings.size()) {
-							stream.print(CommonConstants.COMMA);
-						}
-						counter++;
 					}
 				}
 				stream.println(CommonConstants.SECOND_BRACKET_CLOSE);
@@ -576,9 +582,11 @@ public class SearchRunner {
 			List<Posting> secondPostings) {
 
 		List<Posting> outputPostings = new ArrayList<Posting>();
-		for (Posting posting : firstPostings) {
-			if (!secondPostings.contains(posting)) {
-				outputPostings.add(posting);
+		if (null != firstPostings && null != secondPostings) {
+			for (Posting posting : firstPostings) {
+				if (!secondPostings.contains(posting)) {
+					outputPostings.add(posting);
+				}
 			}
 		}
 		Collections.sort(outputPostings, new DocumentIdComparator());
