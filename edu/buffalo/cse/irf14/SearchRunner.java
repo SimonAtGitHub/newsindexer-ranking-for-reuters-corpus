@@ -149,6 +149,8 @@ public class SearchRunner {
 			parsedQuery = query.getQuery();
 		} catch (QueryParserException e) {
 			throw new QueryParserException();
+		} catch (Exception e) {
+			// Eat the exception and proceed
 		}
 		try {
 
