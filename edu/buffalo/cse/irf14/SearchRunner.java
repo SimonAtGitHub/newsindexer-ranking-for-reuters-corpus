@@ -582,7 +582,12 @@ public class SearchRunner {
 			List<Posting> secondPostings) {
 
 		List<Posting> outputPostings = new ArrayList<Posting>();
-		if (null != firstPostings && null != secondPostings) {
+		if (secondPostings == null) {
+			outputPostings.addAll(firstPostings);
+			Collections.sort(outputPostings, new DocumentIdComparator());
+			return outputPostings;
+		}
+		if (null != firstPostings) {
 			for (Posting posting : firstPostings) {
 				if (!secondPostings.contains(posting)) {
 					outputPostings.add(posting);
